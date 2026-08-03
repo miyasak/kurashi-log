@@ -1,8 +1,9 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { CATEGORIES, CATEGORY_MAP, GROUPS, SITE } from '../lib/config'
-import { PostCard, SectionHeading, EmptyState } from './components'
-import { formatDate, stripMd, yen } from '../lib/utils'
+import { CATEGORIES, CATEGORY_MAP } from '../lib/config'
+import { PostCard, SectionTitle, EmptyState, SpecRow } from './components'
+import { ArrowLink } from './layout'
+import { formatDate, yen } from '../lib/utils'
 
 type Props = {
   latest: Post[]
@@ -18,305 +19,358 @@ export const HomePage: FC<Props> = ({ latest, byCategory, counts, stats, totalDi
   const prev = stats.length > 1 ? stats[stats.length - 2] : null
   const diff = last && prev && last.total_assets && prev.total_assets ? last.total_assets - prev.total_assets : null
   const totalPosts = Object.values(counts).reduce((a, b) => a + b, 0)
+  const heroPost = (byCategory.touring || []).find((p) => p.cover_image)
 
   return (
     <>
-      {/* ===== HERO ===== */}
-      <section class="relative overflow-hidden border-b border-slate-200 bg-white">
-        <div class="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-emerald-200/40 blur-3xl"></div>
-        <div class="pointer-events-none absolute right-0 top-10 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl"></div>
-        <div class="pointer-events-none absolute -bottom-24 left-1/3 h-72 w-72 rounded-full bg-rose-200/30 blur-3xl"></div>
-        <div class="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-          <p class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold tracking-widest text-ink-soft backdrop-blur">
-            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500"></span>
-            PERSONAL ARCHIVE
-          </p>
-          <h1 class="mt-5 max-w-3xl text-[32px] font-black leading-[1.15] tracking-tight sm:text-5xl">
+      {/* ==================== HERO ==================== */}
+      <section class="relative overflow-hidden bg-white">
+        <div class="mx-auto max-w-page px-5 pb-16 pt-16 text-center sm:px-6 sm:pb-24 sm:pt-24">
+          <p class="hero-line text-[13px] font-semibold uppercase tracking-[0.16em] text-mute">Personal Archive</p>
+          <h1 class="hero-line mx-auto mt-5 max-w-[880px] text-[40px] font-semibold leading-[1.06] tracking-[-0.03em] sm:text-[72px]">
             お金と暮らしと、
-            <br class="hidden sm:block" />
-            <span class="bg-gradient-to-r from-sky-500 via-emerald-500 to-rose-500 bg-clip-text text-transparent">
-              走った距離
-            </span>
-            の記録。
+            <br />
+            走った距離を記録する。
           </h1>
-          <p class="mt-5 max-w-xl text-[13px] leading-relaxed text-ink-soft sm:text-[15px]">{SITE.description}</p>
-
-          <div class="mt-8 flex flex-wrap gap-2.5">
-            {GROUPS.map((g) => {
-              const first = CATEGORIES.find((c) => c.group === g.key)!
-              return (
-                <a
-                  href={`/category/${first.key}`}
-                  class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-[13px] font-bold text-white transition hover:bg-slate-700"
-                >
-                  <i class={`fa-solid ${g.icon} text-xs`}></i>
-                  {g.label}
-                </a>
-              )
-            })}
-          </div>
-
-          <dl class="mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label="記事数" value={`${totalPosts}`} unit="本" icon="fa-file-lines" />
-            <Stat
-              label="総資産"
-              value={last?.total_assets ? Math.round(last.total_assets / 10000).toLocaleString() : '—'}
-              unit="万円"
-              icon="fa-sack-dollar"
-              sub={diff ? `${diff > 0 ? '+' : ''}${Math.round(diff / 10000)}万` : undefined}
-            />
-            <Stat label="走行距離" value={totalDistance ? totalDistance.toLocaleString() : '—'} unit="km" icon="fa-route" />
-            <Stat label="スーパー" value={`${superCount}`} unit="店" icon="fa-basket-shopping" />
-          </dl>
-        </div>
-      </section>
-
-      {/* ===== カテゴリ動線 ===== */}
-      <section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <SectionHeading
-          eyebrow="EXPLORE"
-          title="5つのテーマ"
-          desc="興味のあるテーマから読み進められます。それぞれ記録の切り口が違います。"
-        />
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {CATEGORIES.map((c) => (
-            <a
-              href={`/category/${c.key}`}
-              class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg"
-            >
-              <div
-                class="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-60 transition group-hover:scale-125"
-                style={`background:${c.accentSoft}`}
-              ></div>
-              <div class="relative">
-                <span
-                  class="grid h-11 w-11 place-items-center rounded-xl"
-                  style={`background:${c.accentSoft};color:${c.accent}`}
-                >
-                  <i class={`fa-solid ${c.icon} text-lg`}></i>
-                </span>
-                <p class="mt-4 text-[10px] font-black tracking-[0.2em]" style={`color:${c.accent}`}>
-                  {c.short}
-                </p>
-                <h3 class="mt-1 text-lg font-extrabold tracking-tight">{c.name}</h3>
-                <p class="mt-2 text-[12.5px] leading-relaxed text-ink-soft">{c.description}</p>
-                <p class="mt-4 flex items-center gap-2 text-[11px] font-bold text-ink-mute">
-                  <span>{counts[c.key] || 0} 記事</span>
-                  <i class="fa-solid fa-arrow-right transition group-hover:translate-x-1"></i>
-                </p>
-              </div>
-            </a>
-          ))}
-          <a
-            href="/map"
-            class="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-slate-900 p-5 text-white shadow-soft transition hover:-translate-y-0.5"
-          >
-            <div>
-              <span class="grid h-11 w-11 place-items-center rounded-xl bg-white/10">
-                <i class="fa-solid fa-map-location-dot text-lg"></i>
-              </span>
-              <p class="mt-4 text-[10px] font-black tracking-[0.2em] text-white/60">MAP</p>
-              <h3 class="mt-1 text-lg font-extrabold tracking-tight">走行 & スーパーマップ</h3>
-              <p class="mt-2 text-[12.5px] leading-relaxed text-white/70">
-                ツーリング先とご当地スーパーを地図上でまとめてチェック。
-              </p>
-            </div>
-            <p class="mt-4 flex items-center gap-2 text-[11px] font-bold text-white/60">
-              地図を開く<i class="fa-solid fa-arrow-right transition group-hover:translate-x-1"></i>
-            </p>
-          </a>
-        </div>
-      </section>
-
-      {/* ===== MONEY ゾーン ===== */}
-      <section class="border-y border-slate-200 bg-white">
-        <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-          <SectionHeading
-            eyebrow="MONEY"
-            title="資産と暮らしの数字"
-            desc="NISA・iDeCoの積み上げと、実際の生活費をあわせて記録しています。"
-            color="#10b981"
-          />
-          <div class="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-            <div class="rounded-2xl border border-slate-200 p-5">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <h3 class="text-sm font-extrabold">資産推移 / 生活費</h3>
-                {last ? <span class="text-[11px] font-semibold text-ink-mute">最新 {last.ym}</span> : null}
-              </div>
-              {stats.length ? (
-                <>
-                  <div class="mt-4 h-56">
-                    <canvas id="home-asset-chart"></canvas>
-                  </div>
-                  <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-                    <MiniStat label="総資産" value={yen(last?.total_assets)} color="#10b981" />
-                    <MiniStat label="NISA" value={yen(last?.nisa_value)} color="#0ea5e9" />
-                    <MiniStat label="iDeCo" value={yen(last?.ideco_value)} color="#8b5cf6" />
-                  </div>
-                </>
-              ) : (
-                <p class="mt-6 rounded-xl border border-dashed border-slate-300 p-8 text-center text-xs text-ink-mute">
-                  管理画面の「月次データ」から資産・生活費を登録するとグラフが表示されます。
-                </p>
-              )}
-            </div>
-            <div class="space-y-3">
-              {[...(byCategory.asset || []).slice(0, 2), ...(byCategory.life || []).slice(0, 2)].length ? (
-                [...(byCategory.asset || []).slice(0, 2), ...(byCategory.life || []).slice(0, 2)].map((p) => (
-                  <PostCard post={p} />
-                ))
-              ) : (
-                <EmptyState text="資産運用・生活の記事はまだありません" />
-              )}
-            </div>
+          <p class="hero-line mx-auto mt-6 max-w-[600px] text-[17px] leading-[1.5] tracking-[-0.01em] text-sub sm:text-[21px]">
+            資産運用、生活費、ツーリング、ご当地スーパー、そして仕事のIT。
+            <br class="hidden sm:block" />
+            5つのテーマを、数字と写真で残していきます。
+          </p>
+          <div class="hero-line mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            <ArrowLink href="/category/asset">資産の記録を見る</ArrowLink>
+            <ArrowLink href="/category/touring">ツーリングログを見る</ArrowLink>
           </div>
         </div>
-      </section>
 
-      {/* ===== TRAVEL ゾーン ===== */}
-      <section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <SectionHeading
-          eyebrow="TRAVEL"
-          title="ツーリングログ"
-          desc="走った道、見た景色、立ち寄ったスポット。"
-          color="#0ea5e9"
-          href="/category/touring"
-        />
-        {(byCategory.touring || []).length ? (
-          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {(byCategory.touring || []).slice(0, 3).map((p) => (
-              <PostCard post={p} showCategory={false} />
-            ))}
-          </div>
-        ) : (
-          <EmptyState text="ツーリング記録はまだありません" />
-        )}
-
-        <div class="mt-14">
-          <SectionHeading
-            eyebrow="LOCAL SUPER"
-            title="ご当地スーパー紹介"
-            desc="旅先のスーパーは一番おもしろい観光地。品揃えとコスパをレビュー。"
-            color="#f43f5e"
-            href="/category/supermarket"
-          />
-          {(byCategory.supermarket || []).length ? (
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {(byCategory.supermarket || []).slice(0, 3).map((p) => (
-                <PostCard post={p} showCategory={false} />
-              ))}
-            </div>
-          ) : (
-            <EmptyState text="スーパーのレビューはまだありません" />
-          )}
-        </div>
-      </section>
-
-      {/* ===== TECH ゾーン ===== */}
-      <section class="border-t border-slate-200 bg-slate-900">
-        <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-          <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p class="text-[11px] font-extrabold tracking-[0.18em] text-violet-400">TECH</p>
-              <h2 class="mt-1 text-xl font-extrabold tracking-tight text-white sm:text-2xl">社内SE / 生成AI</h2>
-              <p class="mt-1.5 max-w-2xl text-[13px] leading-relaxed text-white/60">
-                情シスの現場で試したこと、生成AIの実践的な使い方。
-              </p>
-            </div>
-            <a
-              href="/category/it"
-              class="inline-flex items-center gap-1.5 rounded-xl border border-white/20 px-3.5 py-2 text-xs font-bold text-white/80 transition hover:bg-white/10"
-            >
-              もっと見る<i class="fa-solid fa-arrow-right text-[10px]"></i>
-            </a>
-          </div>
-          {(byCategory.it || []).length ? (
-            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {(byCategory.it || []).slice(0, 3).map((p) => (
-                <a
-                  href={`/posts/${p.slug}`}
-                  class="group rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-white/25 hover:bg-white/10"
-                >
-                  <p class="text-[11px] font-semibold text-white/40">{formatDate(p.published_at)}</p>
-                  <h3 class="mt-2 line-clamp-2 text-[15px] font-bold leading-snug text-white">{p.title}</h3>
-                  <p class="mt-2 line-clamp-3 text-xs leading-relaxed text-white/55">
-                    {p.summary || stripMd(p.body, 130)}
+        {/* ヒーロー画像（最新ツーリングのカバー） */}
+        {heroPost ? (
+          <div class="hero-media mx-auto max-w-[1180px] px-5 sm:px-6">
+            <a href={`/posts/${heroPost.slug}`} class="group block overflow-hidden rounded-big bg-hazy">
+              <div class="relative aspect-[16/10] sm:aspect-[21/9]">
+                <img
+                  src={heroPost.cover_image!}
+                  alt={heroPost.title}
+                  class="h-full w-full object-cover transition duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div class="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+                  <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">Latest Ride</p>
+                  <p class="mt-2 max-w-xl text-[22px] font-semibold leading-tight tracking-[-0.01em] text-white sm:text-[32px]">
+                    {heroPost.title}
                   </p>
-                  <div class="mt-4 flex flex-wrap gap-1.5">
-                    {(p.tags || []).slice(0, 3).map((t) => (
-                      <span class="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white/70">#{t}</span>
-                    ))}
-                  </div>
-                </a>
-              ))}
-            </div>
-          ) : (
-            <div class="rounded-2xl border border-dashed border-white/20 px-6 py-12 text-center text-sm text-white/50">
-              IT記事はまだありません
-            </div>
-          )}
+                  <p class="mt-3 text-[13px] text-white/70">
+                    {heroPost.prefecture ? heroPost.prefecture + ' ・ ' : ''}
+                    {heroPost.distance_km ? heroPost.distance_km + ' km ・ ' : ''}
+                    {formatDate(heroPost.published_at)}
+                  </p>
+                </div>
+              </div>
+            </a>
+          </div>
+        ) : null}
+
+        {/* 数値スペック */}
+        <div class="mx-auto mt-16 max-w-page px-5 pb-16 sm:mt-24 sm:px-6 sm:pb-24">
+          <div class="reveal">
+            <SpecRow
+              items={[
+                {
+                  label: '総資産',
+                  value: last?.total_assets ? `¥${(last.total_assets / 10000).toLocaleString()}万` : '—',
+                  sub: diff ? `前月比 ${diff > 0 ? '+' : ''}${Math.round(diff / 10000)}万円` : undefined
+                },
+                { label: '総走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '—' },
+                { label: '訪問したスーパー', value: `${superCount} 店` },
+                { label: '公開記事', value: `${totalPosts} 本` }
+              ]}
+            />
+          </div>
         </div>
       </section>
 
-      {/* ===== 最新記事 ===== */}
-      <section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <SectionHeading eyebrow="LATEST" title="新着記事" desc="カテゴリ横断の最新更新。" href="/search" />
-        {latest.length ? (
-          <div class="grid gap-3 md:grid-cols-2">
-            {latest.slice(0, 6).map((p) => (
+      {/* ==================== テーマ一覧 ==================== */}
+      <section class="bg-hazy py-16 sm:py-24">
+        <div class="mx-auto max-w-page px-5 sm:px-6">
+          <div class="reveal">
+            <SectionTitle
+              eyebrow="Explore"
+              title="5つのテーマ。"
+              desc="それぞれ違う切り口で記録しています。気になるテーマから読み進めてください。"
+            />
+          </div>
+          <div class="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+            {CATEGORIES.map((c, i) => (
               <a
-                href={`/posts/${p.slug}`}
-                class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-slate-300 hover:shadow-soft"
+                href={`/category/${c.key}`}
+                class={`reveal group flex flex-col justify-between overflow-hidden rounded-big bg-white p-8 transition duration-500 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.18)] ${
+                  i === 0 ? 'sm:col-span-2 lg:col-span-1' : ''
+                }`}
+                style={`transition-delay:${i * 60}ms`}
               >
-                <span
-                  class="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
-                  style={`background:${CATEGORY_MAP[p.category]?.accentSoft};color:${CATEGORY_MAP[p.category]?.accent}`}
-                >
-                  <i class={`fa-solid ${CATEGORY_MAP[p.category]?.icon} text-sm`}></i>
-                </span>
-                <span class="min-w-0 flex-1">
-                  <span class="block truncate text-[14px] font-bold group-hover:opacity-70">{p.title}</span>
-                  <span class="mt-0.5 block text-[11px] text-ink-mute">
-                    {CATEGORY_MAP[p.category]?.name} ・ {formatDate(p.published_at)}
+                <div>
+                  <span
+                    class="grid h-12 w-12 place-items-center rounded-2xl"
+                    style={`background:${c.accentSoft};color:${c.accent}`}
+                  >
+                    <i class={`fa-solid ${c.icon} text-[18px]`}></i>
                   </span>
-                </span>
-                <i class="fa-solid fa-chevron-right text-[10px] text-ink-mute"></i>
+                  <p class="mt-6 text-[11px] font-semibold uppercase tracking-[0.16em]" style={`color:${c.accent}`}>
+                    {c.short}
+                  </p>
+                  <h3 class="mt-2 text-[24px] font-semibold leading-tight tracking-[-0.02em]">{c.name}</h3>
+                  <p class="mt-3 text-[14px] leading-relaxed text-sub">{c.description}</p>
+                </div>
+                <p class="mt-8 flex items-center gap-1.5 text-[13px] text-blue">
+                  {counts[c.key] || 0} 記事を見る
+                  <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
+                </p>
               </a>
             ))}
+            <a
+              href="/map"
+              class="reveal group relative flex flex-col justify-between overflow-hidden rounded-big bg-ink p-8 text-white transition duration-500 hover:-translate-y-1"
+              style="transition-delay:300ms"
+            >
+              <div>
+                <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white/10">
+                  <i class="fa-solid fa-map-location-dot text-[18px]"></i>
+                </span>
+                <p class="mt-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/50">Map</p>
+                <h3 class="mt-2 text-[24px] font-semibold leading-tight tracking-[-0.02em]">走行 & スーパーマップ</h3>
+                <p class="mt-3 text-[14px] leading-relaxed text-white/60">
+                  訪れた場所とスーパーを、1枚の地図で。ピンから記事へ移動できます。
+                </p>
+              </div>
+              <p class="mt-8 flex items-center gap-1.5 text-[13px] text-white/80">
+                地図を開く
+                <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
+              </p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== MONEY ==================== */}
+      <section class="bg-white py-16 sm:py-28">
+        <div class="mx-auto max-w-page px-5 sm:px-6">
+          <div class="reveal">
+            <SectionTitle
+              eyebrow="Money"
+              title="増えたか、減ったか。"
+              desc="総資産・NISA・iDeCo・生活費。感覚ではなく数字で振り返ります。"
+              accent="#10b981"
+            />
+          </div>
+
+          {stats.length ? (
+            <div class="reveal mt-12 overflow-hidden rounded-big bg-hazy p-6 sm:mt-16 sm:p-12">
+              <div class="flex flex-wrap items-end justify-between gap-6">
+                <div>
+                  <p class="text-[12px] text-mute">{last?.ym} 時点の総資産</p>
+                  <p class="mt-2 text-[40px] font-semibold leading-none tracking-[-0.03em] sm:text-[56px]">
+                    {yen(last?.total_assets)}
+                  </p>
+                  {diff ? (
+                    <p class="mt-3 text-[14px] font-medium" style={`color:${diff > 0 ? '#10b981' : '#ff3b30'}`}>
+                      前月比 {diff > 0 ? '+' : ''}
+                      {yen(Math.abs(diff)).replace('¥', diff > 0 ? '¥' : '-¥')}
+                    </p>
+                  ) : null}
+                </div>
+                <div class="grid grid-cols-3 gap-8">
+                  {[
+                    { l: 'NISA', v: last?.nisa_value },
+                    { l: 'iDeCo', v: last?.ideco_value },
+                    { l: '生活費', v: last?.living_cost }
+                  ].map((x) => (
+                    <div>
+                      <p class="text-[11px] text-mute">{x.l}</p>
+                      <p class="mt-1.5 text-[17px] font-semibold tracking-tight sm:text-[20px]">{yen(x.v)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div class="mt-10 h-[240px] sm:h-[300px]">
+                <canvas id="home-asset-chart"></canvas>
+              </div>
+            </div>
+          ) : null}
+
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            {[...(byCategory.asset || []).slice(0, 1), ...(byCategory.life || []).slice(0, 1)].map((p) => (
+              <div class="reveal">
+                <PostCard post={p} />
+              </div>
+            ))}
+          </div>
+
+          <div class="reveal mt-10 flex flex-wrap justify-center gap-x-10 gap-y-3">
+            <ArrowLink href="/category/asset">資産運用の記事をすべて見る</ArrowLink>
+            <ArrowLink href="/category/life">生活費の記事をすべて見る</ArrowLink>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== TRAVEL（ツーリング） ==================== */}
+      <section class="bg-ink py-16 sm:py-28">
+        <div class="mx-auto max-w-page px-5 sm:px-6">
+          <div class="reveal">
+            <SectionTitle
+              eyebrow="Touring"
+              title="走った分だけ、記憶が増える。"
+              desc="ルート、距離、天気、そして景色。あとから辿れるように残しています。"
+              light
+            />
+          </div>
+        </div>
+
+        {(byCategory.touring || []).length ? (
+          <div class="reveal mt-12 sm:mt-16">
+            <div class="snap-row flex gap-4 overflow-x-auto px-5 pb-4 sm:px-6">
+              {(byCategory.touring || []).slice(0, 4).map((p) => (
+                <div class="w-[78vw] shrink-0 snap-start sm:w-[340px]">
+                  <PostCard post={p} showCategory={false} />
+                </div>
+              ))}
+              <div class="w-1 shrink-0"></div>
+            </div>
           </div>
         ) : (
-          <EmptyState />
+          <div class="mx-auto mt-12 max-w-page px-5 sm:px-6">
+            <EmptyState text="ツーリング記録はまだありません" light />
+          </div>
         )}
+
+        <div class="reveal mx-auto mt-12 max-w-page px-5 sm:px-6">
+          <div class="border-t border-white/10 pt-10">
+            <SpecRow
+              light
+              items={[
+                { label: '総走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '—' },
+                { label: 'ログ数', value: `${counts.touring || 0} 本` },
+                { label: '訪問スーパー', value: `${superCount} 店` },
+                { label: 'マップ', value: '公開中' }
+              ]}
+            />
+            <div class="mt-10 flex flex-wrap justify-center gap-x-10 gap-y-3">
+              <ArrowLink href="/category/touring" color="#2997ff">
+                ツーリングログを見る
+              </ArrowLink>
+              <ArrowLink href="/map" color="#2997ff">
+                マップで見る
+              </ArrowLink>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== ご当地スーパー ==================== */}
+      <section class="bg-hazy py-16 sm:py-28">
+        <div class="mx-auto max-w-page px-5 sm:px-6">
+          <div class="reveal">
+            <SectionTitle
+              eyebrow="Local Super"
+              title="旅先で、一番おもしろい場所。"
+              desc="ご当地スーパーの品揃えと価格は、その土地の暮らしそのもの。星とコスパで記録します。"
+              accent="#f43f5e"
+            />
+          </div>
+          {(byCategory.supermarket || []).length ? (
+            <div class="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+              {(byCategory.supermarket || []).slice(0, 3).map((p, i) => (
+                <div class="reveal" style={`transition-delay:${i * 70}ms`}>
+                  <PostCard post={p} showCategory={false} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div class="mt-12">
+              <EmptyState text="スーパーのレビューはまだありません" />
+            </div>
+          )}
+          <div class="reveal mt-12 text-center">
+            <ArrowLink href="/category/supermarket">レビューをすべて見る</ArrowLink>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== TECH ==================== */}
+      <section class="bg-ink py-16 sm:py-28">
+        <div class="mx-auto max-w-page px-5 sm:px-6">
+          <div class="reveal">
+            <SectionTitle
+              eyebrow="Tech"
+              title="社内SEの現場と、生成AI。"
+              desc="情シスとして試したこと、効いたこと、効かなかったこと。実務ベースで書いています。"
+              light
+            />
+          </div>
+          {(byCategory.it || []).length ? (
+            <div class="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+              {(byCategory.it || []).slice(0, 3).map((p, i) => (
+                <a
+                  href={`/posts/${p.slug}`}
+                  class="reveal group flex h-full flex-col rounded-big bg-white/[0.06] p-7 transition hover:bg-white/[0.1]"
+                  style={`transition-delay:${i * 70}ms`}
+                >
+                  <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                    {formatDate(p.published_at)}
+                  </p>
+                  <h3 class="mt-4 text-[20px] font-semibold leading-snug tracking-[-0.01em] text-white">{p.title}</h3>
+                  <p class="mt-3 line-clamp-4 text-[14px] leading-relaxed text-white/60">{p.summary}</p>
+                  <p class="mt-auto flex items-center gap-1.5 pt-6 text-[13px]" style="color:#2997ff">
+                    続きを読む
+                    <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
+                  </p>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div class="mt-12">
+              <EmptyState text="IT記事はまだありません" light />
+            </div>
+          )}
+          <div class="reveal mt-12 text-center">
+            <ArrowLink href="/category/it" color="#2997ff">
+              IT / 生成AI の記事を見る
+            </ArrowLink>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== 新着 ==================== */}
+      <section class="bg-white py-16 sm:py-24">
+        <div class="mx-auto max-w-[860px] px-5 sm:px-6">
+          <div class="reveal">
+            <SectionTitle eyebrow="Latest" title="新着の記録。" />
+          </div>
+          <div class="mt-10 sm:mt-14">
+            {latest.length ? (
+              latest.slice(0, 6).map((p) => (
+                <a
+                  href={`/posts/${p.slug}`}
+                  class="reveal group flex items-center gap-5 border-b border-black/[0.08] py-5 transition hover:opacity-70"
+                >
+                  <span class="w-[86px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.12em] text-mute">
+                    {CATEGORY_MAP[p.category]?.short}
+                  </span>
+                  <span class="min-w-0 flex-1">
+                    <span class="block text-[16px] font-medium leading-snug tracking-[-0.01em]">{p.title}</span>
+                    <span class="mt-1 block text-[12px] text-mute">{formatDate(p.published_at)}</span>
+                  </span>
+                  <i class="fa-solid fa-chevron-right text-[11px] text-mute transition group-hover:translate-x-0.5"></i>
+                </a>
+              ))
+            ) : (
+              <EmptyState />
+            )}
+          </div>
+          <div class="reveal mt-10 text-center">
+            <ArrowLink href="/search">すべての記事を探す</ArrowLink>
+          </div>
+        </div>
       </section>
     </>
   )
 }
-
-const Stat: FC<{ label: string; value: string; unit?: string; icon: string; sub?: string }> = ({
-  label,
-  value,
-  unit,
-  icon,
-  sub
-}) => (
-  <div class="rounded-2xl border border-slate-200 bg-white/70 p-3.5 backdrop-blur">
-    <p class="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-ink-mute">
-      <i class={`fa-solid ${icon}`}></i>
-      {label}
-    </p>
-    <p class="mt-1.5 flex items-baseline gap-1">
-      <span class="text-xl font-black tracking-tight">{value}</span>
-      {unit ? <span class="text-[11px] font-bold text-ink-mute">{unit}</span> : null}
-    </p>
-    {sub ? <p class="text-[10px] font-bold text-emerald-600">{sub}</p> : null}
-  </div>
-)
-
-const MiniStat: FC<{ label: string; value: string; color: string }> = ({ label, value, color }) => (
-  <div class="rounded-xl bg-slate-50 p-2.5">
-    <p class="text-[9px] font-bold tracking-wider text-ink-mute">{label}</p>
-    <p class="mt-0.5 text-[13px] font-extrabold" style={`color:${color}`}>
-      {value}
-    </p>
-  </div>
-)

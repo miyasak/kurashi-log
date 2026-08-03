@@ -1,18 +1,19 @@
 import type { FC, PropsWithChildren } from 'hono/jsx'
-import { CATEGORIES, GROUPS, SITE, CATEGORY_MAP } from '../lib/config'
+import { CATEGORIES, SITE, CATEGORY_MAP } from '../lib/config'
 
 type LayoutProps = PropsWithChildren<{
   title?: string
   description?: string
   activeCategory?: string
   ogImage?: string | null
-  bodyClass?: string
   scripts?: string[]
   headExtra?: any
+  /** ナビをダーク（黒背景ページ用）にする */
+  darkNav?: boolean
 }>
 
 export const Layout: FC<LayoutProps> = (props) => {
-  const title = props.title ? `${props.title} | ${SITE.title}` : `${SITE.title} — ${SITE.subtitle}`
+  const title = props.title ? `${props.title} — ${SITE.title}` : `${SITE.title} — ${SITE.subtitle}`
   const desc = props.description || SITE.description
   return (
     <html lang="ja">
@@ -21,13 +22,17 @@ export const Layout: FC<LayoutProps> = (props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         <title>{title}</title>
         <meta name="description" content={desc} />
+        <meta name="theme-color" content="#ffffff" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={desc} />
         <meta property="og:type" content="website" />
         {props.ogImage ? <meta property="og:image" content={props.ogImage} /> : null}
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛵</text></svg>" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap"
+          rel="icon"
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛵</text></svg>"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
         <link
@@ -37,17 +42,20 @@ export const Layout: FC<LayoutProps> = (props) => {
         <script src="https://cdn.tailwindcss.com"></script>
         <script
           dangerouslySetInnerHTML={{
-            __html: `tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','Noto Sans JP','system-ui','sans-serif']},
-            colors:{ink:{DEFAULT:'#0f172a',soft:'#475569',mute:'#94a3b8'}},
-            boxShadow:{soft:'0 2px 8px rgba(15,23,42,.05), 0 12px 32px -12px rgba(15,23,42,.12)'}}}}`
+            __html: `tailwind.config={theme:{extend:{
+              fontFamily:{sans:['-apple-system','BlinkMacSystemFont','SF Pro Display','SF Pro Text','Hiragino Sans','Inter','Noto Sans JP','Helvetica Neue','sans-serif']},
+              colors:{ink:'#1d1d1f',sub:'#6e6e73',mute:'#86868b',line:'#d2d2d7',hazy:'#f5f5f7',blue:'#0071e3'},
+              maxWidth:{page:'1024px',text:'700px'},
+              borderRadius:{apple:'18px',big:'28px'}
+            }}}`
           }}
         ></script>
         <link rel="stylesheet" href="/static/style.css" />
         {props.headExtra ?? null}
       </head>
-      <body class={`bg-slate-50 text-ink antialiased ${props.bodyClass || ''}`}>
+      <body class="bg-white font-sans text-ink antialiased">
         <SiteHeader active={props.activeCategory} />
-        <main class="min-h-[70vh]">{props.children}</main>
+        <main>{props.children}</main>
         <SiteFooter />
         {(props.scripts || []).map((s) => (
           <script src={s}></script>
@@ -57,155 +65,93 @@ export const Layout: FC<LayoutProps> = (props) => {
   )
 }
 
-const SiteHeader: FC<{ active?: string }> = ({ active }) => {
-  return (
-    <header class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/85 backdrop-blur-lg">
-      <div class="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
-        <a href="/" class="group flex shrink-0 items-center gap-2.5">
-          <span class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-slate-900 to-slate-700 text-white shadow-sm">
-            <i class="fa-solid fa-compass text-[15px]"></i>
-          </span>
-          <span class="leading-tight">
-            <span class="block text-[15px] font-extrabold tracking-tight">{SITE.title}</span>
-            <span class="hidden text-[10px] font-medium tracking-widest text-ink-mute sm:block">
-              MONEY / LIFE / RIDE / TECH
-            </span>
-          </span>
+/* ============ ナビゲーション（Apple風の細いグローバルバー） ============ */
+const SiteHeader: FC<{ active?: string }> = ({ active }) => (
+  <>
+    <header
+      id="global-nav"
+      class="fixed inset-x-0 top-0 z-50 h-11 border-b border-black/[0.06] bg-white/80 backdrop-blur-xl backdrop-saturate-150 sm:h-12"
+    >
+      <div class="mx-auto flex h-full max-w-page items-center px-5 sm:px-6">
+        <a href="/" class="flex items-center gap-2 text-ink transition hover:opacity-60" aria-label={SITE.title}>
+          <i class="fa-solid fa-compass text-[15px]"></i>
+          <span class="text-[13px] font-semibold tracking-tight sm:hidden">{SITE.title}</span>
         </a>
 
-        {/* PC: グループ別ナビ */}
-        <nav class="ml-auto hidden items-center gap-1 lg:flex">
-          {GROUPS.map((g) => {
-            const cats = CATEGORIES.filter((c) => c.group === g.key)
-            return (
-              <div class="group relative">
-                <button class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-slate-100 hover:text-ink">
-                  <i class={`fa-solid ${g.icon} text-xs text-ink-mute`}></i>
-                  {g.label}
-                  <i class="fa-solid fa-chevron-down text-[9px] text-ink-mute"></i>
-                </button>
-                <div class="invisible absolute left-0 top-full w-64 translate-y-1 pt-2 opacity-0 transition-all duration-150 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                  <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-soft">
-                    {cats.map((c) => (
-                      <a
-                        href={`/category/${c.key}`}
-                        class={`flex items-start gap-3 rounded-xl px-3 py-2.5 transition hover:bg-slate-50 ${
-                          active === c.key ? 'bg-slate-50' : ''
-                        }`}
-                      >
-                        <span
-                          class="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[13px]"
-                          style={`background:${c.accentSoft};color:${c.accent}`}
-                        >
-                          <i class={`fa-solid ${c.icon}`}></i>
-                        </span>
-                        <span>
-                          <span class="block text-[13px] font-bold">{c.name}</span>
-                          <span class="block text-[11px] text-ink-mute">{c.tagline}</span>
-                        </span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-          <a
-            href="/map"
-            class="ml-1 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-slate-100 hover:text-ink"
-          >
-            <i class="fa-solid fa-map-location-dot text-xs text-ink-mute"></i>マップ
+        <nav class="ml-auto hidden items-center gap-8 lg:flex">
+          {CATEGORIES.map((c) => (
+            <a
+              href={`/category/${c.key}`}
+              class={`text-[12px] tracking-tight transition hover:opacity-60 ${
+                active === c.key ? 'font-medium text-ink' : 'text-ink/85'
+              }`}
+            >
+              {c.name}
+            </a>
+          ))}
+          <a href="/map" class="text-[12px] tracking-tight text-ink/85 transition hover:opacity-60">
+            マップ
           </a>
-          <a
-            href="/about"
-            class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-slate-100 hover:text-ink"
-          >
-            <i class="fa-solid fa-circle-info text-xs text-ink-mute"></i>About
+          <a href="/about" class="text-[12px] tracking-tight text-ink/85 transition hover:opacity-60">
+            About
           </a>
-          <a
-            href="/search"
-            class="ml-1 grid h-9 w-9 place-items-center rounded-xl bg-slate-900 text-white transition hover:bg-slate-700"
-            aria-label="検索"
-          >
-            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          <a href="/search" class="text-ink/85 transition hover:opacity-60" aria-label="検索">
+            <i class="fa-solid fa-magnifying-glass text-[13px]"></i>
           </a>
         </nav>
 
-        {/* Mobile */}
-        <div class="ml-auto flex items-center gap-1.5 lg:hidden">
-          <a
-            href="/search"
-            class="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 text-ink-soft"
-            aria-label="検索"
-          >
-            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        <div class="ml-auto flex items-center gap-6 lg:hidden">
+          <a href="/search" class="text-ink/85" aria-label="検索">
+            <i class="fa-solid fa-magnifying-glass text-[14px]"></i>
           </a>
-          <button
-            id="menu-toggle"
-            class="grid h-9 w-9 place-items-center rounded-xl bg-slate-900 text-white"
-            aria-label="メニュー"
-          >
-            <i class="fa-solid fa-bars text-xs"></i>
+          <button id="menu-toggle" class="text-ink/85" aria-label="メニュー">
+            <i id="menu-icon" class="fa-solid fa-bars text-[14px]"></i>
           </button>
         </div>
       </div>
-
-      <div id="mobile-menu" class="hidden border-t border-slate-200 bg-white lg:hidden">
-        <div class="mx-auto max-w-6xl px-4 py-4">
-          <div class="grid gap-2">
-            {CATEGORIES.map((c) => (
-              <a
-                href={`/category/${c.key}`}
-                class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-3"
-              >
-                <span
-                  class="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
-                  style={`background:${c.accentSoft};color:${c.accent}`}
-                >
-                  <i class={`fa-solid ${c.icon} text-sm`}></i>
-                </span>
-                <span>
-                  <span class="block text-sm font-bold">{c.name}</span>
-                  <span class="block text-[11px] text-ink-mute">{c.tagline}</span>
-                </span>
-                <i class="fa-solid fa-chevron-right ml-auto text-[10px] text-ink-mute"></i>
-              </a>
-            ))}
-            <div class="mt-1 grid grid-cols-2 gap-2">
-              <a href="/map" class="rounded-xl border border-slate-200 px-3 py-2.5 text-center text-sm font-semibold">
-                <i class="fa-solid fa-map-location-dot mr-1.5 text-xs text-ink-mute"></i>マップ
-              </a>
-              <a href="/about" class="rounded-xl border border-slate-200 px-3 py-2.5 text-center text-sm font-semibold">
-                <i class="fa-solid fa-circle-info mr-1.5 text-xs text-ink-mute"></i>About
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
     </header>
-  )
-}
 
+    {/* モバイル：全画面メニュー */}
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 z-40 hidden bg-white/95 pt-11 backdrop-blur-xl sm:pt-12 lg:hidden"
+    >
+      <div class="mx-auto max-w-page px-6 py-6">
+        {CATEGORIES.map((c) => (
+          <a
+            href={`/category/${c.key}`}
+            class="menu-item flex items-center justify-between border-b border-black/[0.08] py-4 text-[22px] font-semibold tracking-tight"
+          >
+            {c.name}
+            <i class="fa-solid fa-chevron-right text-[12px] text-mute"></i>
+          </a>
+        ))}
+        <a href="/map" class="menu-item flex items-center justify-between border-b border-black/[0.08] py-4 text-[22px] font-semibold tracking-tight">
+          マップ<i class="fa-solid fa-chevron-right text-[12px] text-mute"></i>
+        </a>
+        <a href="/about" class="menu-item flex items-center justify-between py-4 text-[22px] font-semibold tracking-tight">
+          About<i class="fa-solid fa-chevron-right text-[12px] text-mute"></i>
+        </a>
+      </div>
+    </div>
+    <div class="h-11 sm:h-12"></div>
+  </>
+)
+
+/* ============ フッター ============ */
 const SiteFooter: FC = () => (
-  <footer class="mt-20 border-t border-slate-200 bg-white">
-    <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <div class="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+  <footer class="bg-hazy">
+    <div class="mx-auto max-w-page px-5 py-12 sm:px-6">
+      <p class="max-w-2xl text-[12px] leading-relaxed text-mute">
+        {SITE.description}
+      </p>
+      <div class="mt-9 grid gap-8 border-t border-black/[0.08] pt-9 sm:grid-cols-3">
         <div>
-          <div class="flex items-center gap-2.5">
-            <span class="grid h-9 w-9 place-items-center rounded-xl bg-slate-900 text-white">
-              <i class="fa-solid fa-compass text-[15px]"></i>
-            </span>
-            <span class="text-[15px] font-extrabold">{SITE.title}</span>
-          </div>
-          <p class="mt-4 max-w-sm text-[13px] leading-relaxed text-ink-soft">{SITE.description}</p>
-        </div>
-        <div>
-          <p class="text-[11px] font-bold tracking-widest text-ink-mute">CATEGORY</p>
-          <ul class="mt-4 space-y-2.5">
+          <p class="text-[12px] font-semibold text-ink">記録するテーマ</p>
+          <ul class="mt-3 space-y-2.5">
             {CATEGORIES.map((c) => (
               <li>
-                <a href={`/category/${c.key}`} class="text-[13px] font-medium text-ink-soft hover:text-ink">
-                  <i class={`fa-solid ${c.icon} mr-2 text-[11px]`} style={`color:${c.accent}`}></i>
+                <a href={`/category/${c.key}`} class="text-[12px] text-sub transition hover:text-ink hover:underline">
                   {c.name}
                 </a>
               </li>
@@ -213,35 +159,80 @@ const SiteFooter: FC = () => (
           </ul>
         </div>
         <div>
-          <p class="text-[11px] font-bold tracking-widest text-ink-mute">SITE</p>
-          <ul class="mt-4 space-y-2.5">
-            <li><a href="/" class="text-[13px] font-medium text-ink-soft hover:text-ink">ホーム</a></li>
-            <li><a href="/map" class="text-[13px] font-medium text-ink-soft hover:text-ink">走行マップ</a></li>
-            <li><a href="/search" class="text-[13px] font-medium text-ink-soft hover:text-ink">記事検索</a></li>
-            <li><a href="/about" class="text-[13px] font-medium text-ink-soft hover:text-ink">About</a></li>
-            <li><a href="/admin" class="text-[13px] font-medium text-ink-mute hover:text-ink">管理画面</a></li>
+          <p class="text-[12px] font-semibold text-ink">サイト</p>
+          <ul class="mt-3 space-y-2.5">
+            <li><a href="/" class="text-[12px] text-sub transition hover:text-ink hover:underline">ホーム</a></li>
+            <li><a href="/map" class="text-[12px] text-sub transition hover:text-ink hover:underline">走行マップ</a></li>
+            <li><a href="/search" class="text-[12px] text-sub transition hover:text-ink hover:underline">記事を探す</a></li>
+            <li><a href="/about" class="text-[12px] text-sub transition hover:text-ink hover:underline">このサイトについて</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-[12px] font-semibold text-ink">管理</p>
+          <ul class="mt-3 space-y-2.5">
+            <li><a href="/admin" class="text-[12px] text-sub transition hover:text-ink hover:underline">管理画面</a></li>
+            <li><a href="/sitemap.xml" class="text-[12px] text-sub transition hover:text-ink hover:underline">サイトマップ</a></li>
           </ul>
         </div>
       </div>
-      <p class="mt-10 border-t border-slate-100 pt-6 text-center text-[11px] text-ink-mute">
-        © {new Date().getFullYear()} {SITE.title}. Built with Hono on Cloudflare.
+      <p class="mt-9 border-t border-black/[0.08] pt-6 text-[11px] text-mute">
+        Copyright © {new Date().getFullYear()} {SITE.title}. すべての金額・記録は個人の実績値です。
       </p>
     </div>
   </footer>
 )
 
-export const CategoryChip: FC<{ cat: string; size?: 'sm' | 'md' }> = ({ cat, size = 'sm' }) => {
+/* ============ 共通の小要素 ============ */
+
+/** Apple風のテキストリンク（矢印つき） */
+export const ArrowLink: FC<{ href: string; children?: any; size?: 'sm' | 'md'; color?: string }> = ({
+  href,
+  children,
+  size = 'md',
+  color
+}) => (
+  <a
+    href={href}
+    class={`group inline-flex items-center gap-1.5 font-normal tracking-tight text-blue transition hover:underline ${
+      size === 'sm' ? 'text-[13px]' : 'text-[15px] sm:text-[17px]'
+    }`}
+    style={color ? `color:${color}` : ''}
+  >
+    {children}
+    <i class="fa-solid fa-chevron-right text-[0.7em] transition group-hover:translate-x-0.5"></i>
+  </a>
+)
+
+/** Apple風のピルボタン */
+export const PillButton: FC<{ href: string; children?: any; variant?: 'blue' | 'dark' | 'light' }> = ({
+  href,
+  children,
+  variant = 'blue'
+}) => {
+  const styles = {
+    blue: 'bg-blue text-white hover:brightness-110',
+    dark: 'bg-ink text-white hover:opacity-85',
+    light: 'bg-white/90 text-ink hover:bg-white'
+  }[variant]
+  return (
+    <a
+      href={href}
+      class={`inline-flex items-center justify-center rounded-full px-6 py-2.5 text-[15px] font-normal tracking-tight transition ${styles}`}
+    >
+      {children}
+    </a>
+  )
+}
+
+export const Eyebrow: FC<{ cat: string; light?: boolean }> = ({ cat, light }) => {
   const c = CATEGORY_MAP[cat]
   if (!c) return null
   return (
-    <span
-      class={`inline-flex items-center gap-1.5 rounded-full font-bold ${
-        size === 'sm' ? 'px-2.5 py-1 text-[10px]' : 'px-3 py-1.5 text-xs'
-      }`}
-      style={`background:${c.accentSoft};color:${c.accent}`}
+    <p
+      class="text-[12px] font-semibold uppercase tracking-[0.14em]"
+      style={`color:${light ? '#ffffffb3' : c.accent}`}
     >
-      <i class={`fa-solid ${c.icon}`}></i>
-      {c.name}
-    </span>
+      {c.short}
+    </p>
   )
 }

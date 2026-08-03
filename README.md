@@ -99,6 +99,17 @@ curl http://localhost:3000
   3. `npx wrangler pages project create` → `npm run deploy:prod`
   4. `npx wrangler pages secret put ADMIN_PASSWORD` / `SESSION_SECRET`
 
+## デザイン方針（Apple.com 風）
+「シンプル・見やすい・魅せる」を基準に、Apple の製品ページに近い設計にしています。
+
+- **配色**: 白 `#ffffff` / 淡いグレー `#f5f5f7` / インク `#1d1d1f` / リンク青 `#0071e3` のみ。カテゴリ色はアイコンや小さなラベルのアクセントに限定
+- **タイポグラフィ**: システムフォント（SF Pro / Hiragino Sans）、`font-weight: 600` 主体、負のトラッキング。見出しは 32〜72px の大判、本文は 17〜19px
+- **レイアウト**: 中央寄せ 1024px（本文は 700px）、セクション単位で「白 → 淡グレー → 黒」を交互に配置してリズムを作る
+- **構成（動線）**: ヒーロー → テーマ一覧 → 資産/生活（数字＋グラフ） → ツーリング（黒背景・横スクロール） → スーパー → IT → 新着
+- **演出**: IntersectionObserver によるフェードアップ（`.reveal`）、ヒーローの段階表示（`.hero-line` / `.hero-media`）、`prefers-reduced-motion` 対応
+- **記事ページ**: 中央寄せの読み物レイアウト＋フルブリード画像＋罫線のみのスペック表（テックスペック風）
+- **グラフ / 地図**: Chart.js はモノトーン・グリッド最小化、Leaflet は CARTO Light タイル＋小さめのピン
+
 ## 技術スタック
 Hono + TypeScript(JSX SSR) / Cloudflare Pages + D1 / Tailwind CSS(CDN) / Chart.js / Leaflet + OpenStreetMap / marked
 
@@ -108,4 +119,4 @@ Hono + TypeScript(JSX SSR) / Cloudflare Pages + D1 / Tailwind CSS(CDN) / Chart.j
 - ツーリングのGPXルート表示、スーパーの商品単価データベース
 - RSS配信、OGP画像の自動生成
 
-_Last Updated: 2026-08-02_
+_Last Updated: 2026-08-03_
