@@ -45,7 +45,7 @@ app.get('/', async (c) => {
 
   return doc(
     c,
-    <Layout scripts={[CHART_JS, '/static/site.js']}>
+    <Layout activePage="home" scripts={[CHART_JS, '/static/site.js']}>
       <HomePage
         latest={latest}
         byCategory={byCategory}
@@ -201,7 +201,7 @@ app.get('/search', async (c) => {
   const posts = await listPosts(c.env.DB, { q, category, tag, limit: 60 })
   return doc(
     c,
-    <Layout title="記事を探す" scripts={['/static/site.js']}>
+    <Layout title="記事を探す" activePage="search" scripts={['/static/site.js']}>
       <SearchPage posts={posts} q={q} category={category} tag={tag} total={posts.length} />
     </Layout>
   )
@@ -219,6 +219,7 @@ app.get('/map', async (c) => {
     c,
     <Layout
       title="走行 & スーパーマップ"
+      activePage="map"
       description="ツーリング先とご当地スーパーの位置を地図で確認できます。"
       scripts={[LEAFLET_JS, '/static/site.js']}
       headExtra={LEAFLET_CSS}
@@ -233,7 +234,7 @@ app.get('/about', async (c) => {
   const counts = await getCategoryCounts(c.env.DB)
   return doc(
     c,
-    <Layout title="About" scripts={['/static/site.js']}>
+    <Layout title="About" activePage="about" scripts={['/static/site.js']}>
       <AboutPage counts={counts} />
     </Layout>
   )

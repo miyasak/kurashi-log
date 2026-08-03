@@ -1,35 +1,41 @@
+/* =========================================================
+   Kurashi Log — Dark theme (black base + orange accent)
+   ========================================================= */
+
 :root {
-  -webkit-tap-highlight-color: transparent;
-  --ink: #1d1d1f;
-  --sub: #6e6e73;
-  --mute: #86868b;
-  --line: #d2d2d7;
-  --hazy: #f5f5f7;
-  --blue: #0071e3;
+  --base: #0a0a0b;
+  --panel: #121214;
+  --panel2: #18181b;
+  --edge: rgba(255, 255, 255, 0.10);
+  --edge2: rgba(255, 255, 255, 0.06);
+  --ink: #f5f5f7;
+  --sub: #a1a1aa;
+  --mute: #71717a;
+  --brand: #f97316;
 }
 
 html {
+  -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
+  background: var(--base);
 }
 
 body {
-  font-feature-settings: 'palt';
-  letter-spacing: -0.01em;
+  background: var(--base);
+  color: var(--ink);
+  letter-spacing: 0.01em;
 }
 
 ::selection {
-  background: rgba(0, 113, 227, 0.16);
+  background: rgba(249, 115, 22, 0.35);
+  color: #fff;
 }
 
-/* =====================================================
-   スクロール演出（Apple風のフェードアップ）
-   ===================================================== */
+/* ---------------- scroll reveal ---------------- */
 .reveal {
   opacity: 0;
   transform: translateY(28px);
-  transition:
-    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
@@ -38,11 +44,11 @@ body {
   transform: none;
 }
 
-/* ヒーローの初期アニメーション */
+/* ---------------- hero intro ---------------- */
 .hero-line {
   opacity: 0;
-  transform: translateY(20px);
-  animation: heroIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: translateY(22px);
+  animation: heroUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .hero-line:nth-child(2) {
   animation-delay: 0.08s;
@@ -53,25 +59,31 @@ body {
 .hero-line:nth-child(4) {
   animation-delay: 0.24s;
 }
-.hero-media {
-  opacity: 0;
-  transform: scale(1.02);
-  animation: heroMedia 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
-}
-@keyframes heroIn {
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes heroMedia {
+@keyframes heroUp {
   to {
     opacity: 1;
     transform: none;
   }
 }
 
+.hero-media {
+  animation: heroZoom 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes heroZoom {
+  from {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   .reveal,
   .hero-line,
   .hero-media {
@@ -80,23 +92,17 @@ body {
     animation: none !important;
     transition: none !important;
   }
-  html {
-    scroll-behavior: auto;
-  }
 }
 
-/* =====================================================
-   横スクロールカルーセル
-   ===================================================== */
+/* ---------------- horizontal snap carousel ---------------- */
 .snap-row {
   display: flex;
   gap: 20px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  scroll-padding-left: 20px;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
   scrollbar-width: none;
-  padding-bottom: 4px;
 }
 .snap-row::-webkit-scrollbar {
   display: none;
@@ -106,68 +112,68 @@ body {
   flex: 0 0 auto;
 }
 
-/* =====================================================
-   記事本文タイポグラフィ（Appleの読み物スケール）
-   ===================================================== */
+/* ---------------- article body (light text on dark) ---------------- */
 .post-body {
   font-size: 17px;
-  line-height: 1.76;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-  word-break: break-word;
+  line-height: 1.9;
+  color: #e4e4e7;
+  letter-spacing: 0.012em;
 }
 @media (min-width: 640px) {
   .post-body {
     font-size: 19px;
-    line-height: 1.75;
+    line-height: 1.95;
   }
 }
 .post-body > * + * {
-  margin-top: 1.3em;
+  margin-top: 1.35em;
+}
+.post-body p {
+  color: #d4d4d8;
 }
 .post-body h2 {
   margin-top: 2.4em;
-  margin-bottom: 0.7em;
-  font-size: 1.5em;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  margin-bottom: 0.6em;
+  font-size: 1.45em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--ink);
+  padding-bottom: 0.45em;
+  border-bottom: 1px solid var(--edge2);
 }
 .post-body h3 {
   margin-top: 2em;
-  margin-bottom: 0.5em;
-  font-size: 1.15em;
-  font-weight: 600;
-  letter-spacing: -0.015em;
+  margin-bottom: 0.4em;
+  font-size: 1.18em;
+  font-weight: 700;
   color: var(--ink);
 }
 .post-body h4 {
-  margin-top: 1.7em;
-  font-size: 1em;
-  font-weight: 600;
+  margin-top: 1.6em;
+  font-size: 1.02em;
+  font-weight: 700;
   color: var(--ink);
-}
-.post-body p {
-  margin-top: 1.3em;
-  color: #2b2b2e;
 }
 .post-body a {
-  color: var(--blue);
+  color: #fdba74;
   text-decoration: none;
+  border-bottom: 1px solid rgba(253, 186, 116, 0.4);
 }
 .post-body a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  color: var(--brand);
+  border-bottom-color: var(--brand);
 }
 .post-body strong {
-  font-weight: 600;
-  color: var(--ink);
+  color: #fff;
+  font-weight: 700;
+}
+.post-body em {
+  color: #fff;
 }
 .post-body ul,
 .post-body ol {
-  padding-left: 1.3em;
-  color: #2b2b2e;
+  padding-left: 1.35em;
+  color: #d4d4d8;
 }
 .post-body ul {
   list-style: disc;
@@ -175,215 +181,272 @@ body {
 .post-body ol {
   list-style: decimal;
 }
-.post-body li {
-  margin-top: 0.45em;
+.post-body li + li {
+  margin-top: 0.5em;
 }
 .post-body li::marker {
   color: var(--mute);
 }
 .post-body blockquote {
-  margin-left: 0;
-  padding: 0.2em 0 0.2em 1.2em;
-  border-left: 2px solid var(--line);
+  border-left: 3px solid var(--brand);
+  background: rgba(249, 115, 22, 0.07);
+  padding: 0.9em 1.2em;
+  border-radius: 0 12px 12px 0;
   color: var(--sub);
-  font-size: 0.95em;
+  font-size: 0.96em;
 }
-.post-body blockquote > * + * {
-  margin-top: 0.6em;
+.post-body blockquote p {
+  color: var(--sub);
 }
 .post-body code {
-  background: var(--hazy);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fdba74;
   border-radius: 6px;
-  padding: 0.12em 0.4em;
-  font-size: 0.85em;
-  color: #1d1d1f;
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  padding: 0.15em 0.42em;
+  font-size: 0.88em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 .post-body pre {
-  background: var(--ink);
-  color: #f5f5f7;
+  background: #08080a;
+  border: 1px solid var(--edge2);
+  color: #e4e4e7;
   border-radius: 14px;
-  padding: 1.2rem 1.3rem;
+  padding: 18px 20px;
   overflow-x: auto;
-  font-size: 0.78em;
+  font-size: 14px;
   line-height: 1.7;
-  letter-spacing: 0;
 }
 .post-body pre code {
-  background: transparent;
+  background: none;
   color: inherit;
   padding: 0;
-  font-size: 1em;
+  font-size: inherit;
 }
 .post-body img {
   border-radius: 18px;
   width: 100%;
+  border: 1px solid var(--edge2);
+}
+.post-body hr {
+  border: 0;
+  border-top: 1px solid var(--edge2);
+  margin: 2.4em 0;
 }
 .post-body table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8em;
+  font-size: 0.92em;
   display: block;
   overflow-x: auto;
 }
 .post-body th,
 .post-body td {
-  border-bottom: 1px solid var(--line);
-  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--edge2);
+  padding: 10px 12px;
   text-align: left;
+  white-space: nowrap;
 }
 .post-body th {
-  font-weight: 600;
+  background: var(--panel2);
   color: var(--ink);
-  white-space: nowrap;
-  border-bottom: 1px solid #b8b8bd;
+  font-weight: 700;
 }
-.post-body hr {
-  border: 0;
-  border-top: 1px solid var(--line);
-  margin: 2.6em 0;
+.post-body td {
+  color: #d4d4d8;
 }
 
-/* =====================================================
-   Leaflet（ミニマル）
-   ===================================================== */
+/* ---------------- Leaflet (dark) ---------------- */
 .leaflet-container {
+  background: #0e0e10;
   font-family: inherit;
-  background: var(--hazy);
-  z-index: 1;
 }
-.leaflet-popup-content-wrapper {
-  border-radius: 14px;
-  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.4);
-}
-.leaflet-popup-content {
-  margin: 0.9rem 1.05rem;
-  font-size: 13px;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-}
-.leaflet-popup-tip {
-  box-shadow: none;
-}
-.leaflet-bar,
-.leaflet-bar a {
-  border: 0 !important;
-  border-radius: 10px !important;
-  color: var(--ink) !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+.leaflet-container a {
+  color: #fdba74;
 }
 .leaflet-control-attribution {
-  background: rgba(255, 255, 255, 0.72) !important;
-  font-size: 9.5px !important;
+  background: rgba(10, 10, 11, 0.75) !important;
+  color: var(--mute) !important;
+  font-size: 10px !important;
+  border-radius: 6px 0 0 0;
+}
+.leaflet-control-attribution a {
+  color: var(--sub) !important;
+}
+.leaflet-bar,
+.leaflet-control-zoom {
+  border: 1px solid var(--edge) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+.leaflet-bar a,
+.leaflet-control-zoom a {
+  background: var(--panel) !important;
+  color: var(--ink) !important;
+  border-bottom: 1px solid var(--edge2) !important;
+}
+.leaflet-bar a:hover,
+.leaflet-control-zoom a:hover {
+  background: var(--panel2) !important;
+  color: var(--brand) !important;
+}
+.leaflet-popup-content-wrapper {
+  background: var(--panel) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--edge) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6) !important;
+}
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.leaflet-popup-tip {
+  background: var(--panel) !important;
+  border: 1px solid var(--edge) !important;
+}
+.leaflet-popup-close-button {
   color: var(--mute) !important;
 }
-.map-pin {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  color: #fff;
-  font-size: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
-  border: 2px solid #fff;
+.leaflet-popup-close-button:hover {
+  color: var(--ink) !important;
 }
 
-/* =====================================================
-   Admin
-   ===================================================== */
-/* 太すぎるウェイトをApple寄りに丸める */
-.admin-body .font-black,
-.admin-body .font-extrabold,
-.admin-body .font-bold {
-  font-weight: 600;
-  letter-spacing: -0.015em;
+/* map pin */
+.map-pin {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
 }
-.admin-body .rounded-2xl,
-.admin-body .rounded-xl {
-  border-radius: 16px;
+
+/* ---------------- Admin (dark) ---------------- */
+.admin-body h1,
+.admin-body h2,
+.admin-body h3,
+.admin-body h4,
+.admin-body strong {
+  letter-spacing: -0.01em;
 }
-.nav-btn.active {
-  background: var(--ink);
+.admin-body .nav-btn.active {
+  background: var(--brand);
   color: #fff;
 }
 .admin-input {
   width: 100%;
+  background: var(--base);
+  border: 1px solid var(--edge2);
   border-radius: 12px;
-  border: 1px solid var(--line);
-  padding: 0.62rem 0.85rem;
-  font-size: 13.5px;
-  letter-spacing: -0.01em;
+  padding: 10px 13px;
+  font-size: 14px;
+  color: var(--ink);
   outline: none;
-  background: #fff;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.admin-input::placeholder {
+  color: var(--mute);
 }
 .admin-input:focus {
-  border-color: var(--ink);
+  border-color: rgba(249, 115, 22, 0.65);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.16);
+}
+.admin-input:disabled {
+  opacity: 0.55;
+}
+select.admin-input {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--mute) 50%),
+    linear-gradient(135deg, var(--mute) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+textarea.admin-input {
+  line-height: 1.7;
+  resize: vertical;
 }
 .admin-label {
   display: block;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--mute);
-  margin-bottom: 0.35rem;
-  letter-spacing: 0.02em;
+  margin-bottom: 6px;
 }
-textarea.admin-input {
-  line-height: 1.75;
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
-}
+
+/* markdown preview inside admin */
 .md-preview {
   font-size: 14px;
-  line-height: 1.8;
-  color: #2b2b2e;
+  line-height: 1.85;
+  color: #d4d4d8;
+}
+.md-preview > * + * {
+  margin-top: 1em;
 }
 .md-preview h2 {
   font-size: 1.25em;
-  font-weight: 600;
-  margin: 1.4em 0 0.55em;
+  font-weight: 700;
   color: var(--ink);
+  border-bottom: 1px solid var(--edge2);
+  padding-bottom: 0.3em;
+  margin-top: 1.6em;
 }
 .md-preview h3 {
-  font-size: 1.08em;
-  font-weight: 600;
-  margin: 1.2em 0 0.45em;
+  font-size: 1.1em;
+  font-weight: 700;
   color: var(--ink);
+  margin-top: 1.3em;
 }
-.md-preview p {
-  margin: 0.85em 0;
+.md-preview a {
+  color: #fdba74;
 }
 .md-preview ul {
   list-style: disc;
   padding-left: 1.3em;
-  margin: 0.85em 0;
 }
 .md-preview ol {
   list-style: decimal;
   padding-left: 1.3em;
-  margin: 0.85em 0;
 }
 .md-preview code {
-  background: var(--hazy);
-  padding: 0.1em 0.4em;
-  border-radius: 6px;
-  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fdba74;
+  border-radius: 5px;
+  padding: 0.1em 0.35em;
+  font-size: 0.88em;
 }
 .md-preview pre {
-  background: var(--ink);
-  color: #f5f5f7;
-  padding: 0.9rem;
+  background: #08080a;
+  border: 1px solid var(--edge2);
+  color: #e4e4e7;
   border-radius: 12px;
+  padding: 14px;
   overflow-x: auto;
 }
-.md-preview img {
-  max-width: 100%;
-  border-radius: 12px;
+.md-preview pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
 }
 .md-preview blockquote {
-  border-left: 2px solid var(--line);
-  padding-left: 0.9rem;
+  border-left: 3px solid var(--brand);
+  background: rgba(249, 115, 22, 0.07);
+  padding: 0.7em 1em;
   color: var(--sub);
+  border-radius: 0 10px 10px 0;
+}
+.md-preview img {
+  border-radius: 12px;
+  width: 100%;
 }
 .md-preview table {
   width: 100%;
@@ -392,23 +455,37 @@ textarea.admin-input {
 }
 .md-preview th,
 .md-preview td {
-  border-bottom: 1px solid var(--line);
-  padding: 0.45rem 0.6rem;
-  text-align: left;
+  border: 1px solid var(--edge2);
+  padding: 7px 9px;
+}
+.md-preview th {
+  background: var(--panel2);
+  color: var(--ink);
 }
 
-/* スクロールバー */
+/* ---------------- scrollbar ---------------- */
 ::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--base);
 }
 ::-webkit-scrollbar-thumb {
-  background: #c7c7cc;
-  border-radius: 99px;
-  border: 3px solid transparent;
-  background-clip: content-box;
+  background: #3f3f46;
+  border-radius: 8px;
+  border: 2px solid var(--base);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a6;
-  background-clip: content-box;
+  background: #52525b;
+}
+
+/* ---------------- misc ---------------- */
+input[type='date'].admin-input::-webkit-calendar-picker-indicator,
+input[type='time'].admin-input::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.55);
+  cursor: pointer;
+}
+.no-scroll {
+  overflow: hidden;
 }

@@ -9,8 +9,8 @@ export type CategoryDef = {
   icon: string
   /** tailwind color token */
   color: string
-  accent: string      // hex
-  accentSoft: string  // hex (bg)
+  accent: string      // hex（ダーク背景で映える明度に調整）
+  accentSoft: string  // rgba（ダーク背景用の淡いレイヤー）
   group: 'money' | 'travel' | 'tech'
 }
 
@@ -23,8 +23,8 @@ export const CATEGORIES: CategoryDef[] = [
     description: '現状の資産、NISA / iDeCo の進捗、毎月の振り返りを数字で残していきます。',
     icon: 'fa-chart-line',
     color: 'emerald',
-    accent: '#10b981',
-    accentSoft: '#ecfdf5',
+    accent: '#34d399',
+    accentSoft: 'rgba(52,211,153,0.14)',
     group: 'money'
   },
   {
@@ -35,8 +35,8 @@ export const CATEGORIES: CategoryDef[] = [
     description: 'リアルな生活費・生活水準・買ってよかったもののコスパを、実額ベースで記録します。',
     icon: 'fa-house-chimney',
     color: 'amber',
-    accent: '#f59e0b',
-    accentSoft: '#fffbeb',
+    accent: '#fbbf24',
+    accentSoft: 'rgba(251,191,36,0.14)',
     group: 'money'
   },
   {
@@ -46,9 +46,9 @@ export const CATEGORIES: CategoryDef[] = [
     tagline: '走った道と景色のアーカイブ',
     description: '各地のツーリング記録。ルート・走行距離・写真・地図つきで残しています。',
     icon: 'fa-motorcycle',
-    color: 'sky',
-    accent: '#0ea5e9',
-    accentSoft: '#f0f9ff',
+    color: 'orange',
+    accent: '#fb923c',
+    accentSoft: 'rgba(251,146,60,0.14)',
     group: 'travel'
   },
   {
@@ -59,8 +59,8 @@ export const CATEGORIES: CategoryDef[] = [
     description: 'ツーリング先で立ち寄ったご当地スーパーのレビュー。品揃え・価格・コスパを5段階で評価。',
     icon: 'fa-basket-shopping',
     color: 'rose',
-    accent: '#f43f5e',
-    accentSoft: '#fff1f2',
+    accent: '#fb7185',
+    accentSoft: 'rgba(251,113,133,0.14)',
     group: 'travel'
   },
   {
@@ -71,8 +71,8 @@ export const CATEGORIES: CategoryDef[] = [
     description: '社内SEとしての業務改善、情シスの知見、生成AIの実践的な使い方をまとめます。',
     icon: 'fa-microchip',
     color: 'violet',
-    accent: '#8b5cf6',
-    accentSoft: '#f5f3ff',
+    accent: '#a78bfa',
+    accentSoft: 'rgba(167,139,250,0.14)',
     group: 'tech'
   }
 ]
@@ -87,8 +87,11 @@ export const GROUPS = [
   { key: 'tech', name: 'TECH', label: '仕事とIT', icon: 'fa-laptop-code' }
 ] as const
 
+/** サイト名やキャッチコピーはここを書き換えるだけで全ページに反映されます */
 export const SITE = {
   title: 'Kurashi Log',
+  /** ロゴ下に出る小さな英字キャプション */
+  caption: 'MONEY · LIFE · RIDE · IT',
   subtitle: 'お金・暮らし・バイク・スーパー・IT の記録',
   author: 'Owner',
   description:

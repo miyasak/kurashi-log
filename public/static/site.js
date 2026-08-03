@@ -2,16 +2,18 @@
 (function () {
   'use strict'
 
-  const INK = '#1d1d1f'
-  const MUTE = '#86868b'
-  const LINE = '#e8e8ed'
+  const INK = '#f5f5f7'
+  const SUB = '#a1a1aa'
+  const MUTE = '#71717a'
+  const LINE = 'rgba(255,255,255,0.07)'
+  const BRAND = '#f97316'
 
   const CAT = {
-    asset: { color: '#10b981', icon: 'fa-chart-line', name: '資産運用' },
-    life: { color: '#f59e0b', icon: 'fa-house-chimney', name: '日常の生活' },
-    touring: { color: '#0071e3', icon: 'fa-motorcycle', name: 'ツーリング' },
-    supermarket: { color: '#f43f5e', icon: 'fa-basket-shopping', name: 'ご当地スーパー' },
-    it: { color: '#8b5cf6', icon: 'fa-microchip', name: 'IT / 生成AI' }
+    asset: { color: '#34d399', icon: 'fa-chart-line', name: '資産運用' },
+    life: { color: '#fbbf24', icon: 'fa-house-chimney', name: '日常の生活' },
+    touring: { color: '#fb923c', icon: 'fa-motorcycle', name: 'ツーリング' },
+    supermarket: { color: '#fb7185', icon: 'fa-basket-shopping', name: 'ご当地スーパー' },
+    it: { color: '#a78bfa', icon: 'fa-microchip', name: 'IT / 生成AI' }
   }
 
   /* ---- モバイルメニュー ---- */
@@ -73,7 +75,7 @@
   function toast(msg) {
     const el = document.createElement('div')
     el.className =
-      'fixed bottom-7 left-1/2 z-50 -translate-x-1/2 rounded-full bg-black/85 px-5 py-2.5 text-[13px] text-white backdrop-blur'
+      'fixed bottom-7 left-1/2 z-50 -translate-x-1/2 rounded-full border border-edge bg-panel px-5 py-2.5 text-[13px] text-ink shadow-2xl backdrop-blur'
     el.textContent = msg
     document.body.appendChild(el)
     setTimeout(() => el.remove(), 2000)
@@ -111,10 +113,14 @@
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(29,29,31,.92)',
+        backgroundColor: 'rgba(24,24,27,.95)',
         padding: 10,
         cornerRadius: 10,
         displayColors: false,
+        titleColor: INK,
+        bodyColor: '#e4e4e7',
+        borderColor: 'rgba(255,255,255,.12)',
+        borderWidth: 1,
         titleFont: FONT,
         bodyFont: FONT,
         callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${yen(ctx.parsed.y)}` }
@@ -150,13 +156,13 @@
       label,
       data: stats.map((s) => s[key]),
       borderColor: color,
-      backgroundColor: fill ? color + '14' : 'transparent',
+      backgroundColor: fill ? color + '26' : 'transparent',
       borderWidth: 2,
       tension: 0.4,
       pointRadius: 0,
       pointHoverRadius: 4,
       pointHoverBackgroundColor: color,
-      pointHoverBorderColor: '#fff',
+      pointHoverBorderColor: '#0a0a0b',
       pointHoverBorderWidth: 2,
       fill: !!fill
     })
@@ -164,7 +170,7 @@
     if (homeEl) {
       new Chart(homeEl, {
         type: 'line',
-        data: { labels, datasets: [lineDs('総資産', 'total_assets', INK, true)] },
+        data: { labels, datasets: [lineDs('総資産', 'total_assets', BRAND, true)] },
         options: { ...baseOpts, plugins: { ...baseOpts.plugins, legend: { display: false } } }
       })
     }
@@ -174,9 +180,9 @@
         data: {
           labels,
           datasets: [
-            lineDs('総資産', 'total_assets', INK, true),
-            lineDs('NISA', 'nisa_value', '#10b981', false),
-            lineDs('iDeCo', 'ideco_value', '#8b5cf6', false)
+            lineDs('総資産', 'total_assets', BRAND, true),
+            lineDs('NISA', 'nisa_value', '#34d399', false),
+            lineDs('iDeCo', 'ideco_value', '#a78bfa', false)
           ]
         },
         options: baseOpts
@@ -191,14 +197,14 @@
             {
               label: '生活費',
               data: stats.map((s) => s.living_cost),
-              backgroundColor: INK,
+              backgroundColor: '#fbbf24',
               borderRadius: 5,
               maxBarThickness: 22
             },
             {
               label: '手取り収入',
               data: stats.map((s) => s.income),
-              backgroundColor: '#d2d2d7',
+              backgroundColor: 'rgba(255,255,255,0.18)',
               borderRadius: 5,
               maxBarThickness: 22
             }
@@ -216,7 +222,7 @@
         } catch (e) {}
         const keys = Object.keys(obj)
         if (keys.length) {
-          const mono = ['#1d1d1f', '#3a3a3c', '#545456', '#6e6e73', '#86868b', '#a1a1a6', '#b8b8bd', '#c7c7cc', '#d2d2d7', '#e0e0e5']
+          const mono = ['#f97316', '#fb923c', '#fbbf24', '#34d399', '#22d3ee', '#60a5fa', '#a78bfa', '#fb7185', '#94a3b8', '#52525b']
           new Chart(expenseEl, {
             type: 'doughnut',
             data: {
@@ -226,7 +232,7 @@
                   data: keys.map((k) => obj[k]),
                   backgroundColor: keys.map((_, i) => mono[i % mono.length]),
                   borderWidth: 3,
-                  borderColor: '#f5f5f7',
+                  borderColor: '#121214',
                   hoverOffset: 6
                 }
               ]
@@ -249,10 +255,14 @@
                   }
                 },
                 tooltip: {
-                  backgroundColor: 'rgba(29,29,31,.92)',
+                  backgroundColor: 'rgba(24,24,27,.95)',
                   padding: 10,
                   cornerRadius: 10,
                   displayColors: false,
+                  titleColor: INK,
+                  bodyColor: '#e4e4e7',
+                  borderColor: 'rgba(255,255,255,.12)',
+                  borderWidth: 1,
                   titleFont: FONT,
                   bodyFont: FONT,
                   callbacks: { label: (ctx) => ` ${ctx.label}: ${yen(ctx.parsed)}` }
@@ -278,7 +288,7 @@
   }
 
   function tileLayer() {
-    return L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    return L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO',
       maxZoom: 19
     })
@@ -297,7 +307,7 @@
       <a href="/posts/${p.slug}" style="display:block;margin-top:4px;font-size:15px;font-weight:600;letter-spacing:-.01em;color:${INK};text-decoration:none">${p.title}</a>
       ${p.place_name ? `<div style="color:${MUTE};font-size:11px;margin-top:3px">${p.place_name}</div>` : ''}
       ${extra}
-      <a href="/posts/${p.slug}" style="display:inline-block;margin-top:8px;font-size:12px;color:#0071e3;text-decoration:none">記事を読む ›</a>
+      <a href="/posts/${p.slug}" style="display:inline-block;margin-top:8px;font-size:12px;color:${BRAND};text-decoration:none">記事を読む ›</a>
     </div>`
   }
 
@@ -354,8 +364,8 @@
             ? target
                 .map((p) => {
                   const c = CAT[p.category] || {}
-                  return `<a href="/posts/${p.slug}" class="group flex items-center gap-4 rounded-big bg-hazy p-5 transition hover:bg-[#eeeef0]">
-                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full" style="background:${c.color}14;color:${c.color}">
+                  return `<a href="/posts/${p.slug}" class="group flex items-center gap-4 rounded-big border border-edge2 bg-base p-5 transition hover:border-edge hover:bg-panel2">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full" style="background:${c.color}24;color:${c.color}">
                       <i class="fa-solid ${c.icon} text-[14px]"></i>
                     </span>
                     <span class="min-w-0 flex-1">
@@ -371,9 +381,10 @@
       }
       render('all')
 
-      const ACTIVE = 'map-filter rounded-full bg-white px-5 py-2 text-[13px] text-ink transition'
+      const ACTIVE =
+        'map-filter rounded-full bg-brand px-5 py-2.5 text-[13px] font-medium text-white transition'
       const IDLE =
-        'map-filter rounded-full border border-white/25 px-5 py-2 text-[13px] text-white/85 transition hover:border-white/50'
+        'map-filter rounded-full border border-edge2 bg-panel px-5 py-2.5 text-[13px] text-sub transition hover:text-ink'
       document.querySelectorAll('.map-filter').forEach((btn) => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.map-filter').forEach((b) => (b.className = IDLE))

@@ -557,7 +557,7 @@
     const lat = parseFloat(p.lat) || 36.5
     const lng = parseFloat(p.lng) || 138
     mapPicker = L.map(el).setView([lat, lng], p.lat ? 12 : 5)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO'
     }).addTo(mapPicker)
     let marker = p.lat ? L.marker([lat, lng]).addTo(mapPicker) : null

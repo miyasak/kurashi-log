@@ -15,33 +15,52 @@ export const PostPage: FC<Props> = ({ post, html, related }) => {
     <>
       <article>
         {/* ================= タイトル ================= */}
-        <header class="bg-white pb-10 pt-14 sm:pb-14 sm:pt-24">
-          <div class="mx-auto max-w-text px-5 text-center sm:px-6">
-            <Eyebrow cat={post.category} />
-            <h1 class="mt-3 text-[32px] font-semibold leading-[1.1] tracking-[-0.025em] sm:text-[52px]">
+        <header class="relative -mt-16 overflow-hidden border-b border-edge2 bg-base pt-16">
+          {post.cover_image ? (
+            <div class="absolute inset-0">
+              <img src={post.cover_image} alt="" class="h-full w-full object-cover opacity-25" />
+              <div class="absolute inset-0 bg-gradient-to-b from-base/80 via-base/90 to-base"></div>
+            </div>
+          ) : (
+            <div
+              class="absolute inset-0"
+              style={`background:radial-gradient(circle at 30% 0%, ${cat?.accentSoft}, transparent 65%)`}
+            ></div>
+          )}
+
+          <div class="relative mx-auto max-w-text px-5 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-16">
+            <nav class="flex flex-wrap items-center gap-2 text-[11px] text-mute">
+              <a href="/" class="transition hover:text-ink">ホーム</a>
+              <i class="fa-solid fa-chevron-right text-[8px]"></i>
+              <a href={`/category/${post.category}`} class="transition hover:text-ink" style={`color:${cat?.accent}`}>
+                {cat?.name}
+              </a>
+            </nav>
+
+            <div class="mt-5">
+              <Eyebrow cat={post.category} />
+            </div>
+            <h1 class="mt-5 text-[28px] font-bold leading-[1.2] tracking-[-0.025em] text-white sm:text-[44px]">
               {post.title}
             </h1>
             {post.summary ? (
-              <p class="mx-auto mt-6 max-w-[620px] text-[17px] leading-[1.55] tracking-[-0.01em] text-sub sm:text-[19px]">
-                {post.summary}
-              </p>
+              <p class="mt-5 text-[14.5px] leading-[1.85] text-sub sm:text-[16px]">{post.summary}</p>
             ) : null}
-            <div class="mt-7 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[12px] text-mute">
-              <span>{formatDate(post.published_at || post.created_at)}</span>
+
+            <div class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-mute">
+              <span>
+                <i class="fa-regular fa-calendar mr-1.5"></i>
+                {formatDate(post.published_at || post.created_at)}
+              </span>
               {post.place_name ? (
-                <>
-                  <span class="text-line">|</span>
-                  <span>{post.place_name}</span>
-                </>
+                <span>
+                  <i class="fa-solid fa-location-dot mr-1.5"></i>
+                  {post.place_name}
+                </span>
               ) : null}
-              {post.prefecture ? (
-                <>
-                  <span class="text-line">|</span>
-                  <span>{post.prefecture}</span>
-                </>
-              ) : null}
+              {post.prefecture ? <span>{post.prefecture}</span> : null}
               {post.status === 'draft' ? (
-                <span class="rounded-full bg-ink px-2.5 py-0.5 text-[10px] font-medium text-white">
+                <span class="rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-semibold text-white">
                   下書きプレビュー
                 </span>
               ) : null}
@@ -49,15 +68,17 @@ export const PostPage: FC<Props> = ({ post, html, related }) => {
           </div>
         </header>
 
-        {/* ================= カバー画像（フルブリード） ================= */}
+        {/* ================= カバー画像 ================= */}
         {post.cover_image ? (
-          <div class="mx-auto max-w-[1180px] px-0 sm:px-6">
-            <div class="overflow-hidden sm:rounded-big">
-              <img
-                src={post.cover_image}
-                alt={post.title}
-                class="h-[48vw] max-h-[560px] w-full object-cover sm:h-auto"
-              />
+          <div class="bg-base pt-10 sm:pt-14">
+            <div class="mx-auto max-w-[1120px] px-0 sm:px-6">
+              <div class="overflow-hidden border-y border-edge2 sm:rounded-big sm:border">
+                <img
+                  src={post.cover_image}
+                  alt={post.title}
+                  class="h-[52vw] max-h-[540px] w-full object-cover sm:h-auto"
+                />
+              </div>
             </div>
           </div>
         ) : null}
@@ -66,31 +87,36 @@ export const PostPage: FC<Props> = ({ post, html, related }) => {
         <SpecPanel post={post} />
 
         {/* ================= 本文 ================= */}
-        <div class="mx-auto max-w-text px-5 py-12 sm:px-6 sm:py-16">
-          <div class="post-body" dangerouslySetInnerHTML={{ __html: html }}></div>
+        <div class="bg-base">
+          <div class="mx-auto max-w-text px-5 py-12 sm:px-6 sm:py-16">
+            <div class="post-body" dangerouslySetInnerHTML={{ __html: html }}></div>
 
-          {post.tags && post.tags.length ? (
-            <div class="mt-14 flex flex-wrap gap-2 border-t border-line pt-8">
-              {post.tags.map((t) => (
-                <a
-                  href={`/tags/${encodeURIComponent(t)}`}
-                  class="rounded-full bg-hazy px-3.5 py-1.5 text-[12px] text-sub transition hover:bg-[#eeeef0] hover:text-ink"
-                >
-                  {t}
-                </a>
-              ))}
-            </div>
-          ) : null}
+            {post.tags && post.tags.length ? (
+              <div class="mt-14 border-t border-edge2 pt-8">
+                <p class="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-mute">Tags</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {post.tags.map((t) => (
+                    <a
+                      href={`/tags/${encodeURIComponent(t)}`}
+                      class="rounded-full border border-edge2 bg-panel px-3.5 py-1.5 text-[12px] text-sub transition hover:border-edge hover:text-ink"
+                    >
+                      {t}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
 
         {/* ================= フォト ================= */}
         {post.photos && post.photos.length ? (
-          <section class="bg-hazy py-16 sm:py-24">
+          <section class="border-t border-edge2 bg-panel py-16 sm:py-20">
             <div class="mx-auto max-w-page px-5 sm:px-6">
-              <SectionTitle eyebrow="Photos" title="現地の写真。" />
-              <div class="mt-12 grid gap-5 sm:grid-cols-2">
+              <SectionTitle eyebrow="Photos" icon="fa-images" title="現地の写真。" accent={cat?.accent} />
+              <div class="mt-12 grid gap-4 sm:grid-cols-2">
                 {post.photos.map((ph) => (
-                  <figure class="overflow-hidden rounded-big bg-white">
+                  <figure class="overflow-hidden rounded-big border border-edge2 bg-base">
                     <img
                       src={ph.url}
                       alt={ph.caption || ''}
@@ -109,21 +135,30 @@ export const PostPage: FC<Props> = ({ post, html, related }) => {
 
         {/* ================= 地図 ================= */}
         {hasGeo ? (
-          <section class="bg-white py-16 sm:py-24">
+          <section class="border-t border-edge2 bg-base py-16 sm:py-20">
             <div class="mx-auto max-w-page px-5 sm:px-6">
-              <SectionTitle eyebrow="Location" title="この場所。" desc={post.address || undefined} />
-              <div
-                id="post-map"
-                class="mt-12 h-[340px] w-full overflow-hidden rounded-big sm:h-[420px]"
-                data-lat={String(post.lat)}
-                data-lng={String(post.lng)}
-                data-label={post.place_name || post.title}
-                data-cat={post.category}
-              ></div>
+              <SectionTitle
+                eyebrow="Location"
+                icon="fa-map-location-dot"
+                title="この場所。"
+                desc={post.address || undefined}
+                accent={cat?.accent}
+              />
+              <div class="mt-12 overflow-hidden rounded-big border border-edge2">
+                <div
+                  id="post-map"
+                  class="h-[340px] w-full sm:h-[420px]"
+                  data-lat={String(post.lat)}
+                  data-lng={String(post.lng)}
+                  data-label={post.place_name || post.title}
+                  data-cat={post.category}
+                ></div>
+              </div>
               <div class="mt-6 text-center">
                 <ArrowLink
                   href={`https://www.google.com/maps/search/?api=1&query=${post.lat},${post.lng}`}
                   size="sm"
+                  color={cat?.accent}
                 >
                   Googleマップで開く
                 </ArrowLink>
@@ -133,32 +168,34 @@ export const PostPage: FC<Props> = ({ post, html, related }) => {
         ) : null}
 
         {/* ================= シェア ================= */}
-        <div class="mx-auto max-w-text px-5 pb-16 sm:px-6 sm:pb-24">
-          <div class="flex flex-wrap items-center justify-center gap-3 border-t border-line pt-10">
-            <button
-              class="js-share rounded-full border border-line px-5 py-2 text-[13px] text-ink transition hover:bg-hazy"
-              data-title={post.title}
-            >
-              共有する
-            </button>
-            <button class="js-copy rounded-full border border-line px-5 py-2 text-[13px] text-ink transition hover:bg-hazy">
-              URLをコピー
-            </button>
+        <div class="border-t border-edge2 bg-base">
+          <div class="mx-auto max-w-text px-5 py-12 sm:px-6 sm:py-16">
+            <div class="flex flex-wrap items-center justify-center gap-3">
+              <button
+                class="js-share rounded-full border border-edge bg-panel px-5 py-2.5 text-[13px] text-ink transition hover:bg-panel2"
+                data-title={post.title}
+              >
+                <i class="fa-solid fa-share-nodes mr-2 text-[11px]"></i>共有する
+              </button>
+              <button class="js-copy rounded-full border border-edge bg-panel px-5 py-2.5 text-[13px] text-ink transition hover:bg-panel2">
+                <i class="fa-regular fa-copy mr-2 text-[11px]"></i>URLをコピー
+              </button>
+            </div>
+            <p class="mt-8 text-center">
+              <ArrowLink href={`/category/${post.category}`} size="sm" color={cat?.accent}>
+                {cat?.name}の記事をもっと見る
+              </ArrowLink>
+            </p>
           </div>
-          <p class="mt-8 text-center">
-            <ArrowLink href={`/category/${post.category}`} size="sm">
-              {cat?.name}の記事をもっと見る
-            </ArrowLink>
-          </p>
         </div>
       </article>
 
       {/* ================= 関連記事 ================= */}
       {related.length ? (
-        <section class="bg-hazy py-16 sm:py-24">
+        <section class="border-t border-edge2 bg-panel py-16 sm:py-20">
           <div class="mx-auto max-w-page px-5 sm:px-6">
-            <SectionTitle eyebrow="More" title="あわせて読みたい。" />
-            <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <SectionTitle eyebrow="More" icon="fa-layer-group" title="あわせて読みたい。" />
+            <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((p) => (
                 <PostCard post={p} showCategory={true} />
               ))}
@@ -171,42 +208,47 @@ export const PostPage: FC<Props> = ({ post, html, related }) => {
 }
 
 /* =========================================================
-   カテゴリ別スペック（Appleのテックスペック風・罫線のみ）
+   カテゴリ別スペックパネル
    ========================================================= */
 const SpecPanel: FC<{ post: Post }> = ({ post }) => {
+  const cat = CATEGORY_MAP[post.category]
+
   const wrap = (children: any) => (
-    <div class="mx-auto max-w-page px-5 pt-12 sm:px-6 sm:pt-16">
-      <div class="border-t border-line pt-10">{children}</div>
+    <div class="bg-base pt-10 sm:pt-14">
+      <div class="mx-auto max-w-page px-5 sm:px-6">
+        <div class="rounded-big border border-edge2 bg-panel p-6 sm:p-9">{children}</div>
+      </div>
     </div>
   )
 
-  const cellsGrid = (cells: any[]) => (
-    <dl class="grid grid-cols-2 gap-y-9 sm:grid-cols-4">{cells}</dl>
-  )
-
-  const cell = (label: string, value: any) =>
+  const cell = (label: string, value: any, icon?: string) =>
     value !== null && value !== undefined && value !== '' ? (
       <div class="px-2 text-center">
-        <dd class="text-[24px] font-semibold leading-none tracking-[-0.02em] sm:text-[30px]">{value}</dd>
-        <dt class="mt-2.5 text-[12px] text-mute">{label}</dt>
+        <p class="flex items-center justify-center gap-1.5 text-[10.5px] font-medium uppercase tracking-[0.1em] text-mute">
+          {icon ? <i class={`fa-solid ${icon} text-[10px]`}></i> : null}
+          {label}
+        </p>
+        <p class="mt-2.5 text-[19px] font-bold tracking-[-0.02em] sm:text-[23px]">{value}</p>
       </div>
     ) : null
 
   if (post.category === 'touring') {
     const cells = [
-      cell('走行距離', post.distance_km ? `${post.distance_km} km` : null),
-      cell('所要時間', post.duration_text),
-      cell('天気', post.weather),
-      cell('車両', post.bike)
+      cell('走行距離', post.distance_km ? `${post.distance_km} km` : null, 'fa-route'),
+      cell('所要時間', post.duration_text, 'fa-clock'),
+      cell('天気', post.weather, 'fa-cloud-sun'),
+      cell('車両', post.bike, 'fa-motorcycle')
     ].filter(Boolean)
     if (!cells.length && !post.route_text) return null
     return wrap(
       <>
-        {cells.length ? cellsGrid(cells) : null}
+        {cells.length ? <div class="grid grid-cols-2 gap-y-8 sm:grid-cols-4">{cells}</div> : null}
         {post.route_text ? (
-          <div class="mx-auto mt-10 max-w-text border-t border-line pt-8 text-center">
-            <p class="text-[12px] uppercase tracking-[0.14em] text-mute">Route</p>
-            <p class="mt-3 text-[15px] leading-[1.7] tracking-[-0.01em] text-ink sm:text-[17px]">{post.route_text}</p>
+          <div class="mt-8 border-t border-edge2 pt-7">
+            <p class="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.14em]" style={`color:${cat?.accent}`}>
+              <i class="fa-solid fa-diagram-project text-[10px]"></i>Route
+            </p>
+            <p class="mt-3 text-[14px] leading-[1.85] text-ink sm:text-[15px]">{post.route_text}</p>
           </div>
         ) : null}
       </>
@@ -216,37 +258,41 @@ const SpecPanel: FC<{ post: Post }> = ({ post }) => {
   if (post.category === 'supermarket') {
     return wrap(
       <>
-        <dl class="grid grid-cols-2 gap-y-9 sm:grid-cols-4">
+        <div class="grid grid-cols-2 gap-y-8 sm:grid-cols-4">
           <div class="px-2 text-center">
-            <dd class="flex h-[30px] items-center justify-center">
-              <Stars value={post.rating} />
-            </dd>
-            <dt class="mt-2.5 text-[12px] text-mute">総合評価</dt>
+            <p class="text-[10.5px] font-medium uppercase tracking-[0.1em] text-mute">総合評価</p>
+            <p class="mt-3.5 flex justify-center">
+              <Stars value={post.rating} color={cat?.accent} />
+            </p>
           </div>
           <div class="px-2 text-center">
-            <dd class="flex h-[30px] items-center justify-center">
+            <p class="text-[10.5px] font-medium uppercase tracking-[0.1em] text-mute">コスパ</p>
+            <p class="mt-3.5 flex justify-center">
               <Stars value={post.cospa} />
-            </dd>
-            <dt class="mt-2.5 text-[12px] text-mute">コスパ</dt>
+            </p>
           </div>
-          {cell('会計金額', post.budget ? yen(post.budget) : null)}
-          {cell('訪問日', formatDate(post.visit_date) || null)}
-        </dl>
+          {cell('会計金額', post.budget ? yen(post.budget) : null, 'fa-yen-sign')}
+          {cell('訪問日', formatDate(post.visit_date) || null, 'fa-calendar-check')}
+        </div>
         {post.business_hours || post.address ? (
-          <dl class="mt-10 grid gap-y-6 border-t border-line pt-8 text-center sm:grid-cols-2">
+          <div class="mt-8 grid gap-5 border-t border-edge2 pt-7 sm:grid-cols-2">
             {post.business_hours ? (
               <div>
-                <dt class="text-[12px] uppercase tracking-[0.14em] text-mute">営業時間</dt>
-                <dd class="mt-2 text-[15px] tracking-[-0.01em]">{post.business_hours}</dd>
+                <p class="text-[10.5px] font-medium uppercase tracking-[0.1em] text-mute">
+                  <i class="fa-solid fa-clock mr-1.5 text-[10px]"></i>営業時間
+                </p>
+                <p class="mt-2 text-[14px]">{post.business_hours}</p>
               </div>
             ) : null}
             {post.address ? (
               <div>
-                <dt class="text-[12px] uppercase tracking-[0.14em] text-mute">住所</dt>
-                <dd class="mt-2 text-[15px] tracking-[-0.01em]">{post.address}</dd>
+                <p class="text-[10.5px] font-medium uppercase tracking-[0.1em] text-mute">
+                  <i class="fa-solid fa-location-dot mr-1.5 text-[10px]"></i>住所
+                </p>
+                <p class="mt-2 text-[14px]">{post.address}</p>
               </div>
             ) : null}
-          </dl>
+          </div>
         ) : null}
       </>
     )
@@ -255,11 +301,16 @@ const SpecPanel: FC<{ post: Post }> = ({ post }) => {
   if ((post.category === 'asset' || post.category === 'life') && post.highlight_value) {
     return wrap(
       <div class="text-center">
-        <p class="text-[12px] uppercase tracking-[0.14em] text-mute">{post.highlight_label || 'Highlight'}</p>
-        <p class="mt-4 text-[48px] font-semibold leading-none tracking-[-0.03em] sm:text-[72px]">
+        <p class="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-mute">
+          {post.highlight_label || 'Highlight'}
+        </p>
+        <p
+          class="mt-4 text-[42px] font-bold leading-none tracking-[-0.03em] sm:text-[60px]"
+          style={`color:${cat?.accent}`}
+        >
           {post.highlight_value}
         </p>
-        {post.highlight_sub ? <p class="mt-4 text-[15px] text-sub">{post.highlight_sub}</p> : null}
+        {post.highlight_sub ? <p class="mt-4 text-[14px] text-sub">{post.highlight_sub}</p> : null}
       </div>
     )
   }
