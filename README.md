@@ -21,6 +21,11 @@
 
 さらに `/map` で「ツーリング×スーパー」を1枚の地図に統合表示（カテゴリ絞り込み可）。
 
+## 公開URL
+- **本番サイト**: https://97fdf32d-665b-47ba-ae39-073216cebef5.vip.gensparksite.com
+- **管理画面**: https://97fdf32d-665b-47ba-ae39-073216cebef5.vip.gensparksite.com/admin
+- **ホスティング**: Genspark 管理の Cloudflare（Workers for Platform）+ D1
+
 ## URL 一覧
 ### 公開ページ
 | パス | 内容 |
@@ -39,7 +44,30 @@
 | --- | --- |
 | `/admin` | ログイン → ダッシュボード / 記事管理 / 記事エディタ / 月次データ |
 
-**初期パスワード: `admin1234`**（`ADMIN_PASSWORD` で変更。本番は必ず変更してください）
+**本番パスワード: `KurashiLog2026!`** / ローカル開発は `admin1234`（`.dev.vars`）
+
+### パスワードの変更方法（本番）
+サンドボックスのターミナルで下記1行を実行するだけです（再デプロイ不要・即時反映）。
+```bash
+gsk hosted secret_put --name ADMIN_PASSWORD --value '新しいパスワード'
+```
+- 設定済みのシークレット名の確認: `gsk hosted secret_list`（値は仕様上読み出し不可）
+- ローカル開発用は `.dev.vars` の `ADMIN_PASSWORD=` を書き換え → `pm2 restart webapp`
+- セッション署名鍵 `SESSION_SECRET` も同じ方法で変更可能（変更すると既存ログインは無効化されます）
+
+### サイト名・キャッチコピーの変更方法
+`src/lib/config.ts` の `SITE` を書き換えるだけで、ヘッダー・フッター・タイトル・OGP・sitemap すべてに反映されます。
+```ts
+export const SITE = {
+  title: 'Kurashi Log',            // ← サイト名（ロゴ / <title> / フッター）
+  caption: 'MONEY · LIFE · RIDE · IT', // ← ロゴ下の小さな英字
+  subtitle: 'お金・暮らし・バイク・スーパー・IT の記録',
+  author: 'Owner',
+  description: '…'                  // ← 検索結果 / SNS共有時の説明文
+}
+```
+変更後: `npm run build` → `gsk hosted deploy`（承認）で本番に反映。
+カテゴリ名やアクセント色も同ファイルの `CATEGORIES` で変更できます。
 
 ### API
 | メソッド | パス | 内容 |
@@ -91,13 +119,22 @@ curl http://localhost:3000
 - 環境変数は `.dev.vars`（`ADMIN_PASSWORD`, `SESSION_SECRET`）
 
 ## デプロイ
-- **プラットフォーム**: Cloudflare Pages（Hono / Workers ランタイム）
-- **状態**: ❌ 未デプロイ（ローカル検証済み）
-- **本番手順（概要）**
-  1. `npx wrangler d1 create webapp-production` → `wrangler.jsonc` の `database_id` を更新
-  2. `npm run db:migrate:prod`
-  3. `npx wrangler pages project create` → `npm run deploy:prod`
-  4. `npx wrangler pages secret put ADMIN_PASSWORD` / `SESSION_SECRET`
+- **プラットフォーム**: Genspark 管理の Cloudflare（Workers for Platform）+ D1
+- **状態**: ✅ 稼働中
+- **本番URL**: https://97fdf32d-665b-47ba-ae39-073216cebef5.vip.gensparksite.com
+- **D1**: `97fdf32d-…-db`（スキーマ適用済み / サンプル記事12本・タグ17件・月次12ヶ月を投入済み）
+- **シークレット**: `ADMIN_PASSWORD`, `SESSION_SECRET` を設定済み
+
+### 更新（再デプロイ）手順
+```bash
+npm run build                 # dist を作り直す
+gsk hosted deploy             # 承認ダイアログで Approve
+```
+本番DBの確認・操作:
+```bash
+gsk hosted d1_query   --sql "SELECT slug,title FROM posts ORDER BY published_at DESC"
+gsk hosted d1_execute --sql "DELETE FROM posts WHERE slug='xxx'"   # 記事は管理画面からの操作を推奨
+```
 
 ## デザイン方針（黒基調 × オレンジアクセント）
 「シンプル・見やすい・魅せる」を軸に、深い黒をベースにオレンジのアクセントを効かせたダークテーマです。
