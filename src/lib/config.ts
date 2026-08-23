@@ -98,6 +98,35 @@ export const SITE = {
     '資産運用（NISA/iDeCo）、日常の生活費とコスパ、ツーリングログ、ご当地スーパー巡り、社内SE / 生成AI の話題をまとめた個人サイト。'
 }
 
+/* =========================================================
+   SEO / アクセス解析の設定
+   ここに値を入れるだけで全ページに反映されます。
+   空文字のままなら、そのタグは出力されません。
+   ========================================================= */
+export const SEO = {
+  /**
+   * Google Search Console のサイト所有権確認コード。
+   * Search Console →「HTMLタグ」で表示される
+   * <meta name="google-site-verification" content="ここの文字列" />
+   * の content の値だけを貼り付けてください。
+   */
+  googleSiteVerification: '',
+
+  /**
+   * Google Analytics 4 の測定ID（G- から始まる文字列）。
+   * GA4 管理画面 → データストリーム で確認できます。
+   * 例: 'G-XXXXXXXXXX'
+   */
+  gaMeasurementId: '',
+
+  /**
+   * Google AdSense のパブリッシャーID（ca-pub- から始まる文字列）。
+   * 設定すると自動広告用スクリプトが全ページに入ります。
+   * 例: 'ca-pub-1234567890123456'
+   */
+  adsensePublisherId: ''
+}
+
 export type Bindings = {
   DB: D1Database
   R2?: R2Bucket

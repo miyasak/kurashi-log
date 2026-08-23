@@ -160,3 +160,48 @@ Hono + TypeScript(JSX SSR) / Cloudflare Pages + D1 / Tailwind CSS(CDN) / Chart.j
 - RSS配信、OGP画像の自動生成
 
 _Last Updated: 2026-08-03_
+
+## 今回の追加機能（v3）
+
+### 1. 画像アップロード（Cloudflare R2）
+- `wrangler.jsonc` に R2 バインディング `webapp-media` を追加
+- 管理画面から直接アップロード可能
+  - **カバー画像**：点線の枠をクリックしてファイル選択
+  - **現地の写真**：各写真行の「アップロード」ボタン
+  - **本文内の画像**：ツールバーの「画像挿入」→ カーソル位置に `![name](url)` を挿入
+- API: `POST /api/admin/upload`（10MBまで）→ `/media/<key>` を返す
+- 配信: `GET /media/*`（1年キャッシュ）
+
+### 2. Search Console / Google Analytics / AdSense
+`src/lib/config.ts` の `SEO` に値を入れるだけで全ページに反映されます（空文字ならタグは出力されません）。
+
+| 項目 | 設定キー | 取得場所 |
+|---|---|---|
+| Search Console 所有権確認 | `googleSiteVerification` | Search Console →「HTMLタグ」の content 値 |
+| Google Analytics 4 | `gaMeasurementId` | GA4 → データストリーム（`G-XXXXXXXXXX`） |
+| Google AdSense 自動広告 | `adsensePublisherId` | AdSense（`ca-pub-...`） |
+
+あわせて SEO 強化：全ページに canonical / og:url / og:site_name / Twitter Card、`/sitemap.xml` に `lastmod` `changefreq` `priority` とタグURLを追加。
+
+### 3. 詳細ページの構成（ツーリング / ご当地スーパー）
+- ヒーロー：カバー画像＋パンくず（ホーム / カテゴリ / 地名）＋大見出し＋メタ行（エリア・日付・ジャンル・星）
+- 2カラム：左＝本文、右＝スティッキーな **RIDE DATA**（ツーリング）/ **SHOP DATA**（スーパー）カード
+- `PHOTOS 現地の写真` セクション、`ROAD NOTE` 注意ボックス、タグピル
+- **LOCAL STOP**：ツーリング記事 ⇄ スーパー記事の相互リンクカード（推し買いボックス・地図ボタン付き）
+  - どちらか一方に紐付けを設定すれば、逆方向も自動で表示されます
+
+新しく追加した記事フィールド（migration `0002_detail_fields.sql`）:
+
+| カラム | 用途 |
+|---|---|
+| `genre` | 峠・ワインディング / 郊外型スーパー など |
+| `area` | 東北・中部など（`prefecture` と組で「中部 / 長野県」） |
+| `best_season` | ベストシーズン（ツーリング） |
+| `road_note` | 路面・冬季通行止めなどの注意事項 |
+| `recommend_items` | 推し買い（改行 or `/` 区切り） |
+| `access_text` | スーパーへのアクセス |
+| `linked_slug` | ツーリング ⇄ スーパーの相互リンク |
+
+### 4. サイト構成のモダン化
+- グローバルナビを7項目 → **ホーム / お金の記録（ホバーで資産運用・日常の生活）/ ツーリング記録 / ご当地スーパー / IT・生成AI / エリア別 / 検索** に整理
+- カバー画像が無かった7記事に Wikimedia Commons の CC / パブリックドメイン画像を設定

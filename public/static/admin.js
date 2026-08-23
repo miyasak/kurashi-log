@@ -338,6 +338,10 @@
             <div class="flex items-center justify-between">
               <label class="admin-label !mb-0">本文 (Markdown)</label>
               <div class="flex gap-1.5">
+                <label class="cursor-pointer rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-bold text-ink-soft hover:border-slate-300" title="画像を本文に挿入">
+                  <i class="fa-solid fa-image mr-1"></i>画像挿入
+                  <input type="file" accept="image/*" class="hidden" id="md-upload" />
+                </label>
                 <button type="button" id="md-write" class="rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-bold text-white">編集</button>
                 <button type="button" id="md-prev" class="rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-bold text-ink-soft">プレビュー</button>
               </div>
@@ -388,7 +392,11 @@
           </div>
 
           <div class="rounded-2xl border border-slate-200 bg-white p-5">
-            ${field('カバー画像URL', 'cover_image', p.cover_image, { ph: 'https://...', hint: '画像は外部URLまたは /media/ のパス' })}
+            ${field('カバー画像URL', 'cover_image', p.cover_image, { ph: 'https://... または端末から選択', hint: '外部URL / アップロード画像（/media/…）どちらでも可' })}
+            <label class="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-2.5 text-[11.5px] font-bold text-ink-soft hover:border-slate-400">
+              <i class="fa-solid fa-cloud-arrow-up"></i>端末から画像をアップロード
+              <input type="file" accept="image/*" class="hidden" id="cover-upload" />
+            </label>
             <div id="cover-preview" class="mt-2"></div>
             <div class="mt-3">
               <label class="admin-label">タグ（カンマ区切り）</label>
@@ -428,6 +436,23 @@
         ta.selectionStart = ta.selectionEnd = pos + text.length
       })
     )
+    // 本文への画像挿入
+    const mdUp = document.getElementById('md-upload')
+    if (mdUp) {
+      mdUp.addEventListener('change', async () => {
+        const file = mdUp.files && mdUp.files[0]
+        if (!file) return
+        const url = await uploadImage(file)
+        if (!url) return
+        const ta = $('#md-input')
+        const pos = ta.selectionStart
+        const text = `\n![${file.name.replace(/\.[^.]+$/, '')}](${url})\n`
+        ta.value = ta.value.slice(0, pos) + text + ta.value.slice(pos)
+        ta.focus()
+        ta.selectionStart = ta.selectionEnd = pos + text.length
+        mdUp.value = ''
+      })
+    }
     $('#add-photo').addEventListener('click', () => {
       const cur = currentPhotos()
       cur.push({ url: '', caption: '' })
@@ -441,6 +466,17 @@
     }
     coverInput.addEventListener('input', updateCover)
     updateCover()
+    const coverUp = document.getElementById('cover-upload')
+    if (coverUp) {
+      coverUp.addEventListener('change', async () => {
+        const file = coverUp.files && coverUp.files[0]
+        if (!file) return
+        const url = await uploadImage(file)
+        if (!url) return
+        coverInput.value = url
+        updateCover()
+      })
+    }
 
     main().querySelectorAll('[data-del]').forEach((b) =>
       b.addEventListener('click', async () => {
@@ -483,6 +519,13 @@
           ${field(c === 'touring' ? 'スポット名' : '店舗名', 'place_name', p.place_name, { ph: c === 'touring' ? '例: 美ヶ原高原' : '例: スーパーいちば 高知店' })}
           ${field('都道府県', 'prefecture', p.prefecture, { ph: '例: 長野県' })}
         </div>
+        <div class="mt-3 grid gap-3 sm:grid-cols-2">
+          ${field('エリア', 'area', p.area, { ph: '例: 東北', hint: '詳細ページで「東北 / 福島県」と表示' })}
+          ${field('ジャンル', 'genre', p.genre, {
+            ph: c === 'touring' ? '例: 峠・ワインディング' : '例: 郊外型スーパー',
+            hint: '記事上部と DATA カードに表示'
+          })}
+        </div>
         ${
           c === 'touring'
             ? `<div class="mt-3 grid gap-3 sm:grid-cols-4">
@@ -493,7 +536,16 @@
               </div>
               <div class="mt-3">
                 <label class="admin-label">ルート</label>
-                <input name="route_text" value="${esc(p.route_text)}" placeholder="例: 自宅 → 中央道 → ビーナスライン → 美ヶ原" class="admin-input" />
+                <input name="route_text" value="${esc(p.route_text)}" placeholder="例: 福島市 → 高湯温泉 → 浄土平 → 土湯峠" class="admin-input" />
+              </div>
+              <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                ${field('ベストシーズン', 'best_season', p.best_season, { ph: '例: 5月〜10月（紅葉は10月上旬）' })}
+                ${field('訪問日', 'visit_date', p.visit_date, { type: 'date' })}
+              </div>
+              <div class="mt-3">
+                <label class="admin-label">路面・注意事項</label>
+                <textarea name="road_note" rows="2" class="admin-input !font-sans" placeholder="例: 冬季通行止め（11月中旬〜4月上旬）。夜間通行止めの時間帯あり。">${esc(p.road_note)}</textarea>
+                <p class="mt-1 text-[10.5px] text-ink-mute">本文下に注意ボックスとして表示されます</p>
               </div>`
             : `<div class="mt-3 grid gap-3 sm:grid-cols-4">
                 <div>
@@ -510,8 +562,25 @@
               <div class="mt-3 grid gap-3 sm:grid-cols-2">
                 ${field('住所', 'address', p.address, { ph: '例: 高知県高知市...' })}
                 ${field('営業時間', 'business_hours', p.business_hours, { ph: '例: 9:00-21:00' })}
+              </div>
+              <div class="mt-3">
+                ${field('アクセス', 'access_text', p.access_text, { ph: '例: 常磐道いわき湯本ICから10分' })}
+              </div>
+              <div class="mt-3">
+                <label class="admin-label">推し買い</label>
+                <textarea name="recommend_items" rows="3" class="admin-input !font-sans" placeholder="手むすびおにぎり&#10;常磐ものの刺身&#10;メヒカリの唐揚げ">${esc(p.recommend_items)}</textarea>
+                <p class="mt-1 text-[10.5px] text-ink-mute">改行 または「/」区切り。DATAカード内にオレンジのボックスで表示されます</p>
               </div>`
         }
+        <div class="mt-3">
+          <label class="admin-label">${c === 'touring' ? '寄ったご当地スーパーの記事' : '関連するツーリング記事'}</label>
+          <select name="linked_slug" id="linked-select" class="admin-input">
+            <option value="">— 紐付けなし —</option>
+          </select>
+          <p class="mt-1 text-[10.5px] text-ink-mute">
+            紐付けると、記事下部に「${c === 'touring' ? 'このツーリングで寄った店' : 'この店に寄ったツーリング'}」カードが表示され、相互リンクになります
+          </p>
+        </div>
         <div class="mt-4">
           <label class="admin-label">位置情報（地図をクリックしてピンを設定）</label>
           <div class="flex flex-wrap gap-2">
@@ -543,7 +612,32 @@
         <i class="fa-solid ${catOf(c).icon} mr-1.5"></i>${catOf(c).name} の項目
       </p>${inner}</div>`
 
-    if (c === 'touring' || c === 'supermarket') initMapPicker(p)
+    if (c === 'touring' || c === 'supermarket') {
+      initMapPicker(p)
+      fillLinkedOptions(c, p.linked_slug)
+    }
+  }
+
+  /** 相互リンク候補（ツーリング ⇄ ご当地スーパー）をセレクトに流し込む */
+  async function fillLinkedOptions(cat, current) {
+    const sel = document.getElementById('linked-select')
+    if (!sel) return
+    const target = cat === 'touring' ? 'supermarket' : 'touring'
+    try {
+      const { posts } = await api('/admin/posts?category=' + target + '&limit=100')
+      sel.innerHTML =
+        '<option value="">— 紐付けなし —</option>' +
+        (posts || [])
+          .map(
+            (x) =>
+              `<option value="${esc(x.slug)}" ${current === x.slug ? 'selected' : ''}>${esc(
+                x.place_name || x.title
+              )}${x.prefecture ? '（' + esc(x.prefecture) + '）' : ''}</option>`
+          )
+          .join('')
+    } catch (e) {
+      /* 失敗時は「紐付けなし」のみ */
+    }
   }
 
   const starOpts = (v) =>
@@ -614,6 +708,10 @@
         ${ph.url ? `<img src="${esc(ph.url)}" class="h-12 w-16 rounded-lg object-cover" />` : '<span class="grid h-12 w-16 place-items-center rounded-lg bg-slate-200 text-slate-400"><i class="fa-regular fa-image"></i></span>'}
         <input class="p-url admin-input flex-1 min-w-[160px]" value="${esc(ph.url)}" placeholder="画像URL" />
         <input class="p-cap admin-input flex-1 min-w-[140px]" value="${esc(ph.caption)}" placeholder="キャプション" />
+        <label class="grid h-9 w-9 cursor-pointer place-items-center rounded-xl border border-slate-200 text-ink-soft hover:border-slate-300" title="画像をアップロード">
+          <i class="fa-solid fa-cloud-arrow-up text-xs"></i>
+          <input type="file" accept="image/*" class="hidden p-up" data-idx="${i}" />
+        </label>
         <button type="button" data-rm="${i}" class="grid h-9 w-9 place-items-center rounded-xl border border-rose-200 text-rose-500"><i class="fa-solid fa-xmark text-xs"></i></button>
       </div>`
           )
@@ -627,6 +725,38 @@
       })
     )
     el.querySelectorAll('.p-url').forEach((inp) => inp.addEventListener('change', () => renderPhotos(currentPhotos())))
+    // 各行の画像アップロード
+    el.querySelectorAll('.p-up').forEach((inp) =>
+      inp.addEventListener('change', async () => {
+        const file = inp.files && inp.files[0]
+        if (!file) return
+        const url = await uploadImage(file)
+        if (!url) return
+        const cur = currentPhotos()
+        const i = Number(inp.dataset.idx)
+        if (cur[i]) cur[i].url = url
+        renderPhotos(cur)
+      })
+    )
+  }
+
+  /** 画像を R2 にアップロードして公開パスを返す */
+  async function uploadImage(file) {
+    if (file.size > 10 * 1024 * 1024) {
+      toast('画像は10MB以下にしてください', 'error')
+      return null
+    }
+    const fd = new FormData()
+    fd.append('file', file)
+    toast('アップロード中…')
+    try {
+      const r = await api('/admin/upload', { method: 'POST', body: fd })
+      toast('アップロードしました')
+      return r.url
+    } catch (e) {
+      toast(e.message, 'error')
+      return null
+    }
   }
 
   /* フォーム収集 */

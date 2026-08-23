@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import { CATEGORIES, CATEGORY_MAP, SITE, type Bindings } from './lib/config'
-import { listPosts, countPosts, getPostBySlug, listTags, listMonthlyStats, getCategoryCounts } from './lib/db'
+import { listPosts, countPosts, getPostBySlug, listTags, listMonthlyStats, getCategoryCounts, getLinkedPost } from './lib/db'
 import { renderMarkdown, stripMd } from './lib/utils'
 import { isAuthed } from './lib/auth'
 import { api } from './routes/api'
@@ -15,6 +15,12 @@ import { AdminApp } from './views/admin'
 const app = new Hono<{ Bindings: Bindings }>()
 
 const doc = (c: Context, el: any) => c.html('<!DOCTYPE html>' + el.toString())
+
+/** 現在のリクエストから正規URL（クエリを除いたURL）を作る */
+const canonicalOf = (c: Context) => {
+  const u = new URL(c.req.url)
+  return u.origin + u.pathname
+}
 
 const CHART_JS = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'
 const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
@@ -45,7 +51,7 @@ app.get('/', async (c) => {
 
   return doc(
     c,
-    <Layout activePage="home" scripts={[CHART_JS, '/static/site.js']}>
+    <Layout activePage="home" canonical={canonicalOf(c)} scripts={[CHART_JS, '/static/site.js']}>
       <HomePage
         latest={latest}
         byCategory={byCategory}
@@ -135,6 +141,7 @@ app.get('/category/:key', async (c) => {
       title={cat.name}
       description={cat.description}
       activeCategory={key}
+      canonical={canonicalOf(c)}
       scripts={scripts}
       headExtra={needsMap ? LEAFLET_CSS : null}
     >
@@ -165,6 +172,7 @@ app.get('/posts/:slug', async (c) => {
     (p) => p.id !== post.id
   ).slice(0, 3)
   const hasGeo = post.lat != null && post.lng != null
+  const linked = await getLinkedPost(c.env.DB, post)
 
   return doc(
     c,
@@ -173,10 +181,11 @@ app.get('/posts/:slug', async (c) => {
       description={post.summary || stripMd(post.body, 120)}
       activeCategory={post.category}
       ogImage={post.cover_image}
+      canonical={canonicalOf(c)}
       scripts={[...(hasGeo ? [LEAFLET_JS] : []), '/static/site.js']}
       headExtra={hasGeo ? LEAFLET_CSS : null}
     >
-      <PostPage post={post} html={html} related={related} />
+      <PostPage post={post} html={html} related={related} linked={linked} />
     </Layout>
   )
 })
@@ -187,7 +196,7 @@ app.get('/tags/:tag', async (c) => {
   const posts = await listPosts(c.env.DB, { tag, limit: 60 })
   return doc(
     c,
-    <Layout title={`#${tag}`} scripts={['/static/site.js']}>
+    <Layout title={`#${tag}`} canonical={canonicalOf(c)} scripts={['/static/site.js']}>
       <TagPage tag={tag} posts={posts} />
     </Layout>
   )
@@ -201,7 +210,7 @@ app.get('/search', async (c) => {
   const posts = await listPosts(c.env.DB, { q, category, tag, limit: 60 })
   return doc(
     c,
-    <Layout title="記事を探す" activePage="search" scripts={['/static/site.js']}>
+    <Layout title="記事を探す" activePage="search" canonical={canonicalOf(c)} scripts={['/static/site.js']}>
       <SearchPage posts={posts} q={q} category={category} tag={tag} total={posts.length} />
     </Layout>
   )
@@ -221,6 +230,7 @@ app.get('/map', async (c) => {
       title="走行 & スーパーマップ"
       activePage="map"
       description="ツーリング先とご当地スーパーの位置を地図で確認できます。"
+      canonical={canonicalOf(c)}
       scripts={[LEAFLET_JS, '/static/site.js']}
       headExtra={LEAFLET_CSS}
     >
@@ -234,7 +244,7 @@ app.get('/about', async (c) => {
   const counts = await getCategoryCounts(c.env.DB)
   return doc(
     c,
-    <Layout title="About" activePage="about" scripts={['/static/site.js']}>
+    <Layout title="About" activePage="about" canonical={canonicalOf(c)} scripts={['/static/site.js']}>
       <AboutPage counts={counts} />
     </Layout>
   )
@@ -260,19 +270,63 @@ app.get('/media/*', async (c) => {
 
 /* ================= sitemap / robots ================= */
 app.get('/sitemap.xml', async (c) => {
-  const posts = await listPosts(c.env.DB, { limit: 100 })
+  const posts = await listPosts(c.env.DB, { limit: 1000 })
+  const tags = await listTags(c.env.DB)
   const origin = new URL(c.req.url).origin
-  const urls = [
-    '',
-    '/map',
-    '/about',
-    '/search',
-    ...CATEGORIES.map((x) => `/category/${x.key}`),
-    ...posts.map((p) => `/posts/${p.slug}`)
+
+  /** 日付を W3C Datetime（YYYY-MM-DD）に整える */
+  const day = (v?: string | null) => (v ? String(v).slice(0, 10) : '')
+
+  const newest = day(posts[0]?.updated_at || posts[0]?.published_at)
+
+  type Entry = { loc: string; lastmod?: string; priority: string; freq: string }
+  const entries: Entry[] = [
+    { loc: '', lastmod: newest, priority: '1.0', freq: 'daily' },
+    { loc: '/map', lastmod: newest, priority: '0.6', freq: 'weekly' },
+    { loc: '/about', priority: '0.3', freq: 'yearly' },
+    { loc: '/search', priority: '0.3', freq: 'monthly' }
   ]
+
+  // カテゴリ：そのカテゴリの最新記事日を lastmod に
+  for (const cat of CATEGORIES) {
+    const latest = posts.find((p) => p.category === cat.key)
+    entries.push({
+      loc: `/category/${cat.key}`,
+      lastmod: day(latest?.updated_at || latest?.published_at),
+      priority: '0.8',
+      freq: 'weekly'
+    })
+  }
+
+  // 記事本体：最も優先度を高くする
+  for (const p of posts) {
+    entries.push({
+      loc: `/posts/${p.slug}`,
+      lastmod: day(p.updated_at || p.published_at),
+      priority: '0.9',
+      freq: 'monthly'
+    })
+  }
+
+  // タグ一覧
+  for (const t of tags as any[]) {
+    entries.push({
+      loc: `/tags/${encodeURIComponent(t.name)}`,
+      priority: '0.4',
+      freq: 'weekly'
+    })
+  }
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url><loc>${origin}${u}</loc></url>`).join('\n')}
+${entries
+  .map(
+    (e) =>
+      `  <url><loc>${origin}${e.loc}</loc>${
+        e.lastmod ? `<lastmod>${e.lastmod}</lastmod>` : ''
+      }<changefreq>${e.freq}</changefreq><priority>${e.priority}</priority></url>`
+  )
+  .join('\n')}
 </urlset>`
   return c.body(xml, 200, { 'Content-Type': 'application/xml' })
 })

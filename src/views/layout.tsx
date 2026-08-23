@@ -1,5 +1,5 @@
 import type { FC, PropsWithChildren } from 'hono/jsx'
-import { CATEGORIES, SITE, CATEGORY_MAP } from '../lib/config'
+import { CATEGORIES, SITE, SEO, CATEGORY_MAP } from '../lib/config'
 
 type LayoutProps = PropsWithChildren<{
   title?: string
@@ -10,6 +10,8 @@ type LayoutProps = PropsWithChildren<{
   ogImage?: string | null
   scripts?: string[]
   headExtra?: any
+  /** 正規URL（canonical / og:url に使用） */
+  canonical?: string
 }>
 
 export const Layout: FC<LayoutProps> = (props) => {
@@ -27,7 +29,19 @@ export const Layout: FC<LayoutProps> = (props) => {
         <meta property="og:title" content={title} />
         <meta property="og:description" content={desc} />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE.title} />
         {props.ogImage ? <meta property="og:image" content={props.ogImage} /> : null}
+        {props.canonical ? <meta property="og:url" content={props.canonical} /> : null}
+        {props.canonical ? <link rel="canonical" href={props.canonical} /> : null}
+        <meta name="twitter:card" content={props.ogImage ? 'summary_large_image' : 'summary'} />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={desc} />
+        {props.ogImage ? <meta name="twitter:image" content={props.ogImage} /> : null}
+
+        {/* Google Search Console のサイト所有権確認（config.ts の SEO で設定） */}
+        {SEO.googleSiteVerification ? (
+          <meta name="google-site-verification" content={SEO.googleSiteVerification} />
+        ) : null}
         <link
           rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23f97316'/><text x='50' y='72' font-size='58' text-anchor='middle' fill='%23fff'>🏍</text></svg>"
@@ -68,12 +82,50 @@ export const Layout: FC<LayoutProps> = (props) => {
         {(props.scripts || []).map((s) => (
           <script src={s}></script>
         ))}
+
+        {/* Google Analytics 4（config.ts の SEO.gaMeasurementId を設定すると有効化） */}
+        {SEO.gaMeasurementId ? (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${SEO.gaMeasurementId}`}
+            ></script>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${SEO.gaMeasurementId}');`
+              }}
+            ></script>
+          </>
+        ) : null}
+
+        {/* Google AdSense 自動広告（config.ts の SEO.adsensePublisherId を設定すると有効化） */}
+        {SEO.adsensePublisherId ? (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${SEO.adsensePublisherId}`}
+            crossorigin="anonymous"
+          ></script>
+        ) : null}
       </body>
     </html>
   )
 }
 
 /* ============ グローバルナビ（ダーク・ピル型アクティブ表示） ============ */
+
+/** 「お金の記録」ドロップダウンに入れるカテゴリ */
+const MONEY_CATS = CATEGORIES.filter((c) => c.group === 'money')
+/** ナビに直接並べるカテゴリ（ラベルは短く） */
+const NAV_LABELS: Record<string, string> = {
+  touring: 'ツーリング記録',
+  supermarket: 'ご当地スーパー',
+  it: 'IT / 生成AI'
+}
+const NAV_MAIN = CATEGORIES.filter((c) => c.group !== 'money').map((c) => ({
+  ...c,
+  navLabel: NAV_LABELS[c.key] || c.name
+}))
+
 const SiteHeader: FC<{ active?: string; activePage?: string }> = ({ active, activePage }) => {
   const pill = (isActive: boolean) =>
     `flex items-center gap-2 rounded-full px-4 py-2 text-[13px] tracking-tight transition ${
@@ -100,19 +152,51 @@ const SiteHeader: FC<{ active?: string; activePage?: string }> = ({ active, acti
             </span>
           </a>
 
-          {/* PCナビ */}
+          {/* PCナビ：主要導線を5つに絞り、「お金の記録」はホバーで展開 */}
           <nav class="ml-auto hidden items-center gap-1 lg:flex">
             <a href="/" class={pill(activePage === 'home')}>
               <i class="fa-solid fa-house text-[11px]"></i>ホーム
             </a>
-            {CATEGORIES.map((c) => (
+
+            {/* お金の記録（資産運用 / 日常の生活） */}
+            <div class="relative group">
+              <button class={pill(active === 'asset' || active === 'life')} type="button">
+                <i class="fa-solid fa-coins text-[11px]"></i>
+                お金の記録
+                <i class="fa-solid fa-chevron-down ml-0.5 text-[8px] opacity-70"></i>
+              </button>
+              <div class="invisible absolute right-0 top-full z-50 w-[288px] translate-y-1 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                <div class="overflow-hidden rounded-apple border border-edge bg-panel/95 p-2 shadow-2xl backdrop-blur-xl">
+                  {MONEY_CATS.map((c) => (
+                    <a
+                      href={`/category/${c.key}`}
+                      class="flex items-start gap-3 rounded-xl px-3 py-3 transition hover:bg-white/[0.06]"
+                    >
+                      <span
+                        class="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg"
+                        style={`background:${c.accentSoft};color:${c.accent}`}
+                      >
+                        <i class={`fa-solid ${c.icon} text-[12px]`}></i>
+                      </span>
+                      <span class="min-w-0">
+                        <span class="block text-[13.5px] font-medium tracking-tight text-ink">{c.name}</span>
+                        <span class="mt-0.5 block text-[11.5px] leading-snug text-mute">{c.tagline}</span>
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {NAV_MAIN.map((c) => (
               <a href={`/category/${c.key}`} class={pill(active === c.key)}>
                 <i class={`fa-solid ${c.icon} text-[11px]`}></i>
-                {c.name}
+                {c.navLabel}
               </a>
             ))}
+
             <a href="/map" class={pill(activePage === 'map')}>
-              <i class="fa-solid fa-map-location-dot text-[11px]"></i>マップ
+              <i class="fa-solid fa-map-location-dot text-[11px]"></i>エリア別
             </a>
             <a
               href="/search"

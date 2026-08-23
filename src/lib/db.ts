@@ -29,6 +29,13 @@ export type Post = {
   highlight_label: string | null
   highlight_value: string | null
   highlight_sub: string | null
+  genre: string | null
+  area: string | null
+  best_season: string | null
+  road_note: string | null
+  recommend_items: string | null
+  access_text: string | null
+  linked_slug: string | null
   meta: string | null
   views: number
   created_at: string
@@ -42,7 +49,9 @@ const POST_FIELDS = [
   'place_name','prefecture','address','lat','lng',
   'distance_km','duration_text','weather','bike','route_text',
   'rating','cospa','budget','visit_date','business_hours',
-  'highlight_label','highlight_value','highlight_sub','meta'
+  'highlight_label','highlight_value','highlight_sub',
+  'genre','area','best_season','road_note','recommend_items','access_text','linked_slug',
+  'meta'
 ]
 
 type ListOptions = {
@@ -105,6 +114,28 @@ export async function countPosts(db: D1Database, opts: ListOptions = {}) {
     .bind(...binds)
     .first<{ c: number }>()
   return r?.c ?? 0
+}
+
+/**
+ * 相互リンク記事を取得。
+ * A（この記事）が linked_slug で指している記事、または
+ * 逆方向（相手の linked_slug がこの記事を指している）も拾う。
+ */
+export async function getLinkedPost(db: D1Database, post: Post) {
+  const row = await db
+    .prepare(
+      `SELECT p.*, (
+         SELECT group_concat(t.name, ',') FROM post_tags pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = p.id
+       ) AS tag_names
+       FROM posts p
+       WHERE p.status = 'published' AND p.id <> ?
+         AND (p.slug = ? OR (p.linked_slug IS NOT NULL AND p.linked_slug = ?))
+       LIMIT 1`
+    )
+    .bind(post.id, post.linked_slug || '', post.slug)
+    .first<any>()
+  if (!row) return null
+  return normalize(row)
 }
 
 export async function getPostBySlug(db: D1Database, slug: string, includeDrafts = false) {
