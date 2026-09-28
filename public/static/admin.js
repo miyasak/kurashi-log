@@ -2,12 +2,13 @@
 (function () {
   'use strict'
 
+  /* 公開サイトと同じ3テーマ構成。色はアクセント1色に統一 */
   const CATS = [
-    { key: 'asset', name: '資産運用', color: '#10b981', icon: 'fa-chart-line' },
-    { key: 'life', name: '日常の生活', color: '#f59e0b', icon: 'fa-house-chimney' },
-    { key: 'touring', name: 'ツーリングログ', color: '#0ea5e9', icon: 'fa-motorcycle' },
-    { key: 'supermarket', name: 'ご当地スーパー', color: '#f43f5e', icon: 'fa-basket-shopping' },
-    { key: 'it', name: 'IT / 生成AI', color: '#8b5cf6', icon: 'fa-microchip' }
+    { key: 'asset', name: '資産運用', theme: 'Money', color: '#f97316', icon: 'fa-chart-line' },
+    { key: 'life', name: '生活費', theme: 'Money', color: '#f97316', icon: 'fa-receipt' },
+    { key: 'touring', name: 'ツーリング記録', theme: 'Touring', color: '#f97316', icon: 'fa-motorcycle' },
+    { key: 'supermarket', name: 'ご当地スーパー', theme: 'Touring', color: '#f97316', icon: 'fa-basket-shopping' },
+    { key: 'it', name: '業務効率化', theme: 'Tech', color: '#f97316', icon: 'fa-gears' }
   ]
   const catOf = (k) => CATS.find((c) => c.key === k) || CATS[0]
 

@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { CATEGORY_MAP } from '../lib/config'
+import { CATEGORY_MAP, THEME_MAP, ACCENT } from '../lib/config'
 import { formatDate, yen } from '../lib/utils'
 import { Stars, PostCard, SectionTitle } from './components'
 import { ArrowLink } from './layout'
@@ -13,22 +13,21 @@ const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
   title,
   accent
 }) => (
-  <div class="mb-5">
-    <p
-      class="text-[10.5px] font-semibold uppercase tracking-[0.18em]"
-      style={`color:${accent || '#fb923c'}`}
-    >
-      {eyebrow}
-    </p>
-    <h2 class="mt-1.5 text-[17px] font-bold tracking-[-0.01em] text-ink sm:text-[19px]">{title}</h2>
+  <div class="mb-4">
+    <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">{eyebrow}</p>
+    <h2 class="mt-1 text-[16px] font-bold tracking-[-0.01em] text-ink sm:text-[18px]">{title}</h2>
   </div>
 )
 
 export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
   const cat = CATEGORY_MAP[post.category]
   const hasGeo = post.lat != null && post.lng != null
-  const accent = cat?.accent || '#fb923c'
+  const accent = ACCENT
   const areaLabel = [post.area, post.prefecture].filter(Boolean).join(' / ')
+  const theme = cat ? THEME_MAP[cat.theme] : undefined
+  const themeHref = theme ? `/theme/${theme.key}` : '/'
+  /** テーマ内に複数カテゴリがある場合はサブカテゴリもパンくずに出す */
+  const showSub = !!theme && theme.categories.length > 1
 
   return (
     <>
@@ -56,31 +55,39 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
             )}
           </div>
 
-          <div class="relative mx-auto max-w-page px-5 pb-10 pt-[210px] sm:px-6 sm:pb-14 sm:pt-[300px]">
+          <div class="relative mx-auto max-w-page px-4 pb-8 pt-[170px] sm:px-6 sm:pb-11 sm:pt-[240px]">
             {/* パンくず */}
             <nav class="flex flex-wrap items-center gap-2 text-[11px] text-white/55">
               <a href="/" class="transition hover:text-white">ホーム</a>
               <span class="text-white/30">/</span>
-              <a href={`/category/${post.category}`} class="transition hover:text-white">
-                {cat?.name}
+              <a href={themeHref} class="transition hover:text-white">
+                {theme?.label}
               </a>
+              {showSub ? (
+                <>
+                  <span class="text-white/30">/</span>
+                  <a href={`${themeHref}?cat=${post.category}`} class="transition hover:text-white">
+                    {cat?.name}
+                  </a>
+                </>
+              ) : null}
               <span class="text-white/30">/</span>
               <span class="text-white/80">{post.place_name || post.title}</span>
             </nav>
 
-            <h1 class="mt-4 text-[27px] font-bold leading-[1.18] tracking-[-0.03em] text-white sm:text-[42px]">
+            <h1 class="mt-3.5 max-w-[26ch] text-[24px] font-bold leading-[1.22] tracking-[-0.03em] text-white sm:text-[34px]">
               {post.title}
             </h1>
 
             {/* メタ行：場所 / 日付 / ジャンル / 評価 */}
-            <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-white/70">
+            <div class="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-white/70">
               {areaLabel || post.place_name ? (
                 <span class="inline-flex items-center gap-1.5">
                   <i class="fa-solid fa-location-dot text-[11px]" style={`color:${accent}`}></i>
                   {areaLabel || post.place_name}
                 </span>
               ) : null}
-              <span class="inline-flex items-center gap-1.5">
+              <span class="inline-flex items-center gap-1.5 font-mono tabular-nums">
                 <i class="fa-regular fa-calendar text-[11px]"></i>
                 {formatDate(post.visit_date || post.published_at || post.created_at)}
               </span>
@@ -104,17 +111,19 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
             本文 2カラム（左：本文 / 右：スペックカード）
            ============================================================ */}
         <div class="border-t border-edge2 bg-base">
-          <div class="mx-auto max-w-page px-5 py-12 sm:px-6 sm:py-16">
-            <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-14">
+          <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
+            <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-11">
               {/* ---------------- 左カラム ---------------- */}
               <div class="min-w-0">
                 {post.summary ? (
-                  <p class="text-[15px] leading-[1.9] text-sub sm:text-[16px]">{post.summary}</p>
+                  <p class="border-l-2 border-brand/50 pl-4 text-[14px] leading-[1.9] text-sub sm:text-[15px]">
+                    {post.summary}
+                  </p>
                 ) : null}
 
                 {/* 現地の写真 */}
                 {post.photos && post.photos.length ? (
-                  <section class={post.summary ? 'mt-10' : ''}>
+                  <section class={post.summary ? 'mt-8' : ''}>
                     <BlockTitle eyebrow="Photos" title="現地の写真" accent={accent} />
                     <div class="grid gap-4 sm:grid-cols-2">
                       {post.photos.map((ph) => (
@@ -138,35 +147,28 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
 
                 {/* 本文 */}
                 <div
-                  class={`post-body ${post.summary || (post.photos && post.photos.length) ? 'mt-10' : ''}`}
+                  class={`post-body ${post.summary || (post.photos && post.photos.length) ? 'mt-8' : ''}`}
                   dangerouslySetInnerHTML={{ __html: html }}
                 ></div>
 
                 {/* 路面 / 注意事項 */}
                 {post.road_note ? (
-                  <div
-                    class="mt-8 rounded-big border p-5"
-                    style={`border-color:${accent}40;background:${cat?.accentSoft}`}
-                  >
-                    <p
-                      class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em]"
-                      style={`color:${accent}`}
-                    >
-                      <i class="fa-solid fa-triangle-exclamation text-[11px]"></i>
+                  <div class="mt-7 rounded-big border border-brand/25 bg-brandsoft p-4 sm:p-5">
+                    <p class="flex items-center gap-2 text-[10.5px] font-bold uppercase tracking-[0.14em] text-brand">
+                      <i class="fa-solid fa-triangle-exclamation text-[10.5px]"></i>
                       Road Note
                     </p>
-                    <p class="mt-2.5 text-[13.5px] leading-[1.85] text-ink">{post.road_note}</p>
+                    <p class="mt-2 text-[13px] leading-[1.85] text-ink">{post.road_note}</p>
                   </div>
                 ) : null}
 
                 {/* タグ */}
                 {post.tags && post.tags.length ? (
-                  <div class="mt-9 flex flex-wrap gap-2">
+                  <div class="mt-7 flex flex-wrap gap-1.5">
                     {post.tags.map((t) => (
                       <a
                         href={`/tags/${encodeURIComponent(t)}`}
-                        class="rounded-full border px-3.5 py-1.5 text-[12px] transition hover:brightness-125"
-                        style={`border-color:${accent}33;background:${cat?.accentSoft};color:${accent}`}
+                        class="rounded-full border border-brand/25 bg-brandsoft px-3 py-1 text-[11.5px] text-brand transition hover:brightness-125"
                       >
                         #{t}
                       </a>
@@ -179,7 +181,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
 
                 {/* 地図 */}
                 {hasGeo ? (
-                  <section class="mt-12">
+                  <section class="mt-10">
                     <BlockTitle
                       eyebrow="Location"
                       title={post.category === 'touring' ? 'ルートの位置' : 'この店の場所'}
@@ -195,11 +197,10 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                         data-cat={post.category}
                       ></div>
                     </div>
-                    <p class="mt-4">
+                    <p class="mt-3.5">
                       <ArrowLink
                         href={`https://www.google.com/maps/search/?api=1&query=${post.lat},${post.lng}`}
                         size="sm"
-                        color={accent}
                       >
                         Googleマップで開く
                       </ArrowLink>
@@ -208,18 +209,18 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                 ) : null}
 
                 {/* シェア */}
-                <div class="mt-12 flex flex-wrap items-center gap-3 border-t border-edge2 pt-8">
+                <div class="mt-10 flex flex-wrap items-center gap-2.5 border-t border-edge2 pt-6">
                   <button
-                    class="js-share rounded-full border border-edge bg-panel px-5 py-2.5 text-[13px] text-ink transition hover:bg-panel2"
+                    class="js-share rounded-full border border-edge bg-panel px-4 py-2 text-[12.5px] text-ink transition hover:bg-panel2"
                     data-title={post.title}
                   >
                     <i class="fa-solid fa-share-nodes mr-2 text-[11px]"></i>共有する
                   </button>
-                  <button class="js-copy rounded-full border border-edge bg-panel px-5 py-2.5 text-[13px] text-ink transition hover:bg-panel2">
+                  <button class="js-copy rounded-full border border-edge bg-panel px-4 py-2 text-[12.5px] text-ink transition hover:bg-panel2">
                     <i class="fa-regular fa-copy mr-2 text-[11px]"></i>URLをコピー
                   </button>
                   <span class="ml-auto">
-                    <ArrowLink href={`/category/${post.category}`} size="sm" color={accent}>
+                    <ArrowLink href={showSub ? `${themeHref}?cat=${post.category}` : themeHref} size="sm">
                       {cat?.name}の一覧へ
                     </ArrowLink>
                   </span>
@@ -227,7 +228,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
               </div>
 
               {/* ---------------- 右サイドバー ---------------- */}
-              <aside class="lg:sticky lg:top-24 lg:self-start">
+              <aside class="lg:sticky lg:top-20 lg:self-start">
                 <SpecCard post={post} />
               </aside>
             </div>
@@ -239,10 +240,10 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
           関連記事
          ============================================================ */}
       {related.length ? (
-        <section class="border-t border-edge2 bg-panel py-16 sm:py-20">
-          <div class="mx-auto max-w-page px-5 sm:px-6">
-            <SectionTitle eyebrow="More" icon="fa-layer-group" title="あわせて読みたい。" />
-            <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <section class="border-t border-edge2 bg-panel">
+          <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
+            <SectionTitle eyebrow="More" icon="fa-layer-group" title="あわせて読みたい" />
+            <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((p) => (
                 <PostCard post={p} showCategory={true} />
               ))}
@@ -259,7 +260,17 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
    ========================================================= */
 const SpecCard: FC<{ post: Post }> = ({ post }) => {
   const cat = CATEGORY_MAP[post.category]
-  const accent = cat?.accent || '#fb923c'
+  const accent = ACCENT
+
+  /** 数値を含む行は等幅フォントで桁を揃える */
+  const NUMERIC = new Set([
+    '訪問日',
+    '公開日',
+    '走行距離',
+    '会計金額',
+    '営業時間',
+    '所要時間'
+  ])
 
   type Row = { label: string; value: any }
   const rows: Row[] = []
@@ -310,35 +321,36 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
 
   return (
     <div class="overflow-hidden rounded-big border border-edge2 bg-panel">
-      <div class="border-b border-edge2 px-6 py-4">
-        <p
-          class="text-[10.5px] font-semibold uppercase tracking-[0.18em]"
-          style={`color:${accent}`}
-        >
-          {heading}
-        </p>
+      <div class="border-b border-edge2 px-5 py-3.5">
+        <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">{heading}</p>
       </div>
 
       <dl class="divide-y divide-edge2">
         {rows.map((r) => (
-          <div class="grid grid-cols-[92px_minmax(0,1fr)] gap-3 px-6 py-3.5">
-            <dt class="text-[11.5px] leading-[1.6] text-mute">{r.label}</dt>
-            <dd class="text-[12.5px] leading-[1.65] text-ink">{r.value}</dd>
+          <div class="grid grid-cols-[86px_minmax(0,1fr)] gap-3 px-5 py-3">
+            <dt class="text-[11px] leading-[1.6] text-mute">{r.label}</dt>
+            <dd
+              class={`text-[12.5px] leading-[1.65] text-ink ${
+                NUMERIC.has(r.label) ? 'font-mono tabular-nums font-medium' : ''
+              }`}
+            >
+              {r.value}
+            </dd>
           </div>
         ))}
 
         {/* 評価（スーパー） */}
         {post.rating != null ? (
-          <div class="grid grid-cols-[92px_minmax(0,1fr)] items-center gap-3 px-6 py-3.5">
-            <dt class="text-[11.5px] text-mute">総合評価</dt>
+          <div class="grid grid-cols-[86px_minmax(0,1fr)] items-center gap-3 px-5 py-3">
+            <dt class="text-[11px] text-mute">総合評価</dt>
             <dd>
-              <Stars value={post.rating} color={accent} />
+              <Stars value={post.rating} />
             </dd>
           </div>
         ) : null}
         {post.cospa != null ? (
-          <div class="grid grid-cols-[92px_minmax(0,1fr)] items-center gap-3 px-6 py-3.5">
-            <dt class="text-[11.5px] text-mute">コスパ</dt>
+          <div class="grid grid-cols-[86px_minmax(0,1fr)] items-center gap-3 px-5 py-3">
+            <dt class="text-[11px] text-mute">コスパ</dt>
             <dd>
               <Stars value={post.cospa} />
             </dd>
@@ -348,21 +360,15 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
 
       {/* 推し買い */}
       {items.length ? (
-        <div class="border-t border-edge2 p-4">
-          <div
-            class="rounded-xl p-4"
-            style={`background:${cat?.accentSoft};border:1px solid ${accent}33`}
-          >
-            <p
-              class="flex items-center gap-2 text-[11px] font-semibold tracking-[0.06em]"
-              style={`color:${accent}`}
-            >
-              <i class="fa-solid fa-cart-shopping text-[10px]"></i>
+        <div class="border-t border-edge2 p-3.5">
+          <div class="rounded-xl border border-brand/25 bg-brandsoft p-3.5">
+            <p class="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.06em] text-brand">
+              <i class="fa-solid fa-cart-shopping text-[9.5px]"></i>
               推し買い
             </p>
-            <ul class="mt-2.5 space-y-1.5">
+            <ul class="mt-2 space-y-1.5">
               {items.map((it) => (
-                <li class="text-[12.5px] leading-[1.6] text-ink">{it}</li>
+                <li class="text-[12px] leading-[1.6] text-ink">{it}</li>
               ))}
             </ul>
           </div>
@@ -377,7 +383,7 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
    ========================================================= */
 const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) => {
   const lc = CATEGORY_MAP[linked.category]
-  const accent = lc?.accent || '#fb7185'
+  const accent = ACCENT
   const isSuper = linked.category === 'supermarket'
   const eyebrow = isSuper ? 'Local Stop' : 'Related Ride'
   const heading = isSuper ? 'このツーリングで寄った店' : 'この店に寄ったツーリング'
@@ -388,10 +394,10 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
     .filter(Boolean)
 
   return (
-    <section class="mt-12">
+    <section class="mt-10">
       <BlockTitle eyebrow={eyebrow} title={heading} accent={accent} />
 
-      <div class="max-w-[420px] overflow-hidden rounded-big border border-edge2 bg-panel">
+      <div class="max-w-[400px] overflow-hidden rounded-big border border-edge2 bg-panel">
         {/* 画像 + バッジ */}
         <a href={`/posts/${linked.slug}`} class="group relative block">
           {linked.cover_image ? (
@@ -402,15 +408,12 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
               class="aspect-[16/10] w-full object-cover transition duration-700 group-hover:scale-[1.04]"
             />
           ) : (
-            <div
-              class="grid aspect-[16/10] w-full place-items-center"
-              style={`background:linear-gradient(135deg,${lc?.accentSoft},#18181b)`}
-            >
-              <i class={`fa-solid ${lc?.icon} text-[28px]`} style={`color:${accent}`}></i>
+            <div class="grid aspect-[16/10] w-full place-items-center bg-gradient-to-br from-brandsoft to-panel2">
+              <i class={`fa-solid ${lc?.icon} text-[26px] text-brand/70`}></i>
             </div>
           )}
-          <span class="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-[10.5px] font-semibold text-white backdrop-blur">
-            <i class={`fa-solid ${lc?.icon} text-[9px]`} style={`color:${accent}`}></i>
+          <span class="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-[10.5px] font-bold text-white backdrop-blur">
+            <i class={`fa-solid ${lc?.icon} text-[9px] text-brand`}></i>
             {lc?.name}
           </span>
         </a>
@@ -425,7 +428,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
           <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] text-mute">
             {linked.prefecture ? (
               <span>
-                <i class="fa-solid fa-location-dot mr-1.5 text-[10px]" style={`color:${accent}`}></i>
+                <i class="fa-solid fa-location-dot mr-1.5 text-[10px] text-brand"></i>
                 {linked.prefecture}
               </span>
             ) : null}
@@ -439,7 +442,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
 
           {linked.rating ? (
             <p class="mt-2.5">
-              <Stars value={linked.rating} color={accent} />
+              <Stars value={linked.rating} />
             </p>
           ) : null}
 
@@ -449,14 +452,8 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
 
           {/* 推し買い */}
           {items.length ? (
-            <div
-              class="mt-4 rounded-xl p-3.5"
-              style={`background:${lc?.accentSoft};border:1px solid ${accent}33`}
-            >
-              <p
-                class="flex items-center gap-2 text-[10.5px] font-semibold tracking-[0.06em]"
-                style={`color:${accent}`}
-              >
+            <div class="mt-4 rounded-xl border border-brand/25 bg-brandsoft p-3.5">
+              <p class="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.06em] text-brand">
                 <i class="fa-solid fa-cart-shopping text-[9px]"></i>
                 推し買い
               </p>
@@ -468,8 +465,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
           <div class="mt-4 flex items-center justify-between gap-3">
             <a
               href={`/posts/${current.slug}`}
-              class="truncate rounded-full border px-3 py-1.5 text-[11px] transition hover:brightness-125"
-              style={`border-color:${accent}33;background:${lc?.accentSoft};color:${accent}`}
+              class="truncate rounded-full border border-brand/25 bg-brandsoft px-3 py-1 text-[11px] text-brand transition hover:brightness-125"
             >
               #{current.place_name || current.title}
             </a>

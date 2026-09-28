@@ -265,15 +265,15 @@ VALUES
 -- ===== IT / 生成AI =====
 INSERT INTO posts (slug, category, title, summary, body, status, published_at)
 VALUES
-('genai-in-house-se', 'it', '社内SEが生成AIを社内展開して分かった「効く場所・効かない場所」',
+('genai-in-house-se', 'it', '生成AIを全社展開して分かった「効く場所・効かない場所」',
  '全社にAIチャットを配って半年。実際に業務時間が減ったのは、想像とは違う領域でした。',
  '## 導入の背景
 
-情シス2名で全社400名を支える体制。**問い合わせ対応の削減**が最大の目的でした。
+担当2名で全社400名を支える体制。**問い合わせ対応の削減**が最大の目的でした。
 
 ## 効いた場所
 
-### 1. 情シスへの一次問い合わせ
+### 1. 社内ヘルプデスクへの一次問い合わせ
 
 「パスワードを変えたい」「VPNが繋がらない」レベルはFAQ化＋AI回答でほぼ吸収できました。
 
@@ -298,7 +298,7 @@ VALUES
 社内勉強会を月1で回し、実例を共有するようにしてから利用率が3倍になりました。',
  'published', '2026-07-10'),
 
-('it-asset-inventory', 'it', '情シスのPC資産棚卸しを自動化した話｜手作業40時間→2時間',
+('it-asset-inventory', 'it', 'PC資産棚卸しを自動化した話｜手作業40時間→2時間',
  'Excel台帳とにらめっこしていた棚卸し業務を、スクリプトとクラウド管理に置き換えました。',
  '## 課題
 
@@ -334,7 +334,7 @@ INSERT INTO tags (name, slug) VALUES
  ('生活費','seikatsuhi'), ('コスパ','cospa'), ('節約','setsuyaku'),
  ('長野','nagano'), ('高知','kochi'), ('北海道','hokkaido'), ('日帰り','higaeri'), ('絶景','zekkei'),
  ('惣菜','souzai'), ('地場野菜','jibayasai'),
- ('生成AI','seiseiai'), ('社内SE','shanaise'), ('業務改善','gyoumukaizen');
+ ('生成AI','seiseiai'), ('自動化','jidouka'), ('業務改善','gyoumukaizen');
 
 INSERT INTO post_tags (post_id, tag_id)
 SELECT p.id, t.id FROM posts p, tags t WHERE

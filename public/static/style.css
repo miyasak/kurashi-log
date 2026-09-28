@@ -24,6 +24,23 @@ body {
   background: var(--base);
   color: var(--ink);
   letter-spacing: 0.01em;
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans',
+    'Helvetica Neue', sans-serif;
+}
+
+/* ---------------- 数字は等幅で桁を揃える ----------------
+   金額・基準価額・距離など、縦に並んだときに桁がずれないようにする */
+.font-mono,
+time,
+table td,
+table th {
+  font-family: 'Roboto Mono', SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
 ::selection {
@@ -31,12 +48,12 @@ body {
   color: #fff;
 }
 
-/* ---------------- scroll reveal ---------------- */
+/* ---------------- scroll reveal ----------------
+   読み物向けに演出は最小限（スクロールを邂らない） */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(10px);
+  transition: opacity 0.45s ease-out, transform 0.45s ease-out;
   will-change: opacity, transform;
 }
 .reveal.in {
@@ -114,43 +131,50 @@ body {
 
 /* ---------------- article body (light text on dark) ---------------- */
 .post-body {
-  font-size: 17px;
-  line-height: 1.9;
+  font-size: 15.5px;
+  line-height: 1.95;
   color: #e4e4e7;
   letter-spacing: 0.012em;
 }
 @media (min-width: 640px) {
   .post-body {
-    font-size: 19px;
+    font-size: 16.5px;
     line-height: 1.95;
   }
 }
 .post-body > * + * {
-  margin-top: 1.35em;
+  margin-top: 1.3em;
+}
+/* 本文中の数字だけ等幅にする（見出しの数字も含む） */
+.post-body table td,
+.post-body table th {
+  font-family: 'Roboto Mono', SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.86em;
 }
 .post-body p {
   color: #d4d4d8;
 }
 .post-body h2 {
-  margin-top: 2.4em;
-  margin-bottom: 0.6em;
-  font-size: 1.45em;
+  margin-top: 2em;
+  margin-bottom: 0.55em;
+  font-size: 1.28em;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   color: var(--ink);
-  padding-bottom: 0.45em;
+  padding-bottom: 0.4em;
   border-bottom: 1px solid var(--edge2);
 }
 .post-body h3 {
-  margin-top: 2em;
-  margin-bottom: 0.4em;
-  font-size: 1.18em;
+  margin-top: 1.75em;
+  margin-bottom: 0.35em;
+  font-size: 1.1em;
   font-weight: 700;
   color: var(--ink);
 }
 .post-body h4 {
-  margin-top: 1.6em;
-  font-size: 1.02em;
+  margin-top: 1.45em;
+  font-size: 1em;
   font-weight: 700;
   color: var(--ink);
 }

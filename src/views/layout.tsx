@@ -1,10 +1,13 @@
 import type { FC, PropsWithChildren } from 'hono/jsx'
-import { CATEGORIES, SITE, SEO, CATEGORY_MAP } from '../lib/config'
+import { THEMES, SITE, SEO, CATEGORY_MAP, ACCENT } from '../lib/config'
 
 type LayoutProps = PropsWithChildren<{
   title?: string
   description?: string
+  /** 記事カテゴリ（テーマのハイライト用に自動変換） */
   activeCategory?: string
+  /** 大テーマ（money / touring / tech）を直接指定 */
+  activeTheme?: string
   /** ホーム/マップなど、ナビでハイライトする固定ページ */
   activePage?: 'home' | 'map' | 'about' | 'search'
   ogImage?: string | null
@@ -17,6 +20,7 @@ type LayoutProps = PropsWithChildren<{
 export const Layout: FC<LayoutProps> = (props) => {
   const title = props.title ? `${props.title} — ${SITE.title}` : `${SITE.title} — ${SITE.subtitle}`
   const desc = props.description || SITE.description
+  const activeTheme = props.activeTheme || CATEGORY_MAP[props.activeCategory || '']?.theme
   return (
     <html lang="ja" class="dark">
       <head>
@@ -46,6 +50,13 @@ export const Layout: FC<LayoutProps> = (props) => {
           rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23f97316'/><text x='50' y='72' font-size='58' text-anchor='middle' fill='%23fff'>🏍</text></svg>"
         />
+        {/* 本文フォント：日本語は Noto Sans JP、数字は等幅（Roboto Mono）で桁を揃える */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        />
         <link
           href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
           rel="stylesheet"
@@ -54,7 +65,10 @@ export const Layout: FC<LayoutProps> = (props) => {
         <script
           dangerouslySetInnerHTML={{
             __html: `tailwind.config={darkMode:'class',theme:{extend:{
-              fontFamily:{sans:['-apple-system','BlinkMacSystemFont','SF Pro Display','SF Pro Text','Hiragino Sans','Inter','Noto Sans JP','Helvetica Neue','sans-serif']},
+              fontFamily:{
+                sans:['Noto Sans JP','-apple-system','BlinkMacSystemFont','Hiragino Sans','Helvetica Neue','sans-serif'],
+                mono:['Roboto Mono','SFMono-Regular','Menlo','monospace']
+              },
               colors:{
                 base:'#0a0a0b',
                 panel:'#121214',
@@ -64,11 +78,11 @@ export const Layout: FC<LayoutProps> = (props) => {
                 ink:'#f5f5f7',
                 sub:'#a1a1aa',
                 mute:'#71717a',
-                brand:'#f97316',
+                brand:'${ACCENT}',
                 brandsoft:'rgba(249,115,22,0.14)'
               },
               maxWidth:{page:'1120px',text:'720px'},
-              borderRadius:{apple:'16px',big:'24px'}
+              borderRadius:{apple:'14px',big:'18px'}
             }}}`
           }}
         ></script>
@@ -76,7 +90,7 @@ export const Layout: FC<LayoutProps> = (props) => {
         {props.headExtra ?? null}
       </head>
       <body class="bg-base font-sans text-ink antialiased">
-        <SiteHeader active={props.activeCategory} activePage={props.activePage} />
+        <SiteHeader activeTheme={activeTheme} activePage={props.activePage} />
         <main>{props.children}</main>
         <SiteFooter />
         {(props.scripts || []).map((s) => (
@@ -111,115 +125,66 @@ export const Layout: FC<LayoutProps> = (props) => {
   )
 }
 
-/* ============ グローバルナビ（ダーク・ピル型アクティブ表示） ============ */
-
-/** 「お金の記録」ドロップダウンに入れるカテゴリ */
-const MONEY_CATS = CATEGORIES.filter((c) => c.group === 'money')
-/** ナビに直接並べるカテゴリ（ラベルは短く） */
-const NAV_LABELS: Record<string, string> = {
-  touring: 'ツーリング記録',
-  supermarket: 'ご当地スーパー',
-  it: 'IT / 生成AI'
-}
-const NAV_MAIN = CATEGORIES.filter((c) => c.group !== 'money').map((c) => ({
-  ...c,
-  navLabel: NAV_LABELS[c.key] || c.name
-}))
-
-const SiteHeader: FC<{ active?: string; activePage?: string }> = ({ active, activePage }) => {
-  const pill = (isActive: boolean) =>
-    `flex items-center gap-2 rounded-full px-4 py-2 text-[13px] tracking-tight transition ${
+/* =========================================================
+   固定ヘッダー
+   左：サイト名 ／ 右：Money / Touring / Tech / About
+   ========================================================= */
+const SiteHeader: FC<{ activeTheme?: string; activePage?: string }> = ({ activeTheme, activePage }) => {
+  const link = (isActive: boolean) =>
+    `rounded-full px-3.5 py-1.5 text-[13.5px] font-medium tracking-tight transition ${
       isActive ? 'bg-brand text-white' : 'text-sub hover:bg-white/[0.07] hover:text-ink'
     }`
+
+  const items = [
+    ...THEMES.map((t) => ({ href: `/theme/${t.key}`, label: t.label, active: activeTheme === t.key })),
+    { href: '/about', label: 'About', active: activePage === 'about' }
+  ]
 
   return (
     <>
       <header
         id="global-nav"
-        class="fixed inset-x-0 top-0 z-50 border-b border-edge2 bg-base/85 backdrop-blur-xl backdrop-saturate-150"
+        class="fixed inset-x-0 top-0 z-50 border-b border-edge2 bg-base/90 backdrop-blur-xl backdrop-saturate-150"
       >
-        <div class="mx-auto flex h-16 max-w-page items-center px-5 sm:px-6">
-          {/* ロゴ */}
-          <a href="/" class="flex items-center gap-3 transition hover:opacity-80" aria-label={SITE.title}>
-            <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand text-white">
-              <i class="fa-solid fa-motorcycle text-[15px]"></i>
+        <div class="mx-auto flex h-14 max-w-page items-center px-4 sm:px-6">
+          {/* 左：サイト名 */}
+          <a href="/" class="flex items-center gap-2.5 transition hover:opacity-80" aria-label={SITE.title}>
+            <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">
+              <i class="fa-solid fa-motorcycle text-[13px]"></i>
             </span>
-            <span class="leading-tight">
-              <span class="block text-[15px] font-semibold tracking-tight">{SITE.title}</span>
-              <span class="hidden text-[9px] font-medium uppercase tracking-[0.18em] text-mute sm:block">
-                {SITE.caption}
-              </span>
-            </span>
+            <span class="text-[15px] font-bold tracking-tight">{SITE.title}</span>
           </a>
 
-          {/* PCナビ：主要導線を5つに絞り、「お金の記録」はホバーで展開 */}
-          <nav class="ml-auto hidden items-center gap-1 lg:flex">
-            <a href="/" class={pill(activePage === 'home')}>
-              <i class="fa-solid fa-house text-[11px]"></i>ホーム
-            </a>
-
-            {/* お金の記録（資産運用 / 日常の生活） */}
-            <div class="relative group">
-              <button class={pill(active === 'asset' || active === 'life')} type="button">
-                <i class="fa-solid fa-coins text-[11px]"></i>
-                お金の記録
-                <i class="fa-solid fa-chevron-down ml-0.5 text-[8px] opacity-70"></i>
-              </button>
-              <div class="invisible absolute right-0 top-full z-50 w-[288px] translate-y-1 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                <div class="overflow-hidden rounded-apple border border-edge bg-panel/95 p-2 shadow-2xl backdrop-blur-xl">
-                  {MONEY_CATS.map((c) => (
-                    <a
-                      href={`/category/${c.key}`}
-                      class="flex items-start gap-3 rounded-xl px-3 py-3 transition hover:bg-white/[0.06]"
-                    >
-                      <span
-                        class="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg"
-                        style={`background:${c.accentSoft};color:${c.accent}`}
-                      >
-                        <i class={`fa-solid ${c.icon} text-[12px]`}></i>
-                      </span>
-                      <span class="min-w-0">
-                        <span class="block text-[13.5px] font-medium tracking-tight text-ink">{c.name}</span>
-                        <span class="mt-0.5 block text-[11.5px] leading-snug text-mute">{c.tagline}</span>
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {NAV_MAIN.map((c) => (
-              <a href={`/category/${c.key}`} class={pill(active === c.key)}>
-                <i class={`fa-solid ${c.icon} text-[11px]`}></i>
-                {c.navLabel}
+          {/* 右：4リンク（PC） */}
+          <nav class="ml-auto hidden items-center gap-1 md:flex">
+            {items.map((it) => (
+              <a href={it.href} class={link(it.active)}>
+                {it.label}
               </a>
             ))}
-
-            <a href="/map" class={pill(activePage === 'map')}>
-              <i class="fa-solid fa-map-location-dot text-[11px]"></i>エリア別
-            </a>
             <a
               href="/search"
-              class="ml-1 grid h-9 w-9 place-items-center rounded-full text-sub transition hover:bg-white/[0.07] hover:text-ink"
+              class="ml-1 grid h-8 w-8 place-items-center rounded-full text-sub transition hover:bg-white/[0.07] hover:text-ink"
+              aria-label="検索"
+            >
+              <i class="fa-solid fa-magnifying-glass text-[12.5px]"></i>
+            </a>
+          </nav>
+
+          {/* 右：モバイル */}
+          <div class="ml-auto flex items-center gap-0.5 md:hidden">
+            <a
+              href="/search"
+              class="grid h-9 w-9 place-items-center rounded-full text-sub transition hover:bg-white/[0.07]"
               aria-label="検索"
             >
               <i class="fa-solid fa-magnifying-glass text-[13px]"></i>
             </a>
-          </nav>
-
-          {/* モバイル */}
-          <div class="ml-auto flex items-center gap-1 lg:hidden">
-            <a
-              href="/search"
-              class="grid h-10 w-10 place-items-center rounded-full text-sub transition hover:bg-white/[0.07]"
-              aria-label="検索"
-            >
-              <i class="fa-solid fa-magnifying-glass text-[14px]"></i>
-            </a>
             <button
               id="menu-toggle"
-              class="grid h-10 w-10 place-items-center rounded-full text-ink transition hover:bg-white/[0.07]"
+              class="grid h-9 w-9 place-items-center rounded-full text-ink transition hover:bg-white/[0.07]"
               aria-label="メニュー"
+              aria-expanded="false"
             >
               <i id="menu-icon" class="fa-solid fa-bars text-[15px]"></i>
             </button>
@@ -227,96 +192,93 @@ const SiteHeader: FC<{ active?: string; activePage?: string }> = ({ active, acti
         </div>
       </header>
 
-      {/* モバイル：全画面メニュー */}
-      <div id="mobile-menu" class="fixed inset-0 z-40 hidden bg-base/97 pt-16 backdrop-blur-xl lg:hidden">
-        <div class="mx-auto max-w-page overflow-y-auto px-5 py-6" style="max-height:calc(100vh - 4rem)">
-          <a
-            href="/"
-            class="flex items-center justify-between border-b border-edge2 py-4 text-[19px] font-semibold tracking-tight"
-          >
-            <span class="flex items-center gap-3.5">
-              <i class="fa-solid fa-house w-5 text-[14px] text-mute"></i>ホーム
-            </span>
-            <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
-          </a>
-          {CATEGORIES.map((c) => (
+      {/* モバイル：ハンバーガーメニュー */}
+      <div id="mobile-menu" class="fixed inset-0 z-40 hidden bg-base/97 pt-14 backdrop-blur-xl md:hidden">
+        <div class="mx-auto max-w-page overflow-y-auto px-4 py-4" style="max-height:calc(100vh - 3.5rem)">
+          {THEMES.map((t) => (
             <a
-              href={`/category/${c.key}`}
-              class="flex items-center justify-between border-b border-edge2 py-4 text-[19px] font-semibold tracking-tight"
+              href={`/theme/${t.key}`}
+              class="flex items-center justify-between border-b border-edge2 py-4"
             >
-              <span class="flex items-center gap-3.5">
-                <i class={`fa-solid ${c.icon} w-5 text-[14px]`} style={`color:${c.accent}`}></i>
-                {c.name}
+              <span class="min-w-0">
+                <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
+                  <i class={`fa-solid ${t.icon} w-5 text-[13px] text-brand`}></i>
+                  {t.label}
+                </span>
+                <span class="mt-1 block pl-8 text-[12px] text-mute">{t.name}</span>
               </span>
               <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
             </a>
           ))}
-          <a
-            href="/map"
-            class="flex items-center justify-between border-b border-edge2 py-4 text-[19px] font-semibold tracking-tight"
-          >
-            <span class="flex items-center gap-3.5">
-              <i class="fa-solid fa-map-location-dot w-5 text-[14px] text-mute"></i>マップ
+          <a href="/about" class="flex items-center justify-between border-b border-edge2 py-4">
+            <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
+              <i class="fa-solid fa-circle-info w-5 text-[13px] text-brand"></i>About
             </span>
             <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
           </a>
-          <a href="/about" class="flex items-center justify-between py-4 text-[19px] font-semibold tracking-tight">
-            <span class="flex items-center gap-3.5">
-              <i class="fa-solid fa-circle-info w-5 text-[14px] text-mute"></i>About
+          <a href="/map" class="flex items-center justify-between border-b border-edge2 py-4">
+            <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
+              <i class="fa-solid fa-map-location-dot w-5 text-[13px] text-brand"></i>エリア別
+            </span>
+            <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
+          </a>
+          <a href="/search" class="flex items-center justify-between py-4">
+            <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
+              <i class="fa-solid fa-magnifying-glass w-5 text-[13px] text-brand"></i>記事を探す
             </span>
             <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
           </a>
         </div>
       </div>
-      <div class="h-16"></div>
+      <div class="h-14"></div>
     </>
   )
 }
 
 /* ============ フッター ============ */
 const SiteFooter: FC = () => (
-  <footer class="border-t border-edge2 bg-panel">
-    <div class="mx-auto max-w-page px-5 py-14 sm:px-6">
-      <div class="flex items-center gap-3">
-        <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand text-white">
-          <i class="fa-solid fa-motorcycle text-[15px]"></i>
+  <footer class="mt-16 border-t border-edge2 bg-panel">
+    <div class="mx-auto max-w-page px-4 py-10 sm:px-6">
+      <div class="flex items-center gap-2.5">
+        <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">
+          <i class="fa-solid fa-motorcycle text-[13px]"></i>
         </span>
-        <span class="text-[15px] font-semibold tracking-tight">{SITE.title}</span>
+        <span class="text-[15px] font-bold tracking-tight">{SITE.title}</span>
       </div>
-      <p class="mt-5 max-w-2xl text-[13px] leading-relaxed text-mute">{SITE.description}</p>
+      <p class="mt-4 max-w-xl text-[12.5px] leading-relaxed text-mute">{SITE.description}</p>
 
-      <div class="mt-11 grid gap-9 border-t border-edge2 pt-10 sm:grid-cols-3">
+      <div class="mt-8 grid gap-7 border-t border-edge2 pt-8 sm:grid-cols-3">
         <div>
-          <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-mute">Topics</p>
-          <ul class="mt-4 space-y-3">
-            {CATEGORIES.map((c) => (
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.14em] text-mute">Topics</p>
+          <ul class="mt-3 space-y-2.5">
+            {THEMES.map((t) => (
               <li>
-                <a href={`/category/${c.key}`} class="text-[13px] text-sub transition hover:text-ink">
-                  {c.name}
+                <a href={`/theme/${t.key}`} class="text-[13px] text-sub transition hover:text-ink">
+                  {t.label}
+                  <span class="ml-2 text-[11.5px] text-mute">{t.name}</span>
                 </a>
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-mute">Site</p>
-          <ul class="mt-4 space-y-3">
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.14em] text-mute">Site</p>
+          <ul class="mt-3 space-y-2.5">
             <li><a href="/" class="text-[13px] text-sub transition hover:text-ink">ホーム</a></li>
-            <li><a href="/map" class="text-[13px] text-sub transition hover:text-ink">走行マップ</a></li>
+            <li><a href="/about" class="text-[13px] text-sub transition hover:text-ink">About</a></li>
+            <li><a href="/map" class="text-[13px] text-sub transition hover:text-ink">エリア別マップ</a></li>
             <li><a href="/search" class="text-[13px] text-sub transition hover:text-ink">記事を探す</a></li>
-            <li><a href="/about" class="text-[13px] text-sub transition hover:text-ink">このサイトについて</a></li>
           </ul>
         </div>
         <div>
-          <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-mute">Manage</p>
-          <ul class="mt-4 space-y-3">
-            <li><a href="/admin" class="text-[13px] text-sub transition hover:text-ink">管理画面</a></li>
+          <p class="text-[10.5px] font-bold uppercase tracking-[0.14em] text-mute">Info</p>
+          <ul class="mt-3 space-y-2.5">
             <li><a href="/sitemap.xml" class="text-[13px] text-sub transition hover:text-ink">サイトマップ</a></li>
           </ul>
         </div>
       </div>
 
-      <p class="mt-11 border-t border-edge2 pt-7 text-[11px] text-mute">
+      <p class="mt-8 border-t border-edge2 pt-6 text-[11px] text-mute">
         Copyright © {new Date().getFullYear()} {SITE.title}. すべての金額・記録は個人の実績値です。
       </p>
     </div>
@@ -329,18 +291,16 @@ const SiteFooter: FC = () => (
 export const ArrowLink: FC<{ href: string; children?: any; size?: 'sm' | 'md'; color?: string }> = ({
   href,
   children,
-  size = 'md',
-  color
+  size = 'md'
 }) => (
   <a
     href={href}
-    class={`group inline-flex items-center gap-1.5 font-medium tracking-tight transition hover:opacity-80 ${
-      size === 'sm' ? 'text-[13px]' : 'text-[15px] sm:text-[16px]'
+    class={`group inline-flex items-center gap-1.5 font-medium tracking-tight text-brand transition hover:opacity-80 ${
+      size === 'sm' ? 'text-[12.5px]' : 'text-[13.5px]'
     }`}
-    style={`color:${color || '#fb923c'}`}
   >
     {children}
-    <i class="fa-solid fa-chevron-right text-[0.7em] transition group-hover:translate-x-0.5"></i>
+    <i class="fa-solid fa-chevron-right text-[0.72em] transition group-hover:translate-x-0.5"></i>
   </a>
 )
 
@@ -353,30 +313,27 @@ export const PillButton: FC<{ href: string; children?: any; variant?: 'brand' | 
 }) => {
   const styles = {
     brand: 'bg-brand text-white hover:brightness-110',
-    ghost: 'bg-white/[0.08] text-ink ring-1 ring-inset ring-white/15 hover:bg-white/[0.14]',
+    ghost: 'bg-white/[0.07] text-ink ring-1 ring-inset ring-white/12 hover:bg-white/[0.12]',
     light: 'bg-ink text-base hover:opacity-90'
   }[variant]
   return (
     <a
       href={href}
-      class={`inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[14px] font-medium tracking-tight transition ${styles}`}
+      class={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[13.5px] font-medium tracking-tight transition ${styles}`}
     >
-      {icon ? <i class={`fa-solid ${icon} text-[12px]`}></i> : null}
+      {icon ? <i class={`fa-solid ${icon} text-[11.5px]`}></i> : null}
       {children}
     </a>
   )
 }
 
-/** カテゴリのアイコン付きラベル（バッジ） */
+/** カテゴリのバッジ（単一アクセント） */
 export const Eyebrow: FC<{ cat: string; light?: boolean }> = ({ cat }) => {
   const c = CATEGORY_MAP[cat]
   if (!c) return null
   return (
-    <span
-      class="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]"
-      style={`background:${c.accentSoft};color:${c.accent}`}
-    >
-      <i class={`fa-solid ${c.icon} text-[10px]`}></i>
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-brandsoft px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.1em] text-brand">
+      <i class={`fa-solid ${c.icon} text-[9.5px]`}></i>
       {c.short}
     </span>
   )

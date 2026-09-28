@@ -8,12 +8,13 @@
   const LINE = 'rgba(255,255,255,0.07)'
   const BRAND = '#f97316'
 
+  /* アクセントはサイト共通の1色（オレンジ）に統一 */
   const CAT = {
-    asset: { color: '#34d399', icon: 'fa-chart-line', name: '資産運用' },
-    life: { color: '#fbbf24', icon: 'fa-house-chimney', name: '日常の生活' },
-    touring: { color: '#fb923c', icon: 'fa-motorcycle', name: 'ツーリング' },
-    supermarket: { color: '#fb7185', icon: 'fa-basket-shopping', name: 'ご当地スーパー' },
-    it: { color: '#a78bfa', icon: 'fa-microchip', name: 'IT / 生成AI' }
+    asset: { color: BRAND, icon: 'fa-chart-line', name: '資産運用' },
+    life: { color: BRAND, icon: 'fa-receipt', name: '生活費' },
+    touring: { color: BRAND, icon: 'fa-motorcycle', name: 'ツーリング記録' },
+    supermarket: { color: BRAND, icon: 'fa-basket-shopping', name: 'ご当地スーパー' },
+    it: { color: BRAND, icon: 'fa-gears', name: '業務効率化' }
   }
 
   /* ---- モバイルメニュー ---- */
@@ -90,9 +91,9 @@
     return j.stats || []
   }
 
+  /* グラフの数値は等幅フォントで桁を揃える */
   const FONT = {
-    family:
-      '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Sans", Inter, "Noto Sans JP", sans-serif',
+    family: '"Roboto Mono", SFMono-Regular, Menlo, monospace',
     size: 11
   }
 
@@ -181,8 +182,8 @@
           labels,
           datasets: [
             lineDs('総資産', 'total_assets', BRAND, true),
-            lineDs('NISA', 'nisa_value', '#34d399', false),
-            lineDs('iDeCo', 'ideco_value', '#a78bfa', false)
+            lineDs('NISA', 'nisa_value', '#e4e4e7', false),
+            lineDs('iDeCo', 'ideco_value', '#71717a', false)
           ]
         },
         options: baseOpts
@@ -197,16 +198,16 @@
             {
               label: '生活費',
               data: stats.map((s) => s.living_cost),
-              backgroundColor: '#fbbf24',
-              borderRadius: 5,
-              maxBarThickness: 22
+              backgroundColor: BRAND,
+              borderRadius: 4,
+              maxBarThickness: 20
             },
             {
               label: '手取り収入',
               data: stats.map((s) => s.income),
-              backgroundColor: 'rgba(255,255,255,0.18)',
-              borderRadius: 5,
-              maxBarThickness: 22
+              backgroundColor: 'rgba(255,255,255,0.16)',
+              borderRadius: 4,
+              maxBarThickness: 20
             }
           ]
         },
@@ -222,7 +223,8 @@
         } catch (e) {}
         const keys = Object.keys(obj)
         if (keys.length) {
-          const mono = ['#f97316', '#fb923c', '#fbbf24', '#34d399', '#22d3ee', '#60a5fa', '#a78bfa', '#fb7185', '#94a3b8', '#52525b']
+          // オレンジ1色の濃淡でまとめる
+          const mono = ['#f97316', '#fb8c3c', '#fda462', '#fdbb88', '#a1a1aa', '#8b8b93', '#71717a', '#5a5a61', '#45454b', '#333338']
           new Chart(expenseEl, {
             type: 'doughnut',
             data: {
@@ -303,8 +305,8 @@
           ? `<div style="margin-top:5px;color:${MUTE};font-size:11px">${p.distance_km} km</div>`
           : ''
     return `<div style="min-width:180px">
-      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${MUTE}">${c.name || ''}</div>
-      <a href="/posts/${p.slug}" style="display:block;margin-top:4px;font-size:15px;font-weight:600;letter-spacing:-.01em;color:${INK};text-decoration:none">${p.title}</a>
+      <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${BRAND}">${c.name || ''}</div>
+      <a href="/posts/${p.slug}" style="display:block;margin-top:4px;font-size:14px;font-weight:700;letter-spacing:-.01em;color:${INK};text-decoration:none">${p.title}</a>
       ${p.place_name ? `<div style="color:${MUTE};font-size:11px;margin-top:3px">${p.place_name}</div>` : ''}
       ${extra}
       <a href="/posts/${p.slug}" style="display:inline-block;margin-top:8px;font-size:12px;color:${BRAND};text-decoration:none">記事を読む ›</a>
@@ -333,7 +335,11 @@
       tileLayer().addTo(map)
       const res = await fetch('/api/map/points')
       const { points } = await res.json()
-      const target = points.filter((p) => p.category === catMapEl.dataset.category)
+      // data-category が空ならツーリング系すべて（テーマ表示）
+      const want = catMapEl.dataset.category
+      const target = want
+        ? points.filter((p) => p.category === want)
+        : points.filter((p) => p.category === 'touring' || p.category === 'supermarket')
       const group = []
       target.forEach((p) => {
         group.push(L.marker([p.lat, p.lng], { icon: pinIcon(p.category) }).addTo(map).bindPopup(popupHtml(p)))
@@ -364,27 +370,27 @@
             ? target
                 .map((p) => {
                   const c = CAT[p.category] || {}
-                  return `<a href="/posts/${p.slug}" class="group flex items-center gap-4 rounded-big border border-edge2 bg-base p-5 transition hover:border-edge hover:bg-panel2">
-                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full" style="background:${c.color}24;color:${c.color}">
-                      <i class="fa-solid ${c.icon} text-[14px]"></i>
+                  return `<a href="/posts/${p.slug}" class="group flex items-center gap-3.5 rounded-big border border-edge2 bg-base p-4 transition hover:border-brand/40">
+                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg" style="background:rgba(249,115,22,0.14);color:${c.color}">
+                      <i class="fa-solid ${c.icon} text-[13px]"></i>
                     </span>
                     <span class="min-w-0 flex-1">
-                      <span class="block truncate text-[15px] font-semibold tracking-[-0.01em]">${p.title}</span>
-                      <span class="mt-0.5 block truncate text-[12px] text-mute">${p.prefecture || ''} ${p.place_name || ''}</span>
+                      <span class="block truncate text-[13.5px] font-bold tracking-[-0.01em]">${p.title}</span>
+                      <span class="mt-0.5 block truncate text-[11.5px] text-mute">${p.prefecture || ''} ${p.place_name || ''}</span>
                     </span>
                     <i class="fa-solid fa-chevron-right text-[10px] text-mute transition group-hover:translate-x-0.5"></i>
                   </a>`
                 })
                 .join('')
-            : '<p class="text-[15px] text-mute">スポットが登録されていません</p>'
+            : '<p class="text-[13px] text-mute">該当するスポットはありません</p>'
         }
       }
       render('all')
 
       const ACTIVE =
-        'map-filter rounded-full bg-brand px-5 py-2.5 text-[13px] font-medium text-white transition'
+        'map-filter rounded-full bg-brand px-4 py-2 text-[12.5px] font-medium text-white transition'
       const IDLE =
-        'map-filter rounded-full border border-edge2 bg-panel px-5 py-2.5 text-[13px] text-sub transition hover:text-ink'
+        'map-filter rounded-full border border-edge2 bg-panel px-4 py-2 text-[12.5px] text-sub transition hover:text-ink'
       document.querySelectorAll('.map-filter').forEach((btn) => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.map-filter').forEach((b) => (b.className = IDLE))

@@ -1,9 +1,9 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { CATEGORIES, CATEGORY_MAP } from '../lib/config'
-import { PostCard, SectionTitle, EmptyState, SpecRow } from './components'
+import { THEMES, CATEGORY_MAP } from '../lib/config'
+import { PostCard, SectionTitle, SpecRow, validSpecs } from './components'
 import { ArrowLink, PillButton } from './layout'
-import { formatDate, yen } from '../lib/utils'
+import { yen } from '../lib/utils'
 
 type Props = {
   latest: Post[]
@@ -12,378 +12,254 @@ type Props = {
   stats: any[]
   totalDistance: number
   superCount: number
+  prefCount: number
+  /** About として使う自己紹介記事のURL（無ければ /about） */
+  aboutHref: string
 }
 
-export const HomePage: FC<Props> = ({ latest, byCategory, counts, stats, totalDistance, superCount }) => {
+export const HomePage: FC<Props> = ({
+  latest,
+  byCategory,
+  counts,
+  stats,
+  totalDistance,
+  superCount,
+  prefCount,
+  aboutHref
+}) => {
   const last = stats.length ? stats[stats.length - 1] : null
   const prev = stats.length > 1 ? stats[stats.length - 2] : null
   const diff = last && prev && last.total_assets && prev.total_assets ? last.total_assets - prev.total_assets : null
   const totalPosts = Object.values(counts).reduce((a, b) => a + b, 0)
-  const heroPost = (byCategory.touring || []).find((p) => p.cover_image)
-  const prefCount = new Set(
-    [...(byCategory.touring || []), ...(byCategory.supermarket || [])].map((p) => p.prefecture).filter(Boolean)
-  ).size
+
+  /** ヒーロー下の数字（値が無いものは自動的に消える） */
+  const heroSpecs = validSpecs([
+    {
+      label: '総資産',
+      value: last?.total_assets ? `¥${Number(last.total_assets).toLocaleString('ja-JP')}` : '',
+      sub: diff ? `前月比 ${diff > 0 ? '+' : '−'}¥${Math.abs(diff).toLocaleString('ja-JP')}` : undefined
+    },
+    { label: '走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
+    { label: '立ち寄り店', value: superCount ? `${superCount}` : '' },
+    { label: '都道府県', value: prefCount ? `${prefCount}` : '' },
+    { label: '公開記事', value: totalPosts ? `${totalPosts}` : '' }
+  ])
+
+  /** 新着に出した記事はカテゴリ別セクションでは繰り返さない */
+  const shownIds = new Set(latest.slice(0, 6).map((p) => p.id))
+
+  /** テーマごとの記事（空のテーマはセクションごと非表示） */
+  const themeBlocks = THEMES.map((t) => {
+    const posts = t.categories
+      .flatMap((k) => byCategory[k] || [])
+      .filter((p) => !shownIds.has(p.id))
+      .sort((a, b) =>
+        String(b.published_at || '').localeCompare(String(a.published_at || ''))
+      )
+      .slice(0, 3)
+    const count = t.categories.reduce((s, k) => s + (counts[k] || 0), 0)
+    return { theme: t, posts, count }
+  }).filter((b) => b.posts.length > 0)
+
+  const moneyBlock = themeBlocks.find((b) => b.theme.key === 'money')
 
   return (
     <>
-      {/* ==================== HERO ==================== */}
-      <section class="relative -mt-16 overflow-hidden bg-base pt-16">
-        {/* 背景写真 */}
-        {heroPost?.cover_image ? (
-          <div class="absolute inset-0">
-            <img src={heroPost.cover_image} alt="" class="h-full w-full object-cover opacity-70" />
-            <div class="absolute inset-0 bg-gradient-to-r from-base via-base/85 to-base/10"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-base via-transparent to-base/70"></div>
-          </div>
-        ) : (
-          <div class="absolute inset-0 bg-gradient-to-br from-panel2 via-base to-black"></div>
-        )}
+      {/* ==================== ヒーロー ==================== */}
+      <section class="border-b border-edge2 bg-base">
+        <div class="mx-auto max-w-page px-4 py-10 sm:px-6 sm:py-14">
+          <p class="inline-flex items-center gap-2 rounded-full bg-brandsoft px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
+            <i class="fa-solid fa-chart-simple text-[10px]"></i>
+            Personal Record
+          </p>
+          <h1 class="mt-4 text-[26px] font-bold leading-[1.28] tracking-[-0.03em] text-ink sm:text-[36px]">
+            <span class="block">数字で記録する、</span>
+            <span class="block">お金とツーリングと仕事。</span>
+          </h1>
+          <p class="mt-4 max-w-[64ch] text-[13.5px] leading-[1.85] text-sub sm:text-[14.5px]">
+            資産運用・生活費・ツーリング・ご当地スーパー・業務効率化と自動化。
+            感覚ではなく<span class="font-medium text-ink">実額と実測値</span>で、あとから辿れるように残しています。
+          </p>
 
-        <div class="relative mx-auto max-w-page px-5 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-24">
-          <div class="max-w-[640px]">
-            <p class="hero-line inline-flex items-center gap-2.5 rounded-full border border-brand/40 bg-brandsoft px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand">
-              <i class="fa-solid fa-motorcycle text-[11px]"></i>
-              Personal Archive
-            </p>
-            <h1 class="hero-line mt-7 text-[38px] font-bold leading-[1.12] tracking-[-0.03em] text-white sm:text-[60px]">
-              走った道と、
-              <br />
-              その土地の<span class="text-brand">数字</span>の記録。
-            </h1>
-            <p class="hero-line mt-6 max-w-[520px] text-[14.5px] leading-[1.85] text-sub sm:text-[16px]">
-              資産運用・生活費・ツーリング・ご当地スーパー・社内SEとしてのIT。
-              5つのテーマを、写真とルートと<span class="font-medium text-ink">実額の数字</span>であとから辿れるように残しています。
-            </p>
-            <div class="hero-line mt-9 flex flex-wrap items-center gap-3">
-              <PillButton href="/category/touring" icon="fa-motorcycle">
-                ツーリング記録を見る
-              </PillButton>
-              <PillButton href="/category/asset" variant="ghost" icon="fa-chart-line">
-                資産の記録を見る
-              </PillButton>
-            </div>
-          </div>
-
-          {/* 数値スペック */}
-          <div class="hero-media mt-14 sm:mt-20">
-            <div class="rounded-big border border-edge bg-panel/80 px-4 py-8 backdrop-blur-xl sm:px-6 sm:py-9">
-              <SpecRow
-                panel={false}
-                items={[
-                  {
-                    label: '総資産',
-                    value: last?.total_assets ? `${(last.total_assets / 10000).toLocaleString()}万` : '—',
-                    sub: diff ? `前月比 ${diff > 0 ? '+' : ''}${Math.round(diff / 10000)}万円` : undefined,
-                    accent: '#34d399'
-                  },
-                  {
-                    label: '走行距離 km',
-                    value: totalDistance ? totalDistance.toLocaleString() : '—',
-                    accent: '#fb923c'
-                  },
-                  { label: '立ち寄り店', value: String(superCount), accent: '#fb7185' },
-                  { label: '公開記事', value: String(totalPosts) }
-                ]}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== テーマ一覧 ==================== */}
-      <section class="border-t border-edge2 bg-panel py-16 sm:py-24">
-        <div class="mx-auto max-w-page px-5 sm:px-6">
-          <div class="reveal">
-            <SectionTitle
-              eyebrow="Explore"
-              icon="fa-compass"
-              title="5つのテーマ。"
-              desc="それぞれ違う切り口で記録しています。気になるテーマから読み進めてください。"
-            />
-          </div>
-          <div class="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
-            {CATEGORIES.map((c, i) => (
-              <a
-                href={`/category/${c.key}`}
-                class="reveal group flex flex-col justify-between overflow-hidden rounded-big border border-edge2 bg-base p-7 transition duration-500 hover:-translate-y-1 hover:border-edge"
-                style={`transition-delay:${i * 60}ms`}
-              >
-                <div>
-                  <span
-                    class="grid h-12 w-12 place-items-center rounded-2xl"
-                    style={`background:${c.accentSoft};color:${c.accent}`}
-                  >
-                    <i class={`fa-solid ${c.icon} text-[17px]`}></i>
-                  </span>
-                  <p class="mt-6 text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={`color:${c.accent}`}>
-                    {c.short}
-                  </p>
-                  <h3 class="mt-2 text-[22px] font-bold leading-tight tracking-[-0.02em]">{c.name}</h3>
-                  <p class="mt-3 text-[13.5px] leading-relaxed text-sub">{c.description}</p>
-                </div>
-                <p class="mt-8 flex items-center gap-1.5 text-[13px] font-medium" style={`color:${c.accent}`}>
-                  {counts[c.key] || 0} 記事を見る
-                  <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
-                </p>
-              </a>
-            ))}
-
-            {/* マップタイル */}
+          {/* はじめての方はこちら（1つだけの小さな導線） */}
+          <p class="mt-4">
             <a
-              href="/map"
-              class="reveal group relative flex flex-col justify-between overflow-hidden rounded-big border border-brand/30 p-7 transition duration-500 hover:-translate-y-1 hover:border-brand/60"
-              style="transition-delay:300ms;background:linear-gradient(150deg,rgba(249,115,22,0.16),rgba(249,115,22,0.03))"
+              href={aboutHref}
+              class="group inline-flex items-center gap-2 text-[12.5px] font-medium text-brand transition hover:opacity-80"
             >
-              <div>
-                <span class="grid h-12 w-12 place-items-center rounded-2xl bg-brand text-white">
-                  <i class="fa-solid fa-map-location-dot text-[17px]"></i>
-                </span>
-                <p class="mt-6 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand">Map</p>
-                <h3 class="mt-2 text-[22px] font-bold leading-tight tracking-[-0.02em]">走行 & スーパーマップ</h3>
-                <p class="mt-3 text-[13.5px] leading-relaxed text-sub">
-                  訪れた場所とスーパーを1枚の地図に。ピンから記事へ移動できます。
-                </p>
-              </div>
-              <p class="mt-8 flex items-center gap-1.5 text-[13px] font-medium text-brand">
-                地図を開く
-                <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
-              </p>
+              <i class="fa-solid fa-circle-info text-[11px]"></i>
+              はじめての方はこちら
+              <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
             </a>
-          </div>
+          </p>
+
+          {/* 数字（0件の項目は非表示。全て0ならブロック自体が出ない） */}
+          {heroSpecs.length ? (
+            <div class="mt-7">
+              <SpecRow items={heroSpecs} />
+            </div>
+          ) : null}
         </div>
       </section>
 
-      {/* ==================== MONEY ==================== */}
-      <section class="border-t border-edge2 bg-base py-16 sm:py-24">
-        <div class="mx-auto max-w-page px-5 sm:px-6">
-          <div class="reveal">
+      {/* ==================== 新着記事 ==================== */}
+      {latest.length ? (
+        <section class="border-b border-edge2 bg-base">
+          <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
+            <SectionTitle
+              eyebrow="Latest"
+              icon="fa-clock-rotate-left"
+              title="新着記事"
+              action={<ArrowLink href="/search">すべての記事</ArrowLink>}
+            />
+            <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {latest.slice(0, 6).map((p) => (
+                <PostCard post={p} />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* ==================== 資産の推移（データがある時のみ） ==================== */}
+      {stats.length ? (
+        <section class="border-b border-edge2 bg-panel">
+          <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
             <SectionTitle
               eyebrow="Money"
               icon="fa-coins"
-              title="増えたか、減ったか。"
-              desc="総資産・NISA・iDeCo・生活費。感覚ではなく数字で振り返ります。"
-              accent="#34d399"
+              title="資産の推移"
+              desc="総資産・NISA評価額・iDeCo評価額の月次推移です。"
+              action={<ArrowLink href="/theme/money">お金の記録へ</ArrowLink>}
             />
-          </div>
 
-          {stats.length ? (
-            <div class="reveal mt-12 overflow-hidden rounded-big border border-edge2 bg-panel p-6 sm:mt-16 sm:p-10">
-              <div class="flex flex-wrap items-end justify-between gap-7">
+            <div class="mt-6 rounded-big border border-edge2 bg-base p-4 sm:p-6">
+              {/* 大きな数字を主役に */}
+              <div class="flex flex-wrap items-end gap-x-9 gap-y-5">
                 <div>
-                  <p class="text-[11px] font-medium uppercase tracking-[0.12em] text-mute">
+                  <p class="font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-mute">
                     {last?.ym} 時点の総資産
                   </p>
-                  <p class="mt-3 text-[38px] font-bold leading-none tracking-[-0.03em] sm:text-[52px]">
+                  <p class="mt-1.5 font-mono text-[34px] font-bold leading-none tabular-nums tracking-[-0.02em] text-ink sm:text-[46px]">
                     {yen(last?.total_assets)}
                   </p>
                   {diff ? (
                     <p
-                      class="mt-3.5 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12.5px] font-semibold"
-                      style={`background:${diff > 0 ? 'rgba(52,211,153,.12)' : 'rgba(251,113,133,.12)'};color:${
-                        diff > 0 ? '#34d399' : '#fb7185'
-                      }`}
+                      class="mt-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[12px] font-bold tabular-nums"
+                      style={`background:${
+                        diff > 0 ? 'rgba(249,115,22,.14)' : 'rgba(161,161,170,.14)'
+                      };color:${diff > 0 ? '#f97316' : '#a1a1aa'}`}
                     >
                       <i class={`fa-solid ${diff > 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'} text-[10px]`}></i>
-                      前月比 {diff > 0 ? '+' : '-'}
-                      {yen(Math.abs(diff)).replace('¥', '¥')}
+                      前月比 {diff > 0 ? '+' : '−'}
+                      {yen(Math.abs(diff))}
                     </p>
                   ) : null}
                 </div>
-                <div class="grid grid-cols-3 gap-7 sm:gap-10">
+                <dl class="flex flex-wrap gap-x-7 gap-y-4">
                   {[
-                    { l: 'NISA', v: last?.nisa_value, c: '#34d399' },
-                    { l: 'iDeCo', v: last?.ideco_value, c: '#a78bfa' },
-                    { l: '生活費', v: last?.living_cost, c: '#fbbf24' }
-                  ].map((x) => (
-                    <div>
-                      <p class="text-[10.5px] font-semibold uppercase tracking-[0.12em]" style={`color:${x.c}`}>
-                        {x.l}
-                      </p>
-                      <p class="mt-1.5 text-[16px] font-bold tracking-tight sm:text-[19px]">{yen(x.v)}</p>
-                    </div>
-                  ))}
-                </div>
+                    { l: 'NISA', v: last?.nisa_value },
+                    { l: 'iDeCo', v: last?.ideco_value },
+                    { l: '生活費', v: last?.living_cost }
+                  ]
+                    .filter((x) => x.v)
+                    .map((x) => (
+                      <div>
+                        <dt class="text-[10px] font-bold uppercase tracking-[0.12em] text-mute">{x.l}</dt>
+                        <dd class="mt-1 font-mono text-[17px] font-bold tabular-nums tracking-tight text-ink sm:text-[19px]">
+                          {yen(x.v)}
+                        </dd>
+                      </div>
+                    ))}
+                </dl>
               </div>
-              <div class="mt-10 h-[240px] sm:h-[300px]">
+
+              <div class="mt-6 h-[210px] sm:h-[260px]">
                 <canvas id="home-asset-chart"></canvas>
               </div>
             </div>
-          ) : null}
 
-          <div class="mt-4 grid gap-4 sm:grid-cols-2">
-            {[...(byCategory.asset || []).slice(0, 1), ...(byCategory.life || []).slice(0, 1)].map((p) => (
-              <div class="reveal">
-                <PostCard post={p} />
+            {/* Money の記事（新着で既に出したものは除く） */}
+            {moneyBlock && moneyBlock.posts.length ? (
+              <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {moneyBlock.posts.map((p) => (
+                  <PostCard post={p} />
+                ))}
               </div>
-            ))}
+            ) : null}
           </div>
+        </section>
+      ) : null}
 
-          <div class="reveal mt-10 flex flex-wrap justify-center gap-x-10 gap-y-3">
-            <ArrowLink href="/category/asset" color="#34d399">
-              資産運用の記事をすべて見る
-            </ArrowLink>
-            <ArrowLink href="/category/life" color="#fbbf24">
-              生活費の記事をすべて見る
-            </ArrowLink>
-          </div>
-        </div>
-      </section>
+      {/* ==================== カテゴリ別（記事0件のテーマは非表示） ==================== */}
+      {themeBlocks
+        .filter((b) => !(b.theme.key === 'money' && stats.length))
+        .map((b, i) => (
+          <section class={`border-b border-edge2 ${i % 2 === 0 ? 'bg-base' : 'bg-panel'}`}>
+            <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
+              <SectionTitle
+                eyebrow={b.theme.label}
+                icon={b.theme.icon}
+                title={b.theme.head}
+                desc={b.theme.lead}
+                action={<ArrowLink href={`/theme/${b.theme.key}`}>{b.count} 件を見る</ArrowLink>}
+              />
 
-      {/* ==================== TOURING ==================== */}
-      <section class="relative border-t border-edge2 bg-panel py-16 sm:py-24">
-        <div class="mx-auto max-w-page px-5 sm:px-6">
-          <div class="reveal">
-            <SectionTitle
-              eyebrow="Touring"
-              icon="fa-route"
-              title="走った分だけ、記憶が増える。"
-              desc="ルート、距離、天気、そして景色。あとから辿れるように残しています。"
-            />
-          </div>
-        </div>
-
-        {(byCategory.touring || []).length ? (
-          <div class="reveal mt-12 sm:mt-16">
-            <div class="snap-row px-5 pb-4 sm:px-6">
-              {(byCategory.touring || []).slice(0, 4).map((p) => (
-                <div class="w-[78vw] sm:w-[330px]">
-                  <PostCard post={p} showCategory={false} />
+              {/* テーマ固有の数字（値が無ければ非表示） */}
+              {b.theme.key === 'touring' ? (
+                <div class="mt-6">
+                  <SpecRow
+                    items={[
+                      { label: '総走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
+                      { label: '都道府県', value: prefCount ? `${prefCount}` : '' },
+                      { label: 'ログ数', value: counts.touring ? `${counts.touring}` : '' },
+                      { label: '立ち寄り店', value: superCount ? `${superCount}` : '' }
+                    ]}
+                  />
                 </div>
-              ))}
-              <div class="w-1"></div>
+              ) : null}
+
+              <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {b.posts.map((p) => (
+                  <PostCard post={p} showCategory={b.theme.categories.length > 1} />
+                ))}
+              </div>
+
+              {/* ツーリングは地図への導線を1つだけ */}
+              {b.theme.key === 'touring' ? (
+                <p class="mt-5">
+                  <ArrowLink href="/map" size="sm">
+                    エリア別マップで見る
+                  </ArrowLink>
+                </p>
+              ) : null}
             </div>
-            <p class="mt-3 px-5 text-[11px] text-mute sm:px-6 lg:hidden">
-              <i class="fa-solid fa-hand-point-right mr-1.5"></i>横にスワイプできます
+          </section>
+        ))}
+
+      {/* ==================== About ==================== */}
+      <section class="bg-base">
+        <div class="mx-auto max-w-page px-4 py-10 sm:px-6 sm:py-12">
+          <div class="rounded-big border border-edge2 bg-panel p-5 sm:p-7">
+            <p class="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
+              <i class="fa-solid fa-circle-info text-[10px]"></i>About
             </p>
-          </div>
-        ) : (
-          <div class="mx-auto mt-12 max-w-page px-5 sm:px-6">
-            <EmptyState text="ツーリング記録はまだありません" />
-          </div>
-        )}
-
-        <div class="reveal mx-auto mt-14 max-w-page px-5 sm:px-6">
-          <SpecRow
-            items={[
-              { label: '総走行距離 km', value: totalDistance ? totalDistance.toLocaleString() : '—', accent: '#fb923c' },
-              { label: '都道府県', value: String(prefCount || '—') },
-              { label: 'ログ数', value: String(counts.touring || 0) },
-              { label: '立ち寄り店', value: String(superCount), accent: '#fb7185' }
-            ]}
-          />
-          <div class="mt-10 flex flex-wrap justify-center gap-x-10 gap-y-3">
-            <ArrowLink href="/category/touring">ツーリングログを見る</ArrowLink>
-            <ArrowLink href="/map">マップで見る</ArrowLink>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== ご当地スーパー ==================== */}
-      <section class="border-t border-edge2 bg-base py-16 sm:py-24">
-        <div class="mx-auto max-w-page px-5 sm:px-6">
-          <div class="reveal">
-            <SectionTitle
-              eyebrow="Local Super"
-              icon="fa-basket-shopping"
-              title="旅先で、一番おもしろい場所。"
-              desc="ご当地スーパーの品揃えと価格は、その土地の暮らしそのもの。星とコスパで記録します。"
-              accent="#fb7185"
-            />
-          </div>
-          {(byCategory.supermarket || []).length ? (
-            <div class="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
-              {(byCategory.supermarket || []).slice(0, 3).map((p, i) => (
-                <div class="reveal" style={`transition-delay:${i * 70}ms`}>
-                  <PostCard post={p} showCategory={false} />
-                </div>
-              ))}
+            <h2 class="mt-2 text-[19px] font-bold leading-tight tracking-[-0.02em] sm:text-[23px]">
+              このサイトについて
+            </h2>
+            <p class="mt-3 max-w-[66ch] text-[13px] leading-[1.85] text-sub">
+              資産運用と生活費、ツーリングとご当地スーパー、業務効率化と自動化。
+              数字と写真で「あとから見返せる」ことを大切にして記録しています。
+              運営者の経歴や、このサイトを始めた理由はこちらにまとめています。
+            </p>
+            <div class="mt-5 flex flex-wrap items-center gap-2.5">
+              <PillButton href={aboutHref} icon="fa-circle-info">
+                運営者について読む
+              </PillButton>
+              <PillButton href="/search" variant="ghost" icon="fa-magnifying-glass">
+                記事を探す
+              </PillButton>
             </div>
-          ) : (
-            <div class="mt-12">
-              <EmptyState text="スーパーのレビューはまだありません" />
-            </div>
-          )}
-          <div class="reveal mt-12 text-center">
-            <ArrowLink href="/category/supermarket" color="#fb7185">
-              レビューをすべて見る
-            </ArrowLink>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== TECH ==================== */}
-      <section class="border-t border-edge2 bg-panel py-16 sm:py-24">
-        <div class="mx-auto max-w-page px-5 sm:px-6">
-          <div class="reveal">
-            <SectionTitle
-              eyebrow="Tech"
-              icon="fa-microchip"
-              title="社内SEの現場と、生成AI。"
-              desc="情シスとして試したこと、効いたこと、効かなかったこと。実務ベースで書いています。"
-              accent="#a78bfa"
-            />
-          </div>
-          {(byCategory.it || []).length ? (
-            <div class="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
-              {(byCategory.it || []).slice(0, 3).map((p, i) => (
-                <div class="reveal" style={`transition-delay:${i * 70}ms`}>
-                  <PostCard post={p} showCategory={false} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div class="mt-12">
-              <EmptyState text="IT記事はまだありません" />
-            </div>
-          )}
-          <div class="reveal mt-12 text-center">
-            <ArrowLink href="/category/it" color="#a78bfa">
-              IT / 生成AI の記事を見る
-            </ArrowLink>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================== 新着 ==================== */}
-      <section class="border-t border-edge2 bg-base py-16 sm:py-24">
-        <div class="mx-auto max-w-[880px] px-5 sm:px-6">
-          <div class="reveal">
-            <SectionTitle eyebrow="Latest" icon="fa-clock-rotate-left" title="新着の記録。" />
-          </div>
-          <div class="mt-10 sm:mt-14">
-            {latest.length ? (
-              latest.slice(0, 6).map((p) => {
-                const c = CATEGORY_MAP[p.category]
-                return (
-                  <a
-                    href={`/posts/${p.slug}`}
-                    class="reveal group flex items-center gap-4 border-b border-edge2 py-5 transition hover:bg-white/[0.03] sm:gap-5"
-                  >
-                    <span
-                      class="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
-                      style={`background:${c?.accentSoft};color:${c?.accent}`}
-                    >
-                      <i class={`fa-solid ${c?.icon} text-[13px]`}></i>
-                    </span>
-                    <span class="min-w-0 flex-1">
-                      <span class="block text-[10px] font-semibold uppercase tracking-[0.14em]" style={`color:${c?.accent}`}>
-                        {c?.short}
-                      </span>
-                      <span class="mt-1 block text-[15px] font-medium leading-snug tracking-[-0.01em] sm:text-[16px]">
-                        {p.title}
-                      </span>
-                      <span class="mt-1 block text-[11.5px] text-mute">{formatDate(p.published_at)}</span>
-                    </span>
-                    <i class="fa-solid fa-chevron-right text-[11px] text-mute transition group-hover:translate-x-0.5"></i>
-                  </a>
-                )
-              })
-            ) : (
-              <EmptyState />
-            )}
-          </div>
-          <div class="reveal mt-10 text-center">
-            <ArrowLink href="/search">すべての記事を探す</ArrowLink>
           </div>
         </div>
       </section>

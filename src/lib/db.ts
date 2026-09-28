@@ -56,6 +56,8 @@ const POST_FIELDS = [
 
 type ListOptions = {
   category?: string
+  /** 複数カテゴリ（テーマ単位の絞り込み用） */
+  categories?: string[]
   tag?: string
   q?: string
   limit?: number
@@ -72,6 +74,9 @@ export async function listPosts(db: D1Database, opts: ListOptions = {}) {
   if (opts.category) {
     where.push('p.category = ?')
     binds.push(opts.category)
+  } else if (opts.categories && opts.categories.length) {
+    where.push(`p.category IN (${opts.categories.map(() => '?').join(',')})`)
+    binds.push(...opts.categories)
   }
   if (opts.featuredOnly) where.push('p.featured = 1')
   if (opts.withGeo) where.push('p.lat IS NOT NULL AND p.lng IS NOT NULL')
@@ -108,6 +113,9 @@ export async function countPosts(db: D1Database, opts: ListOptions = {}) {
   if (opts.category) {
     where.push('category = ?')
     binds.push(opts.category)
+  } else if (opts.categories && opts.categories.length) {
+    where.push(`category IN (${opts.categories.map(() => '?').join(',')})`)
+    binds.push(...opts.categories)
   }
   const r = await db
     .prepare(`SELECT COUNT(*) AS c FROM posts ${where.length ? 'WHERE ' + where.join(' AND ') : ''}`)
@@ -262,16 +270,44 @@ export async function deletePost(db: D1Database, id: number) {
   await db.prepare('DELETE FROM posts WHERE id = ?').bind(id).run()
 }
 
-export async function listTags(db: D1Database, category?: string) {
+export async function listTags(db: D1Database, category?: string, categories?: string[]) {
+  const binds: any[] = []
+  let filter = ''
+  if (category) {
+    filter = 'AND p.category = ?'
+    binds.push(category)
+  } else if (categories && categories.length) {
+    filter = `AND p.category IN (${categories.map(() => '?').join(',')})`
+    binds.push(...categories)
+  }
   const sql = `
     SELECT t.name, t.slug, COUNT(pt.post_id) AS cnt
     FROM tags t
     JOIN post_tags pt ON pt.tag_id = t.id
     JOIN posts p ON p.id = pt.post_id AND p.status = 'published'
-    ${category ? 'AND p.category = ?' : ''}
+    ${filter}
     GROUP BY t.id ORDER BY cnt DESC, t.name`
-  const r = category ? await db.prepare(sql).bind(category).all() : await db.prepare(sql).all()
+  const r = binds.length ? await db.prepare(sql).bind(...binds).all() : await db.prepare(sql).all()
   return r.results as { name: string; slug: string; cnt: number }[]
+}
+
+/**
+ * 候補スラッグのうち、公開済みで最初に見つかったものを返す。
+ * About 用の自己紹介記事を解決するのに使用。
+ */
+export async function findFirstPostSlug(db: D1Database, slugs: string[]) {
+  if (!slugs.length) return null
+  const r = await db
+    .prepare(
+      `SELECT slug FROM posts
+       WHERE status='published' AND slug IN (${slugs.map(() => '?').join(',')})`
+    )
+    .bind(...slugs)
+    .all()
+  const found = (r.results as any[]).map((x) => x.slug)
+  // config.ts の並び順を優先する
+  for (const s of slugs) if (found.includes(s)) return s as string
+  return null
 }
 
 export async function listMonthlyStats(db: D1Database, limit = 36) {

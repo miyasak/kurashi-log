@@ -1,13 +1,30 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
-import { CATEGORIES, CATEGORY_MAP, SITE, type Bindings } from './lib/config'
-import { listPosts, countPosts, getPostBySlug, listTags, listMonthlyStats, getCategoryCounts, getLinkedPost } from './lib/db'
+import {
+  CATEGORIES,
+  CATEGORY_MAP,
+  THEMES,
+  THEME_MAP,
+  ABOUT_POST_SLUGS,
+  SITE,
+  type Bindings
+} from './lib/config'
+import {
+  listPosts,
+  countPosts,
+  getPostBySlug,
+  listTags,
+  listMonthlyStats,
+  getCategoryCounts,
+  getLinkedPost,
+  findFirstPostSlug
+} from './lib/db'
 import { renderMarkdown, stripMd } from './lib/utils'
 import { isAuthed } from './lib/auth'
 import { api } from './routes/api'
 import { Layout } from './views/layout'
 import { HomePage } from './views/home'
-import { CategoryPage } from './views/category'
+import { ThemePage } from './views/theme'
 import { PostPage } from './views/post'
 import { SearchPage, MapPage, AboutPage, NotFoundPage, TagPage } from './views/pages'
 import { AdminApp } from './views/admin'
@@ -33,20 +50,28 @@ app.route('/api', api)
 /* ================= HOME ================= */
 app.get('/', async (c) => {
   const db = c.env.DB
-  const [latest, counts, stats] = await Promise.all([
-    listPosts(db, { limit: 8 }),
+  const [latest, counts, stats, aboutSlug] = await Promise.all([
+    listPosts(db, { limit: 6 }),
     getCategoryCounts(db),
-    listMonthlyStats(db)
+    listMonthlyStats(db),
+    findFirstPostSlug(db, ABOUT_POST_SLUGS)
   ])
   const byCategory: Record<string, any[]> = {}
   for (const cat of CATEGORIES) {
-    byCategory[cat.key] = await listPosts(db, { category: cat.key, limit: 4 })
+    byCategory[cat.key] = counts[cat.key] ? await listPosts(db, { category: cat.key, limit: 3 }) : []
   }
   const dist = await db
     .prepare("SELECT COALESCE(SUM(distance_km),0) AS d FROM posts WHERE status='published' AND category='touring'")
     .first<{ d: number }>()
   const sup = await db
     .prepare("SELECT COUNT(*) AS c FROM posts WHERE status='published' AND category='supermarket'")
+    .first<{ c: number }>()
+  const pref = await db
+    .prepare(
+      `SELECT COUNT(DISTINCT prefecture) AS c FROM posts
+       WHERE status='published' AND prefecture IS NOT NULL AND prefecture <> ''
+         AND category IN ('touring','supermarket')`
+    )
     .first<{ c: number }>()
 
   return doc(
@@ -59,95 +84,101 @@ app.get('/', async (c) => {
         stats={stats}
         totalDistance={Math.round(dist?.d || 0)}
         superCount={sup?.c || 0}
+        prefCount={pref?.c || 0}
+        aboutHref={aboutSlug ? `/posts/${aboutSlug}` : '/about'}
       />
     </Layout>
   )
 })
 
-/* ================= CATEGORY ================= */
-app.get('/category/:key', async (c) => {
+/* ================= THEME（Money / Touring / Tech） ================= */
+app.get('/theme/:key', async (c) => {
   const key = c.req.param('key')
-  const cat = CATEGORY_MAP[key]
-  if (!cat) return notFound(c)
+  const theme = THEME_MAP[key]
+  if (!theme) return notFound(c)
   const db = c.env.DB
   const page = Math.max(1, Number(c.req.query('page') || 1))
   const perPage = 12
   const q = c.req.query('q') || undefined
   const tag = c.req.query('tag') || undefined
+  const catParam = c.req.query('cat') || undefined
+  // テーマ配下のカテゴリ以外が来たら無視する
+  const activeCat =
+    catParam && theme.categories.includes(catParam as any) ? catParam : undefined
+  const cats = activeCat ? [activeCat] : theme.categories
 
-  const [posts, tags, stats] = await Promise.all([
-    listPosts(db, { category: key, q, tag, limit: perPage, offset: (page - 1) * perPage }),
-    listTags(db, key),
-    key === 'asset' || key === 'life' ? listMonthlyStats(db) : Promise.resolve([])
+  const [posts, counts] = await Promise.all([
+    listPosts(db, { categories: cats, q, tag, limit: perPage, offset: (page - 1) * perPage }),
+    getCategoryCounts(db)
   ])
+
+  // タグはテーマ配下の記事のものだけ
+  const tags = await listTags(db, undefined, cats)
 
   // フィルタ付きの総件数
   let total: number
   if (q || tag) {
-    const all = await listPosts(db, { category: key, q, tag, limit: 100 })
+    const all = await listPosts(db, { categories: cats, q, tag, limit: 100 })
     total = all.length
   } else {
-    total = await countPosts(db, { category: key })
+    total = await countPosts(db, { categories: cats })
   }
 
+  const stats = theme.key === 'money' ? await listMonthlyStats(db) : []
+
   const summary: Record<string, any> = {}
-  if (key === 'asset' && stats.length) {
+  if (theme.key === 'money' && stats.length) {
     const last: any = stats[stats.length - 1]
+    const withCost = stats.filter((s: any) => s.living_cost)
     Object.assign(summary, {
       total_assets: last.total_assets,
       nisa_value: last.nisa_value,
-      ideco_value: last.ideco_value
+      ideco_value: last.ideco_value,
+      living_cost: withCost.length ? withCost[withCost.length - 1].living_cost : null
     })
-  } else if (key === 'life' && stats.length) {
-    const withCost = stats.filter((s: any) => s.living_cost)
-    summary.living_cost = withCost.length ? withCost[withCost.length - 1].living_cost : null
-    summary.avg_cost = withCost.length
-      ? Math.round(withCost.reduce((a: number, s: any) => a + s.living_cost, 0) / withCost.length)
-      : null
-    summary.months = withCost.length
-  } else if (key === 'touring') {
+  } else if (theme.key === 'touring') {
     const r = await db
       .prepare(
-        `SELECT COALESCE(SUM(distance_km),0) AS d, COALESCE(AVG(distance_km),0) AS a,
-                COUNT(DISTINCT prefecture) AS p
-         FROM posts WHERE status='published' AND category='touring'`
+        `SELECT COALESCE(SUM(distance_km),0) AS d,
+                COUNT(DISTINCT CASE WHEN prefecture <> '' THEN prefecture END) AS p
+         FROM posts WHERE status='published' AND category IN ('touring','supermarket')`
       )
       .first<any>()
-    Object.assign(summary, { distance: Math.round(r?.d || 0), avg_distance: r?.a || 0, prefectures: r?.p || 0 })
-  } else if (key === 'supermarket') {
-    const r = await db
+    const s = await db
       .prepare(
-        `SELECT AVG(rating) AS r, AVG(cospa) AS c, AVG(budget) AS b
-         FROM posts WHERE status='published' AND category='supermarket'`
+        `SELECT AVG(budget) AS b FROM posts
+         WHERE status='published' AND category='supermarket' AND budget IS NOT NULL`
       )
       .first<any>()
     Object.assign(summary, {
-      avg_rating: r?.r || 0,
-      avg_cospa: r?.c || 0,
-      avg_budget: r?.b ? Math.round(r.b) : null
+      distance: Math.round(r?.d || 0),
+      prefectures: r?.p || 0,
+      avg_budget: s?.b ? Math.round(s.b) : null
     })
   }
 
-  const needsMap = key === 'touring' || key === 'supermarket'
+  const needsMap = theme.key === 'touring' && total > 0
   const scripts = [
     ...(needsMap ? [LEAFLET_JS] : []),
-    ...(key === 'asset' || key === 'life' ? [CHART_JS] : []),
+    ...(theme.key === 'money' && stats.length ? [CHART_JS] : []),
     '/static/site.js'
   ]
 
   return doc(
     c,
     <Layout
-      title={cat.name}
-      description={cat.description}
-      activeCategory={key}
+      title={theme.label}
+      description={theme.description}
+      activeTheme={theme.key}
       canonical={canonicalOf(c)}
       scripts={scripts}
       headExtra={needsMap ? LEAFLET_CSS : null}
     >
-      <CategoryPage
-        cat={cat}
+      <ThemePage
+        theme={theme}
         posts={posts}
+        activeCat={activeCat}
+        counts={counts}
         tags={tags}
         activeTag={tag}
         q={q}
@@ -161,6 +192,17 @@ app.get('/category/:key', async (c) => {
   )
 })
 
+/* ===== 旧カテゴリURLは新テーマURLへ恒久リダイレクト ===== */
+app.get('/category/:key', (c) => {
+  const key = c.req.param('key')
+  const cat = CATEGORY_MAP[key]
+  if (!cat) return notFound(c)
+  const theme = cat.theme
+  // テーマ内に複数カテゴリがある場合はサブカテゴリを選択した状態へ
+  const multi = THEME_MAP[theme].categories.length > 1
+  return c.redirect(`/theme/${theme}${multi ? `?cat=${key}` : ''}`, 301)
+})
+
 /* ================= POST ================= */
 app.get('/posts/:slug', async (c) => {
   const slug = c.req.param('slug')
@@ -168,9 +210,15 @@ app.get('/posts/:slug', async (c) => {
   const post = await getPostBySlug(c.env.DB, slug, authed)
   if (!post) return notFound(c)
   const html = renderMarkdown(post.body)
-  const related = (await listPosts(c.env.DB, { category: post.category, limit: 4 })).filter(
-    (p) => p.id !== post.id
-  ).slice(0, 3)
+  const theme = CATEGORY_MAP[post.category]?.theme
+  const related = (
+    await listPosts(c.env.DB, {
+      categories: theme ? THEME_MAP[theme].categories : [post.category],
+      limit: 4
+    })
+  )
+    .filter((p) => p.id !== post.id)
+    .slice(0, 3)
   const hasGeo = post.lat != null && post.lng != null
   const linked = await getLinkedPost(c.env.DB, post)
 
@@ -205,13 +253,19 @@ app.get('/tags/:tag', async (c) => {
 /* ================= SEARCH ================= */
 app.get('/search', async (c) => {
   const q = c.req.query('q') || undefined
-  const category = c.req.query('category') || undefined
+  const themeKey = c.req.query('theme') || undefined
   const tag = c.req.query('tag') || undefined
-  const posts = await listPosts(c.env.DB, { q, category, tag, limit: 60 })
+  const theme = themeKey ? THEME_MAP[themeKey] : undefined
+  const posts = await listPosts(c.env.DB, {
+    q,
+    categories: theme ? theme.categories : undefined,
+    tag,
+    limit: 60
+  })
   return doc(
     c,
     <Layout title="記事を探す" activePage="search" canonical={canonicalOf(c)} scripts={['/static/site.js']}>
-      <SearchPage posts={posts} q={q} category={category} tag={tag} total={posts.length} />
+      <SearchPage posts={posts} q={q} theme={themeKey} tag={tag} total={posts.length} />
     </Layout>
   )
 })
@@ -227,7 +281,7 @@ app.get('/map', async (c) => {
   return doc(
     c,
     <Layout
-      title="走行 & スーパーマップ"
+      title="エリア別マップ"
       activePage="map"
       description="ツーリング先とご当地スーパーの位置を地図で確認できます。"
       canonical={canonicalOf(c)}
@@ -239,8 +293,11 @@ app.get('/map', async (c) => {
   )
 })
 
-/* ================= ABOUT ================= */
+/* ================= ABOUT =================
+   自己紹介記事があればそこへ転送し、無ければ簡易ページを表示する */
 app.get('/about', async (c) => {
+  const slug = await findFirstPostSlug(c.env.DB, ABOUT_POST_SLUGS)
+  if (slug) return c.redirect(`/posts/${slug}`, 302)
   const counts = await getCategoryCounts(c.env.DB)
   return doc(
     c,
@@ -283,15 +340,14 @@ app.get('/sitemap.xml', async (c) => {
   const entries: Entry[] = [
     { loc: '', lastmod: newest, priority: '1.0', freq: 'daily' },
     { loc: '/map', lastmod: newest, priority: '0.6', freq: 'weekly' },
-    { loc: '/about', priority: '0.3', freq: 'yearly' },
     { loc: '/search', priority: '0.3', freq: 'monthly' }
   ]
 
-  // カテゴリ：そのカテゴリの最新記事日を lastmod に
-  for (const cat of CATEGORIES) {
-    const latest = posts.find((p) => p.category === cat.key)
+  // テーマ：配下の最新記事日を lastmod に
+  for (const t of THEMES) {
+    const latest = posts.find((p) => t.categories.includes(p.category as any))
     entries.push({
-      loc: `/category/${cat.key}`,
+      loc: `/theme/${t.key}`,
       lastmod: day(latest?.updated_at || latest?.published_at),
       priority: '0.8',
       freq: 'weekly'
