@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { THEMES, CATEGORY_MAP } from '../lib/config'
+import { THEMES, CATEGORY_MAP, SITE, POST_COUNT_THRESHOLD } from '../lib/config'
 import { PostCard, SectionTitle, SpecRow, validSpecs } from './components'
 import { ArrowLink, PillButton } from './layout'
 import { yen } from '../lib/utils'
@@ -13,8 +13,6 @@ type Props = {
   totalDistance: number
   superCount: number
   prefCount: number
-  /** About として使う自己紹介記事のURL（無ければ /about） */
-  aboutHref: string
 }
 
 export const HomePage: FC<Props> = ({
@@ -24,8 +22,7 @@ export const HomePage: FC<Props> = ({
   stats,
   totalDistance,
   superCount,
-  prefCount,
-  aboutHref
+  prefCount
 }) => {
   const last = stats.length ? stats[stats.length - 1] : null
   const prev = stats.length > 1 ? stats[stats.length - 2] : null
@@ -42,7 +39,8 @@ export const HomePage: FC<Props> = ({
     { label: '走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
     { label: '立ち寄り店', value: superCount ? `${superCount}` : '' },
     { label: '都道府県', value: prefCount ? `${prefCount}` : '' },
-    { label: '公開記事', value: totalPosts ? `${totalPosts}` : '' }
+    // 記事数は10件に達するまで出さない（少ないと逆にマイナスに見える）
+    { label: '公開記事', value: totalPosts >= POST_COUNT_THRESHOLD ? `${totalPosts}` : '' }
   ])
 
   /** 新着に出した記事はカテゴリ別セクションでは繰り返さない */
@@ -68,23 +66,27 @@ export const HomePage: FC<Props> = ({
       {/* ==================== ヒーロー ==================== */}
       <section class="border-b border-edge2 bg-base">
         <div class="mx-auto max-w-page px-4 py-10 sm:px-6 sm:py-14">
+          {/* ロゴ・<title> と同じブランド名で統一 */}
           <p class="inline-flex items-center gap-2 rounded-full bg-brandsoft px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
             <i class="fa-solid fa-chart-simple text-[10px]"></i>
-            Personal Record
+            {SITE.title}
           </p>
           <h1 class="mt-4 text-[26px] font-bold leading-[1.28] tracking-[-0.03em] text-ink sm:text-[36px]">
             <span class="block">数字で記録する、</span>
             <span class="block">お金とツーリングと仕事。</span>
           </h1>
+          {/* ナビと同じ 3テーマ构成で統一 */}
           <p class="mt-4 max-w-[64ch] text-[13.5px] leading-[1.85] text-sub sm:text-[14.5px]">
-            資産運用・生活費・ツーリング・ご当地スーパー・業務効率化と自動化。
+            <span class="font-medium text-ink">Money</span>（資産運用・生活費）、
+            <span class="font-medium text-ink">Touring</span>（ツーリング・ご当地スーパー）、
+            <span class="font-medium text-ink">Tech</span>（業務効率化）。
             感覚ではなく<span class="font-medium text-ink">実額と実測値</span>で、あとから辿れるように残しています。
           </p>
 
-          {/* はじめての方はこちら（1つだけの小さな導線） */}
+          {/* はじめての方はこちら（1つだけの小さな導線。About固定ページへ） */}
           <p class="mt-4">
             <a
-              href={aboutHref}
+              href="/about"
               class="group inline-flex items-center gap-2 text-[12.5px] font-medium text-brand transition hover:opacity-80"
             >
               <i class="fa-solid fa-circle-info text-[11px]"></i>
@@ -248,12 +250,13 @@ export const HomePage: FC<Props> = ({
               このサイトについて
             </h2>
             <p class="mt-3 max-w-[66ch] text-[13px] leading-[1.85] text-sub">
-              資産運用と生活費、ツーリングとご当地スーパー、業務効率化と自動化。
+              Money（資産運用・生活費）、Touring（ツーリング・ご当地スーパー）、Tech（業務効率化）。
               数字と写真で「あとから見返せる」ことを大切にして記録しています。
-              運営者の経歴や、このサイトを始めた理由はこちらにまとめています。
+              運営者のプロフィールと投資方針は About にまとめています。
             </p>
             <div class="mt-5 flex flex-wrap items-center gap-2.5">
-              <PillButton href={aboutHref} icon="fa-circle-info">
+              {/* 重複を避けるため /about へ集約する */}
+              <PillButton href="/about" icon="fa-circle-info">
                 運営者について読む
               </PillButton>
               <PillButton href="/search" variant="ghost" icon="fa-magnifying-glass">

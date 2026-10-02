@@ -15,12 +15,27 @@ type LayoutProps = PropsWithChildren<{
   headExtra?: any
   /** 正規URL（canonical / og:url に使用） */
   canonical?: string
+  /** 地図に表示できるピンが1件以上あるか（0件ならフッターのマップリンクを出さない） */
+  hasMapPins?: boolean
+  /** og:type（記事ページは article） */
+  ogType?: 'website' | 'article'
+  /** 記事の公開日 / 更新日（article のときのみ） */
+  publishedTime?: string | null
+  modifiedTime?: string | null
+  /** JSON-LD（構造化データ） */
+  jsonLd?: any
 }>
 
 export const Layout: FC<LayoutProps> = (props) => {
   const title = props.title ? `${props.title} — ${SITE.title}` : `${SITE.title} — ${SITE.subtitle}`
   const desc = props.description || SITE.description
   const activeTheme = props.activeTheme || CATEGORY_MAP[props.activeCategory || '']?.theme
+  /** カバー画像がないページでも SNS に画像が出るよう、OG画像を自動生成する */
+  const ogImage =
+    props.ogImage ||
+    `/og.png?t=${encodeURIComponent(props.title || SITE.title)}${
+      props.ogType === 'article' ? '' : '&s=1'
+    }`
   return (
     <html lang="ja" class="dark">
       <head>
@@ -32,15 +47,32 @@ export const Layout: FC<LayoutProps> = (props) => {
         <meta name="color-scheme" content="dark" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={desc} />
-        <meta property="og:type" content="website" />
+        <meta property="og:type" content={props.ogType || 'website'} />
         <meta property="og:site_name" content={SITE.title} />
-        {props.ogImage ? <meta property="og:image" content={props.ogImage} /> : null}
+        <meta property="og:locale" content="ja_JP" />
+        {/* og:image は記事のカバー画像、なければ自動生成のOG画像を使う */}
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={props.title || SITE.title} />
         {props.canonical ? <meta property="og:url" content={props.canonical} /> : null}
         {props.canonical ? <link rel="canonical" href={props.canonical} /> : null}
-        <meta name="twitter:card" content={props.ogImage ? 'summary_large_image' : 'summary'} />
+        {props.ogType === 'article' && props.publishedTime ? (
+          <meta property="article:published_time" content={props.publishedTime} />
+        ) : null}
+        {props.ogType === 'article' && props.modifiedTime ? (
+          <meta property="article:modified_time" content={props.modifiedTime} />
+        ) : null}
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={desc} />
-        {props.ogImage ? <meta name="twitter:image" content={props.ogImage} /> : null}
+        <meta name="twitter:image" content={ogImage} />
+        {props.jsonLd ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(props.jsonLd) }}
+          ></script>
+        ) : null}
 
         {/* Google Search Console のサイト所有権確認（config.ts の SEO で設定） */}
         {SEO.googleSiteVerification ? (
@@ -90,9 +122,9 @@ export const Layout: FC<LayoutProps> = (props) => {
         {props.headExtra ?? null}
       </head>
       <body class="bg-base font-sans text-ink antialiased">
-        <SiteHeader activeTheme={activeTheme} activePage={props.activePage} />
+        <SiteHeader activeTheme={activeTheme} activePage={props.activePage} hasMapPins={props.hasMapPins} />
         <main>{props.children}</main>
-        <SiteFooter />
+        <SiteFooter hasMapPins={props.hasMapPins} />
         {(props.scripts || []).map((s) => (
           <script src={s}></script>
         ))}
@@ -129,7 +161,11 @@ export const Layout: FC<LayoutProps> = (props) => {
    固定ヘッダー
    左：サイト名 ／ 右：Money / Touring / Tech / About
    ========================================================= */
-const SiteHeader: FC<{ activeTheme?: string; activePage?: string }> = ({ activeTheme, activePage }) => {
+const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: boolean }> = ({
+  activeTheme,
+  activePage,
+  hasMapPins
+}) => {
   const link = (isActive: boolean) =>
     `rounded-full px-3.5 py-1.5 text-[13.5px] font-medium tracking-tight transition ${
       isActive ? 'bg-brand text-white' : 'text-sub hover:bg-white/[0.07] hover:text-ink'
@@ -216,12 +252,15 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string }> = ({ activeT
             </span>
             <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
           </a>
-          <a href="/map" class="flex items-center justify-between border-b border-edge2 py-4">
-            <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
-              <i class="fa-solid fa-map-location-dot w-5 text-[13px] text-brand"></i>エリア別
-            </span>
-            <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
-          </a>
+          {/* マップはピンが1件以上になるまで出さない */}
+          {hasMapPins ? (
+            <a href="/map" class="flex items-center justify-between border-b border-edge2 py-4">
+              <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
+                <i class="fa-solid fa-map-location-dot w-5 text-[13px] text-brand"></i>エリア別
+              </span>
+              <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
+            </a>
+          ) : null}
           <a href="/search" class="flex items-center justify-between py-4">
             <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
               <i class="fa-solid fa-magnifying-glass w-5 text-[13px] text-brand"></i>記事を探す
@@ -236,7 +275,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string }> = ({ activeT
 }
 
 /* ============ フッター ============ */
-const SiteFooter: FC = () => (
+const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
   <footer class="mt-16 border-t border-edge2 bg-panel">
     <div class="mx-auto max-w-page px-4 py-10 sm:px-6">
       <div class="flex items-center gap-2.5">
@@ -245,6 +284,7 @@ const SiteFooter: FC = () => (
         </span>
         <span class="text-[15px] font-bold tracking-tight">{SITE.title}</span>
       </div>
+      {/* 説明文はナビと同じ3テーマ構成で統一 */}
       <p class="mt-4 max-w-xl text-[12.5px] leading-relaxed text-mute">{SITE.description}</p>
 
       <div class="mt-8 grid gap-7 border-t border-edge2 pt-8 sm:grid-cols-3">
@@ -266,7 +306,10 @@ const SiteFooter: FC = () => (
           <ul class="mt-3 space-y-2.5">
             <li><a href="/" class="text-[13px] text-sub transition hover:text-ink">ホーム</a></li>
             <li><a href="/about" class="text-[13px] text-sub transition hover:text-ink">About</a></li>
-            <li><a href="/map" class="text-[13px] text-sub transition hover:text-ink">エリア別マップ</a></li>
+            {/* マップはピンが1件以上になるまで出さない */}
+            {hasMapPins ? (
+              <li><a href="/map" class="text-[13px] text-sub transition hover:text-ink">エリア別マップ</a></li>
+            ) : null}
             <li><a href="/search" class="text-[13px] text-sub transition hover:text-ink">記事を探す</a></li>
           </ul>
         </div>
@@ -274,13 +317,19 @@ const SiteFooter: FC = () => (
           <p class="text-[10.5px] font-bold uppercase tracking-[0.14em] text-mute">Info</p>
           <ul class="mt-3 space-y-2.5">
             <li><a href="/sitemap.xml" class="text-[13px] text-sub transition hover:text-ink">サイトマップ</a></li>
+            <li><a href="/rss.xml" class="text-[13px] text-sub transition hover:text-ink">RSS</a></li>
           </ul>
         </div>
       </div>
 
-      <p class="mt-8 border-t border-edge2 pt-6 text-[11px] text-mute">
-        Copyright © {new Date().getFullYear()} {SITE.title}. すべての金額・記録は個人の実績値です。
-      </p>
+      <div class="mt-8 border-t border-edge2 pt-6">
+        <p class="text-[11px] leading-relaxed text-mute">
+          本サイトの内容は個人の記録であり、特定の金融商品の推奨や投資助言ではありません。
+        </p>
+        <p class="mt-2 text-[11px] text-mute">
+          Copyright © {new Date().getFullYear()} {SITE.title}. すべての金額・記録は個人の実績値です。
+        </p>
+      </div>
     </div>
   </footer>
 )

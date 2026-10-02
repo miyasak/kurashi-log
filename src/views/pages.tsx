@@ -3,6 +3,7 @@ import type { Post } from '../lib/db'
 import { THEMES, SITE } from '../lib/config'
 import { PostCard, EmptyState, SectionTitle } from './components'
 import { ArrowLink, PillButton } from './layout'
+import { yen } from '../lib/utils'
 
 /* =========================================================
    検索
@@ -163,7 +164,23 @@ export const MapPage: FC<{ touringCount: number; superCount: number }> = ({ tour
       ) : (
         <section class="bg-base">
           <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">
-            <EmptyState text="地図に表示できる記録は準備中です" />
+            <div class="rounded-big border border-edge2 bg-panel px-5 py-10 text-center">
+              <i class="fa-solid fa-map-location-dot text-[22px] text-brand/50"></i>
+              <p class="mt-3.5 text-[14px] font-bold tracking-tight text-sub">
+                記事が増え次第、順次追加します
+              </p>
+              <p class="mx-auto mt-2 max-w-[46ch] text-[12.5px] leading-[1.8] text-mute">
+                ツーリングやご当地スーパーの記事に位置情報を登録すると、ここに地図とピンが表示されます。
+              </p>
+              <div class="mt-5 flex flex-wrap items-center justify-center gap-2.5">
+                <PillButton href="/theme/touring" variant="ghost" icon="fa-motorcycle">
+                  ツーリングのページへ
+                </PillButton>
+                <PillButton href="/" variant="ghost" icon="fa-house">
+                  ホームへ戻る
+                </PillButton>
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -172,10 +189,40 @@ export const MapPage: FC<{ touringCount: number; superCount: number }> = ({ tour
 }
 
 /* =========================================================
-   About（自己紹介記事が無い場合のフォールバック）
+   About（固定ページ）
+   プロフィールの要約を置き、詳しい経緯は自己紹介記事へ送る。
+   資産の数字は月次データの最新値から差し込むので直書きしない。
    ========================================================= */
-export const AboutPage: FC<{ counts: Record<string, number> }> = ({ counts }) => {
-  const total = Object.values(counts).reduce((a, b) => a + b, 0)
+export const AboutPage: FC<{
+  counts: Record<string, number>
+  stats: any[]
+  /** 自己紹介記事（詳しい経緯）へのリンク。無ければ null */
+  storyHref: string | null
+}> = ({ counts, stats, storyHref }) => {
+  const last = stats.length ? stats[stats.length - 1] : null
+  const n = (v: any) => (v === null || v === undefined || v === '' ? null : Number(v))
+  const total = last ? n(last.total_assets) : null
+  const ymLabel = (() => {
+    if (!last?.ym) return ''
+    const [y, m] = String(last.ym).split('-')
+    return `${y}年${Number(m)}月`
+  })()
+
+  /** 資産構成（値があるものだけ表示） */
+  const breakdown = [
+    { label: '現金・預金', value: last ? n(last.cash) : null },
+    { label: 'NISA', value: last ? n(last.nisa_value) : null },
+    { label: 'iDeCo', value: last ? n(last.ideco_value) : null }
+  ].filter((x) => x.value)
+
+  /** プロフィール項目 */
+  const profile: [string, string][] = [
+    ['年齢', '41歳'],
+    ['職業', '会社員（専門学校卒・年収600万円ほど）'],
+    ['住まい', '都内で一人暮らし（1K・30㎡／家賃55,000円）'],
+    ['世帯', '独身']
+  ]
+
   return (
     <>
       <section class="border-b border-edge2 bg-base">
@@ -190,21 +237,134 @@ export const AboutPage: FC<{ counts: Record<string, number> }> = ({ counts }) =>
             <i class="fa-solid fa-circle-info text-[10px]"></i>About
           </p>
           <h1 class="mt-1.5 max-w-[24ch] text-[24px] font-bold leading-[1.22] tracking-[-0.03em] text-ink sm:text-[32px]">
-            記録は、いちばん正直な判断材料になる。
+            60歳で資産1億円を目指す、
+            <br class="hidden sm:block" />
+            会社員の記録です。
           </h1>
           <p class="mt-3 max-w-[66ch] text-[13.5px] leading-[1.85] text-sub">
             {SITE.title} は、資産運用と生活費、ツーリングとご当地スーパー、業務効率化と自動化の記録を
-            ひとつにまとめた個人サイトです。数字と写真で「あとから見返せる」ことを大切にしています。
+            まとめた個人サイトです。特別な経歴はなく、使っているのは誰でも同じ条件で使える制度と時間だけ。
+            感覚ではなく実額で記録し、あとから見返せることを大切にしています。
           </p>
         </div>
       </section>
 
-      <section class="bg-base">
+      {/* プロフィール */}
+      <section class="border-b border-edge2 bg-base">
         <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">
-          <SectionTitle eyebrow="Topics" icon="fa-compass" title="3つのテーマ" />
+          <SectionTitle eyebrow="Profile" icon="fa-user" title="運営者について" />
+          <div class="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <dl class="divide-y divide-edge2 rounded-big border border-edge2 bg-panel px-5">
+              {profile.map(([k, v]) => (
+                <div class="grid grid-cols-[88px_minmax(0,1fr)] gap-3 py-3.5">
+                  <dt class="text-[11.5px] text-mute">{k}</dt>
+                  <dd class="text-[13px] leading-[1.7] text-ink">{v}</dd>
+                </div>
+              ))}
+              <div class="grid grid-cols-[88px_minmax(0,1fr)] gap-3 py-3.5">
+                <dt class="text-[11.5px] text-mute">目標</dt>
+                <dd class="text-[13px] leading-[1.7] text-ink">
+                  60歳で資産1億円
+                  {total ? (
+                    <span class="ml-2 font-mono text-[12.5px] tabular-nums text-brand">
+                      （現在 {yen(total)}）
+                    </span>
+                  ) : null}
+                </dd>
+              </div>
+            </dl>
+
+            {/* 資産構成：月次データの最新値から自動表示 */}
+            {breakdown.length ? (
+              <div class="rounded-big border border-edge2 bg-panel p-5">
+                <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
+                  Assets
+                </p>
+                <h3 class="mt-1 text-[15px] font-bold tracking-tight">
+                  資産構成
+                  {ymLabel ? <span class="ml-1.5 text-[11.5px] font-medium text-mute">{ymLabel}時点</span> : null}
+                </h3>
+                <p class="mt-3 font-mono text-[26px] font-bold leading-none tabular-nums tracking-tight text-ink">
+                  {yen(total)}
+                </p>
+                <dl class="mt-4 divide-y divide-edge2 border-t border-edge2">
+                  {breakdown.map((b) => (
+                    <div class="flex items-baseline justify-between py-2.5">
+                      <dt class="text-[11.5px] text-mute">{b.label}</dt>
+                      <dd class="font-mono text-[13px] font-bold tabular-nums text-ink">{yen(b.value)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p class="mt-3 text-[11px] leading-relaxed text-mute">
+                  数字は管理画面に登録した月次データと連動しています。
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      {/* 投資方針 */}
+      <section class="border-b border-edge2 bg-panel">
+        <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">
+          <SectionTitle
+            eyebrow="Policy"
+            icon="fa-compass"
+            title="投資方針"
+            desc="判断する余地を最初から消して、続けられる金額だけを入れる。それだけです。"
+          />
+          <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: 'fa-globe',
+                t: '全世界株式1本に絞る',
+                d: '全世界株式のインデックスファンド（オルカン）を買い続けるだけ。米国株を足したり金を混ぜたりはしません。'
+              },
+              {
+                icon: 'fa-scale-balanced',
+                t: '判断の余地を作らない',
+                d: '複数のファンドを持つと「どちらを増やすか」を考える日が来るので、最初から1本にしています。'
+              },
+              {
+                icon: 'fa-calculator',
+                t: '年3%でも届く設計',
+                d: '年7%のような都合のいい数字は使いません。普通にいけば達成できる目標にしてあります。'
+              },
+              {
+                icon: 'fa-hand-holding-dollar',
+                t: 'やめないことが最優先',
+                d: '3〜4割下がる局面でも売らずにいられる金額しか入れません。続けられない額を入れるのが最大のリスクです。'
+              },
+              {
+                icon: 'fa-motorcycle',
+                t: '趣味は削らない',
+                d: 'ツーリング代を削って投資額を増やすことはしません。我慢を前提にした計画は続かないからです。'
+              },
+              {
+                icon: 'fa-chart-line',
+                t: '実額をそのまま公開',
+                d: '毎月の評価額・積立額・生活費を、加工せず数字のまま記録します。'
+              }
+            ].map((x) => (
+              <div class="rounded-big border border-edge2 bg-base p-5">
+                <span class="grid h-9 w-9 place-items-center rounded-lg bg-brandsoft text-brand">
+                  <i class={`fa-solid ${x.icon} text-[13px]`}></i>
+                </span>
+                <h3 class="mt-3.5 text-[14.5px] font-bold tracking-tight">{x.t}</h3>
+                <p class="mt-2 text-[12.5px] leading-[1.75] text-sub">{x.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3つのテーマ */}
+      <section class="border-b border-edge2 bg-base">
+        <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">
+          <SectionTitle eyebrow="Topics" icon="fa-layer-group" title="書いていること" />
           <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {THEMES.map((t) => {
-              const n = t.categories.reduce((s, k) => s + (counts[k] || 0), 0)
+              const num = t.categories.reduce((s, k) => s + (counts[k] || 0), 0)
               return (
                 <a
                   href={`/theme/${t.key}`}
@@ -213,26 +373,49 @@ export const AboutPage: FC<{ counts: Record<string, number> }> = ({ counts }) =>
                   <span class="grid h-9 w-9 place-items-center rounded-lg bg-brandsoft text-brand">
                     <i class={`fa-solid ${t.icon} text-[14px]`}></i>
                   </span>
-                  <h2 class="mt-3.5 text-[16px] font-bold tracking-[-0.02em]">
+                  <h3 class="mt-3.5 text-[16px] font-bold tracking-[-0.02em]">
                     {t.label}
                     <span class="ml-2 text-[12.5px] font-medium text-mute">{t.name}</span>
-                  </h2>
+                  </h3>
                   <p class="mt-2 text-[12.5px] leading-[1.7] text-sub">{t.description}</p>
                   <p class="mt-4 flex items-center gap-1.5 text-[12.5px] font-medium text-brand">
-                    <span class="font-mono tabular-nums">{n}</span> 件を見る
+                    <span class="font-mono tabular-nums">{num}</span> 件を見る
                     <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
                   </p>
                 </a>
               )
             })}
           </div>
+        </div>
+      </section>
 
-          <div class="mt-8 rounded-big border border-edge2 bg-panel p-5 sm:p-6">
+      {/* 詳しい経緯はこちら */}
+      <section class="bg-base">
+        <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">
+          {storyHref ? (
+            <div class="rounded-big border border-brand/25 bg-brandsoft p-5 sm:p-7">
+              <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">Read next</p>
+              <h2 class="mt-1.5 text-[17px] font-bold leading-snug tracking-[-0.02em] sm:text-[20px]">
+                詳しい経緯はこちら
+              </h2>
+              <p class="mt-2.5 max-w-[62ch] text-[13px] leading-[1.8] text-sub">
+                貯金が2万円だった時期から現在までの14年間、どうやって積み上げたのか。
+                収入の推移や実家を出たタイミングまで含めて、1本の記事にまとめています。
+              </p>
+              <div class="mt-5">
+                <PillButton href={storyHref} icon="fa-book-open">
+                  資産2万円からの記録を読む
+                </PillButton>
+              </div>
+            </div>
+          ) : null}
+
+          <div class="mt-4 rounded-big border border-edge2 bg-panel p-5 sm:p-6">
             <p class="text-[10.5px] font-bold uppercase tracking-[0.14em] text-brand">Site</p>
-            <h2 class="mt-1.5 text-[17px] font-bold tracking-[-0.02em]">このサイトの構成</h2>
+            <h2 class="mt-1.5 text-[16px] font-bold tracking-[-0.02em]">このサイトの構成</h2>
             <dl class="mt-4 divide-y divide-edge2 text-[13px]">
               {[
-                ['公開記事', `${total} 件`],
+                ['公開記事', `${Object.values(counts).reduce((a, b) => a + b, 0)} 件`],
                 ['構成', 'Hono / Cloudflare Workers'],
                 ['データベース', 'Cloudflare D1 (SQLite)'],
                 ['地図', 'Leaflet / OpenStreetMap'],
@@ -245,6 +428,11 @@ export const AboutPage: FC<{ counts: Record<string, number> }> = ({ counts }) =>
               ))}
             </dl>
           </div>
+
+          <p class="mt-5 rounded-xl border border-edge2 bg-panel px-4 py-3.5 text-[11.5px] leading-relaxed text-mute">
+            本サイトの内容は個人の記録であり、特定の金融商品の推奨や投資助言ではありません。
+            投資の判断はご自身の責任で行ってください。
+          </p>
         </div>
       </section>
     </>

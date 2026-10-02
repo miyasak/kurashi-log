@@ -2,6 +2,17 @@
 (function () {
   'use strict'
 
+  /** 本文で使える数値ショートコード（src/lib/utils.ts の SHORTCODES と対応） */
+  const SHORTCODES = [
+    { code: 'total_assets', label: '総資産（現金＋NISA＋iDeCo）' },
+    { code: 'cash', label: '現金・預金' },
+    { code: 'nisa', label: 'NISA評価額' },
+    { code: 'ideco', label: 'iDeCo評価額' },
+    { code: 'living_cost', label: '直近の生活費' },
+    { code: 'diff', label: '総資産の前月比（±付き）' },
+    { code: 'updated', label: 'データの更新月（例: 2026年7月）' }
+  ]
+
   /* 公開サイトと同じ3テーマ構成。色はアクセント1色に統一 */
   const CATS = [
     { key: 'asset', name: '資産運用', theme: 'Money', color: '#f97316', icon: 'fa-chart-line' },
@@ -352,6 +363,23 @@
                 .map((t) => `<button type="button" data-insert="${esc(t)}" class="rounded-md bg-slate-100 px-2 py-1 text-[10.5px] font-bold text-ink-soft hover:bg-slate-200">${esc(t)}</button>`)
                 .join('')}
             </div>
+            <!-- ショートコード：クリックで本文に挿入 -->
+            <div class="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p class="text-[11px] font-extrabold text-ink-soft">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>数値のショートコード
+              </p>
+              <p class="mt-1 text-[10.5px] leading-relaxed text-ink-mute">
+                クリックで挿入。表示時に<strong>月次データの最新値</strong>へ自動で置き換わるので、
+                金額を直書きする必要がありません（記事を書き直さなくてもトップの数字と一致します）。
+              </p>
+              <div class="mt-2 flex flex-wrap gap-1.5">
+                ${SHORTCODES.map(
+                  (s) =>
+                    `<button type="button" data-insert="{{${s.code}}}" title="${esc(s.label)}"
+                       class="rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-[10.5px] font-bold text-slate-700 hover:border-brand hover:text-brand">{{${s.code}}}</button>`
+                ).join('')}
+              </div>
+            </div>
             <textarea name="body" id="md-input" rows="20" class="admin-input mt-2" placeholder="Markdownで記述できます">${esc(p.body)}</textarea>
             <div id="md-output" class="md-preview mt-2 hidden min-h-[300px] rounded-xl border border-slate-200 bg-white p-4"></div>
           </div>
@@ -431,7 +459,9 @@
       b.addEventListener('click', () => {
         const ta = $('#md-input')
         const pos = ta.selectionStart
-        const text = b.dataset.insert + '\n'
+        const raw = b.dataset.insert
+        // ショートコードは文中に差し込むので改行を付けない
+        const text = raw.startsWith('{{') ? raw : raw + '\n'
         ta.value = ta.value.slice(0, pos) + text + ta.value.slice(pos)
         ta.focus()
         ta.selectionStart = ta.selectionEnd = pos + text.length
@@ -789,17 +819,38 @@
           <p class="mt-1 text-[11.5px] text-ink-soft">同じ年月を登録すると上書きされます。</p>
           <form id="stat-form" class="mt-4 space-y-3">
             ${field('年月 (YYYY-MM)', 'ym', nowYm, { ph: '2026-08', attr: 'required' })}
-            <div class="grid grid-cols-2 gap-3">
-              ${field('総資産', 'total_assets', '', { type: 'number' })}
-              ${field('現金', 'cash', '', { type: 'number' })}
-              ${field('NISA評価額', 'nisa_value', '', { type: 'number' })}
-              ${field('NISA累計投資額', 'nisa_contribution', '', { type: 'number' })}
-              ${field('iDeCo評価額', 'ideco_value', '', { type: 'number' })}
-              ${field('iDeCo累計拠出額', 'ideco_contribution', '', { type: 'number' })}
-              ${field('その他資産', 'other', '', { type: 'number' })}
-              ${field('手取り収入', 'income', '', { type: 'number' })}
+
+            <!-- 資産の内訳：この3つだけを入力する -->
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p class="text-[11px] font-extrabold text-ink-soft">資産の内訳（この3つだけ入力）</p>
+              <div class="mt-2.5 space-y-2.5">
+                ${field('現金・預金', 'cash', '', { type: 'number', attr: 'data-sum="1" step="1"' })}
+                ${field('NISA評価額', 'nisa_value', '', { type: 'number', attr: 'data-sum="1" step="1"' })}
+                ${field('iDeCo評価額', 'ideco_value', '', { type: 'number', attr: 'data-sum="1" step="1"' })}
+              </div>
+
+              <!-- 総資産：手入力させず、上の3項目の合計を自動表示 -->
+              <div class="mt-3 border-t border-slate-200 pt-3">
+                <div class="flex items-baseline justify-between">
+                  <span class="text-[11px] font-extrabold text-ink-soft">総資産（自動計算）</span>
+                  <span id="sum-total" class="font-mono text-[17px] font-extrabold text-slate-900">¥0</span>
+                </div>
+                <div class="mt-1.5 flex items-baseline justify-between">
+                  <span class="text-[11px] font-bold text-ink-mute">前月比（自動計算）</span>
+                  <span id="sum-diff" class="font-mono text-[12.5px] font-bold text-ink-mute">—</span>
+                </div>
+                <p class="mt-2 text-[10.5px] leading-relaxed text-ink-mute">
+                  総資産は「現金・預金＋NISA＋iDeCo」で自動計算されます。手入力欄はありません。
+                </p>
+              </div>
             </div>
-            ${field('生活費合計', 'living_cost', '', { type: 'number' })}
+
+            <div class="grid grid-cols-2 gap-3">
+              ${field('NISA累計投資額', 'nisa_contribution', '', { type: 'number' })}
+              ${field('iDeCo累計拠出額', 'ideco_contribution', '', { type: 'number' })}
+              ${field('手取り収入', 'income', '', { type: 'number' })}
+              ${field('生活費合計', 'living_cost', '', { type: 'number' })}
+            </div>
             <div>
               <label class="admin-label">費目内訳（JSON）</label>
               <textarea name="expense_json" rows="4" class="admin-input" placeholder='{"家賃":75000,"食費":42000,"光熱費":12000}'></textarea>
@@ -814,8 +865,20 @@
           </form>
         </div>
         <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div class="border-b border-slate-100 p-4">
-            <h2 class="text-sm font-extrabold">登録済みデータ（${stats.length}件）</h2>
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 p-4">
+            <div>
+              <h2 class="text-sm font-extrabold">登録済みデータ（${stats.length}件）</h2>
+              <p class="mt-0.5 text-[10.5px] text-ink-mute">
+                「不一致」の行は総資産と内訳の合計が合っていません。編集→保存で自動的に合います。
+              </p>
+            </div>
+            ${
+              stats.length
+                ? `<button id="stat-bulk-del" class="rounded-lg border border-rose-200 px-2.5 py-1.5 text-[10.5px] font-bold text-rose-500 hover:bg-rose-50">
+                     <i class="fa-regular fa-trash-can mr-1"></i>複数まとめて削除
+                   </button>`
+                : ''
+            }
           </div>
           <div class="overflow-x-auto">
             <table class="w-full min-w-[640px] text-left text-[12px]">
@@ -823,9 +886,10 @@
                 <tr>
                   <th class="px-4 py-2.5 font-bold">年月</th>
                   <th class="px-4 py-2.5 text-right font-bold">総資産</th>
+                  <th class="px-4 py-2.5 text-right font-bold">現金</th>
                   <th class="px-4 py-2.5 text-right font-bold">NISA</th>
                   <th class="px-4 py-2.5 text-right font-bold">iDeCo</th>
-                  <th class="px-4 py-2.5 text-right font-bold">生活費</th>
+                  <th class="px-4 py-2.5 text-right font-bold">前月比</th>
                   <th class="px-4 py-2.5"></th>
                 </tr>
               </thead>
@@ -835,21 +899,45 @@
                     ? stats
                         .slice()
                         .reverse()
-                        .map(
-                          (s) => `<tr class="border-t border-slate-100">
+                        .map((s, i, arr) => {
+                          // arr は新しい順。前月は1つ後ろの要素
+                          const prev = arr[i + 1]
+                          const n = (v) => Number(v || 0)
+                          const sum = n(s.cash) + n(s.nisa_value) + n(s.ideco_value)
+                          // 総資産と内訳の合計が合っているか（1円以上ずれていたら警告）
+                          const mismatch = Math.abs(n(s.total_assets) - sum) >= 1
+                          const d = prev ? n(s.total_assets) - n(prev.total_assets) : null
+                          const dTxt =
+                            d === null
+                              ? '—'
+                              : `${d > 0 ? '+' : d < 0 ? '−' : '±'}${yen(Math.abs(d))}`
+                          const dCls =
+                            d === null
+                              ? 'text-ink-mute'
+                              : d > 0
+                                ? 'text-emerald-600'
+                                : d < 0
+                                  ? 'text-rose-500'
+                                  : 'text-ink-mute'
+                          return `<tr class="border-t border-slate-100 ${mismatch ? 'bg-amber-50' : ''}">
                     <td class="px-4 py-2.5 font-bold">${s.ym}</td>
-                    <td class="px-4 py-2.5 text-right">${yen(s.total_assets)}</td>
+                    <td class="px-4 py-2.5 text-right font-bold">${yen(s.total_assets)}${
+                      mismatch
+                        ? `<span class="ml-1.5 inline-block rounded bg-amber-200 px-1.5 py-0.5 text-[9.5px] font-extrabold text-amber-900" title="内訳の合計 ${yen(sum)} と一致していません。編集して保存すると自動で合います。">不一致</span>`
+                        : ''
+                    }</td>
+                    <td class="px-4 py-2.5 text-right text-ink-soft">${yen(s.cash)}</td>
                     <td class="px-4 py-2.5 text-right text-ink-soft">${yen(s.nisa_value)}</td>
                     <td class="px-4 py-2.5 text-right text-ink-soft">${yen(s.ideco_value)}</td>
-                    <td class="px-4 py-2.5 text-right text-ink-soft">${yen(s.living_cost)}</td>
-                    <td class="px-4 py-2.5 text-right">
+                    <td class="px-4 py-2.5 text-right font-bold ${dCls}">${dTxt}</td>
+                    <td class="px-4 py-2.5 text-right whitespace-nowrap">
                       <button data-load="${s.ym}" class="mr-1 rounded-lg border border-slate-200 px-2 py-1 text-[10.5px] font-bold text-ink-soft">編集</button>
                       <button data-dels="${s.ym}" class="rounded-lg border border-rose-200 px-2 py-1 text-[10.5px] font-bold text-rose-500">削除</button>
                     </td>
                   </tr>`
-                        )
+                        })
                         .join('')
-                    : '<tr><td colspan="6" class="p-8 text-center text-ink-mute">データがありません</td></tr>'
+                    : '<tr><td colspan="7" class="p-8 text-center text-ink-mute">データがありません</td></tr>'
                 }
               </tbody>
             </table>
@@ -857,7 +945,53 @@
         </div>
       </div>`
 
-    $('#stat-form').addEventListener('submit', async (e) => {
+    /* ---- 総資産と前月比を自動計算して表示する ---- */
+    const statForm = $('#stat-form')
+    const num = (v) => {
+      const n = parseFloat(String(v ?? '').replace(/[^\d.-]/g, ''))
+      return isNaN(n) ? 0 : n
+    }
+    /** 現金 + NISA + iDeCo */
+    function computeTotal() {
+      return ['cash', 'nisa_value', 'ideco_value'].reduce(
+        (s, k) => s + num(statForm.querySelector(`[name="${k}"]`)?.value),
+        0
+      )
+    }
+    /** 入力中の年月の「前月」の総資産を登録済みデータから探す */
+    function prevTotal(ym) {
+      if (!ym || !/^\d{4}-\d{2}$/.test(ym)) return null
+      const [y, m] = ym.split('-').map(Number)
+      const d = new Date(y, m - 2, 1) // m-1 が当月なので m-2 が前月
+      const pym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      const row = state.stats.find((s) => s.ym === pym)
+      if (!row) return null
+      return { ym: pym, total: num(row.total_assets) }
+    }
+    function refreshSum() {
+      const total = computeTotal()
+      $('#sum-total').textContent = yen(total)
+      const prev = prevTotal(statForm.querySelector('[name="ym"]').value)
+      const el = $('#sum-diff')
+      if (!prev || !total) {
+        el.textContent = prev ? '—' : '前月のデータがありません'
+        el.className = 'font-mono text-[12.5px] font-bold text-ink-mute'
+        return
+      }
+      const d = total - prev.total
+      const sign = d > 0 ? '+' : d < 0 ? '−' : '±'
+      el.textContent = `${prev.ym} 比 ${sign}${yen(Math.abs(d)).replace('¥', '¥')}`
+      el.className =
+        'font-mono text-[12.5px] font-bold ' +
+        (d > 0 ? 'text-emerald-600' : d < 0 ? 'text-rose-500' : 'text-ink-mute')
+    }
+    statForm.querySelectorAll('[data-sum], [name="ym"]').forEach((i) => {
+      i.addEventListener('input', refreshSum)
+      i.addEventListener('change', refreshSum)
+    })
+    refreshSum()
+
+    statForm.addEventListener('submit', async (e) => {
       e.preventDefault()
       const fd = new FormData(e.target)
       const data = {}
@@ -869,9 +1003,14 @@
           return toast('費目内訳のJSON形式が不正です', 'error')
         }
       }
+      // 総資産は内訳の合計で確定させる（手入力を受け付けない）
+      const total = computeTotal()
+      if (!total) return toast('現金・NISA・iDeCo のいずれかを入力してください', 'error')
+      data.total_assets = total
+      data.other = null
       try {
         await api('/admin/stats', { method: 'POST', body: JSON.stringify(data) })
-        toast('保存しました')
+        toast('保存しました（総資産 ' + yen(total) + '）')
         renderStats()
       } catch (err) {
         toast(err.message, 'error')
@@ -887,6 +1026,14 @@
           const inp = form.querySelector(`[name="${k}"]`)
           if (inp) inp.value = s[k] ?? ''
         })
+        // 旧データは内訳が未入力で総資産だけ入っている場合がある。
+        // その差額を現金・預金として補完し、合計が一致した状態で編集を始められるようにする。
+        const cashInp = form.querySelector('[name="cash"]')
+        if (cashInp && !num(cashInp.value)) {
+          const rest = num(s.total_assets) - num(s.nisa_value) - num(s.ideco_value)
+          if (rest > 0) cashInp.value = String(Math.round(rest))
+        }
+        refreshSum()
         window.scrollTo({ top: 0, behavior: 'smooth' })
       })
     )
@@ -898,6 +1045,57 @@
         renderStats()
       })
     )
+
+    /* ---- まとめて削除（ダミー行の一括整理用） ---- */
+    const bulk = $('#stat-bulk-del')
+    if (bulk) {
+      bulk.addEventListener('click', async () => {
+        const all = state.stats.map((s) => s.ym).join(', ')
+        const input = prompt(
+          '削除する年月をカンマ区切りで入力してください。\n' +
+            '範囲指定も使えます（例: 2025-12~2026-07）。\n\n登録済み: ' +
+            all,
+          ''
+        )
+        if (!input) return
+        // 「2025-12~2026-07」形式を展開する
+        const targets = new Set()
+        input
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .forEach((tok) => {
+            const m = tok.match(/^(\d{4}-\d{2})\s*[~〜-]{1}\s*(\d{4}-\d{2})$/)
+            if (m) {
+              let [y1, m1] = m[1].split('-').map(Number)
+              const [y2, m2] = m[2].split('-').map(Number)
+              let guard = 0
+              while ((y1 < y2 || (y1 === y2 && m1 <= m2)) && guard++ < 240) {
+                targets.add(`${y1}-${String(m1).padStart(2, '0')}`)
+                m1++
+                if (m1 > 12) {
+                  m1 = 1
+                  y1++
+                }
+              }
+            } else if (/^\d{4}-\d{2}$/.test(tok)) {
+              targets.add(tok)
+            }
+          })
+        const list = [...targets].filter((ym) => state.stats.some((s) => s.ym === ym))
+        if (!list.length) return toast('該当する年月がありません', 'error')
+        if (!confirm(`${list.length}件を削除します。\n\n${list.join(', ')}\n\nよろしいですか？`)) return
+        let ok = 0
+        for (const ym of list) {
+          try {
+            await api('/admin/stats/' + ym, { method: 'DELETE' })
+            ok++
+          } catch (e) {}
+        }
+        toast(`${ok}件を削除しました`)
+        renderStats()
+      })
+    }
   }
 
   /* ================= 起動 ================= */

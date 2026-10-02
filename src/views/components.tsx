@@ -63,9 +63,18 @@ export const Cover: FC<{ post: Post; ratio?: string }> = ({ post, ratio = 'aspec
       </div>
     )
   }
+  /* 画像未登録のプレースホルダー（ツーリング・スーパー記事で必ず表示） */
   return (
-    <div class={`relative grid place-items-center bg-panel2 ${ratio}`}>
-      <i class={`fa-solid ${c?.icon || 'fa-file-lines'} text-[22px] text-brand/50`}></i>
+    <div
+      class={`relative grid place-items-center ${ratio}`}
+      style="background:linear-gradient(135deg,rgba(249,115,22,0.10),#18181b)"
+    >
+      <div class="text-center">
+        <i class={`fa-solid ${c?.icon || 'fa-file-lines'} text-[22px] text-brand/55`}></i>
+        <p class="mt-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-mute">
+          {c?.short || 'POST'}
+        </p>
+      </div>
     </div>
   )
 }
@@ -81,8 +90,16 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
   const c = CATEGORY_MAP[post.category]
   const href = `/posts/${post.slug}`
   const lead = post.summary || stripMd(post.body, 110)
-  /** 画像がない記事は、余白を作らず文字主体のカードにする */
+  /**
+   * サムネイル枠の扱い
+   * - ツーリング / ご当地スーパーは写真が主役なので、画像が無くても枠を必ず置く
+   *   （一覧の見た目が揃い、画像の入れ忘れにも気づける）
+   * - それ以外（資産運用・生活費・業務効率化）は画像が無ければ枠を作らず文字主体にする
+   */
+  const PHOTO_CATS = ['touring', 'supermarket']
+  const needsFrame = PHOTO_CATS.includes(post.category)
   const hasImage = !!post.cover_image
+  const showFrame = hasImage || needsFrame
 
   /** カテゴリごとの「数字」行 */
   const metrics: { label: string; value: string; stars?: number | null }[] = []
@@ -101,7 +118,7 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
       href={href}
       class="group flex h-full flex-col overflow-hidden rounded-big border border-edge2 bg-panel transition duration-300 hover:border-brand/40"
     >
-      {hasImage ? <Cover post={post} ratio="aspect-[16/9]" /> : null}
+      {showFrame ? <Cover post={post} ratio="aspect-[16/9]" /> : null}
       <div class="flex flex-1 flex-col p-4 sm:p-5">
         {/* バッジ + 日付 */}
         <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
@@ -114,20 +131,20 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
           <time class="font-mono text-[11px] tabular-nums text-mute">{formatDate(post.published_at)}</time>
         </div>
 
-        {/* タイトル：画像がない記事は少し大きく見せる */}
+        {/* タイトル：画像枠がない記事は少し大きく見せる */}
         <h3
           class={`mt-2.5 font-bold leading-[1.45] tracking-[-0.01em] text-ink transition group-hover:text-brand ${
-            hasImage ? 'text-[15.5px]' : 'text-[16.5px]'
+            showFrame ? 'text-[15.5px]' : 'text-[16.5px]'
           }`}
         >
           {post.title}
         </h3>
 
-        {/* リード文（画像がない場合は3行まで見せる） */}
+        {/* リード文（画像枠がない場合は3行まで見せる） */}
         {lead ? (
           <p
             class={`mt-2 text-[12.5px] leading-[1.7] text-sub ${
-              hasImage ? 'line-clamp-2' : 'line-clamp-3'
+              showFrame ? 'line-clamp-2' : 'line-clamp-3'
             }`}
           >
             {lead}

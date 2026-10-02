@@ -1,10 +1,13 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
 import type { ThemeDef } from '../lib/config'
-import { CATEGORY_MAP } from '../lib/config'
+import { CATEGORY_MAP, THEMES } from '../lib/config'
 import { PostCard, EmptyState, SpecRow, SectionTitle, validSpecs } from './components'
 import { ArrowLink } from './layout'
 import { yen } from '../lib/utils'
+
+/** 記事0件のときに案内する、他テーマの導線 */
+const OTHER_THEMES = (current: string) => THEMES.filter((t) => t.key !== current)
 
 type Props = {
   theme: ThemeDef
@@ -268,14 +271,31 @@ export const ThemePage: FC<Props> = ({
                   <PostCard post={p} showCategory={hasSub && !activeCat} />
                 ))}
               </div>
+            ) : q || activeTag ? (
+              <EmptyState text="条件に合う記事が見つかりませんでした" />
             ) : (
-              <EmptyState
-                text={
-                  q || activeTag
-                    ? '条件に合う記事が見つかりませんでした'
-                    : 'このテーマの記事は準備中です'
-                }
-              />
+              /* 記事0件：全テーマで同じ形の空ステートを出す（空白のまま終わらせない） */
+              <div class="rounded-big border border-edge2 bg-panel px-5 py-10 text-center">
+                <i class={`fa-solid ${theme.icon} text-[22px] text-brand/50`}></i>
+                <p class="mt-3.5 text-[14px] font-bold tracking-tight text-sub">
+                  このテーマの記事は準備中です
+                </p>
+                <p class="mx-auto mt-2 max-w-[48ch] text-[12.5px] leading-[1.8] text-mute">
+                  {theme.lead}
+                  記事を公開すると、ここに一覧が表示されます。
+                </p>
+                <div class="mt-5 flex flex-wrap items-center justify-center gap-2.5">
+                  {OTHER_THEMES(theme.key).map((t) => (
+                    <a
+                      href={`/theme/${t.key}`}
+                      class="inline-flex items-center gap-2 rounded-full bg-white/[0.07] px-4 py-2 text-[12.5px] font-medium text-ink ring-1 ring-inset ring-white/12 transition hover:bg-white/[0.12]"
+                    >
+                      <i class={`fa-solid ${t.icon} text-[11px]`}></i>
+                      {t.label}の記事を見る
+                    </a>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 

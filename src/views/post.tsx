@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { CATEGORY_MAP, THEME_MAP, ACCENT } from '../lib/config'
+import { CATEGORY_MAP, THEME_MAP, ACCENT, DISCLAIMER } from '../lib/config'
 import { formatDate, yen } from '../lib/utils'
 import { Stars, PostCard, SectionTitle } from './components'
 import { ArrowLink } from './layout'
@@ -28,6 +28,13 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
   const themeHref = theme ? `/theme/${theme.key}` : '/'
   /** テーマ内に複数カテゴリがある場合はサブカテゴリもパンくずに出す */
   const showSub = !!theme && theme.categories.length > 1
+  /** 公開日と最終更新日が違うときだけ「更新」を出す */
+  const showUpdated = (() => {
+    if (!post.updated_at) return false
+    const pub = String(post.published_at || post.created_at || '').slice(0, 10)
+    const upd = String(post.updated_at).slice(0, 10)
+    return !!upd && upd !== pub
+  })()
 
   return (
     <>
@@ -90,7 +97,16 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
               <span class="inline-flex items-center gap-1.5 font-mono tabular-nums">
                 <i class="fa-regular fa-calendar text-[11px]"></i>
                 {formatDate(post.visit_date || post.published_at || post.created_at)}
+                <span class="ml-0.5 font-sans text-[10.5px] text-white/50">公開</span>
               </span>
+              {/* 数字を更新していくサイトなので、最終更新日も並べて出す */}
+              {showUpdated ? (
+                <span class="inline-flex items-center gap-1.5 font-mono tabular-nums text-brand">
+                  <i class="fa-solid fa-rotate text-[10.5px]"></i>
+                  {formatDate(post.updated_at)}
+                  <span class="ml-0.5 font-sans text-[10.5px] opacity-80">更新</span>
+                </span>
+              ) : null}
               {post.genre ? (
                 <span class="inline-flex items-center gap-1.5">
                   <i class={`fa-solid ${cat?.icon} text-[11px]`}></i>
@@ -208,8 +224,14 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                   </section>
                 ) : null}
 
+                {/* 免責文（全記事の末尾に自動挿入） */}
+                <p class="mt-8 rounded-xl border border-edge2 bg-panel px-4 py-3.5 text-[11.5px] leading-[1.8] text-mute">
+                  <i class="fa-solid fa-circle-info mr-1.5 text-[11px]"></i>
+                  {DISCLAIMER}
+                </p>
+
                 {/* シェア */}
-                <div class="mt-10 flex flex-wrap items-center gap-2.5 border-t border-edge2 pt-6">
+                <div class="mt-6 flex flex-wrap items-center gap-2.5 border-t border-edge2 pt-6">
                   <button
                     class="js-share rounded-full border border-edge bg-panel px-4 py-2 text-[12.5px] text-ink transition hover:bg-panel2"
                     data-title={post.title}
@@ -239,12 +261,23 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
       {/* ============================================================
           関連記事
          ============================================================ */}
+      {/* 次に読む：同テーマから2件（記事間の内部リンクを必ず作る） */}
       {related.length ? (
         <section class="border-t border-edge2 bg-panel">
           <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
-            <SectionTitle eyebrow="More" icon="fa-layer-group" title="あわせて読みたい" />
-            <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {related.map((p) => (
+            <SectionTitle
+              eyebrow="Read next"
+              icon="fa-layer-group"
+              title="次に読む"
+              desc={theme ? `${theme.label} のほかの記事です。` : undefined}
+              action={
+                <ArrowLink href={showSub ? `${themeHref}?cat=${post.category}` : themeHref}>
+                  一覧へ
+                </ArrowLink>
+              }
+            />
+            <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {related.slice(0, 2).map((p) => (
                 <PostCard post={p} showCategory={true} />
               ))}
             </div>

@@ -142,6 +142,16 @@
     }
   }
 
+  /** canvas をメッセージ表示に差し替える（データ不足時） */
+  function emptyChart(el, msg) {
+    if (!el || !el.parentElement) return
+    const box = document.createElement('div')
+    box.className =
+      'flex h-full min-h-[120px] w-full items-center justify-center px-5 text-center text-[12.5px] leading-relaxed text-mute'
+    box.textContent = msg
+    el.parentElement.replaceChild(box, el)
+  }
+
   async function initCharts() {
     const homeEl = document.getElementById('home-asset-chart')
     const assetEl = document.getElementById('asset-chart')
@@ -150,29 +160,70 @@
     if (!homeEl && !assetEl && !lifeEl && !expenseEl) return
     if (typeof Chart === 'undefined') return
     const stats = await fetchStats()
-    if (!stats.length) return
+    if (!stats.length) {
+      // データ0件でも空白にせず案内を出す
+      const msg = '月次データを登録すると、ここに推移グラフが表示されます'
+      ;[homeEl, assetEl, lifeEl, expenseEl].forEach((el) => emptyChart(el, msg))
+      return
+    }
     const labels = stats.map((s) => s.ym)
 
+    /* データ点が少ないときの描画対策
+       - 1点のみ: 折れ線が引けないので、必ず見えるドットにする
+       - 2点:     直線で結ぶ（tension を 0 にして不自然な曲線を防ぐ）
+       - 3点以上: 通常のなめらかな折れ線 */
+    const few = stats.length <= 2
+    const single = stats.length === 1
     const lineDs = (label, key, color, fill) => ({
       label,
-      data: stats.map((s) => s[key]),
+      data: stats.map((s) => (s[key] == null || s[key] === '' ? null : Number(s[key]))),
       borderColor: color,
       backgroundColor: fill ? color + '26' : 'transparent',
       borderWidth: 2,
-      tension: 0.4,
-      pointRadius: 0,
-      pointHoverRadius: 4,
+      tension: few ? 0 : 0.4,
+      // 点が少ないときは点自体を常時表示（1点でも必ず見える）
+      pointRadius: single ? 6 : few ? 4 : 0,
+      pointBackgroundColor: color,
+      pointBorderColor: '#0a0a0b',
+      pointBorderWidth: single ? 3 : 2,
+      pointHoverRadius: 6,
       pointHoverBackgroundColor: color,
       pointHoverBorderColor: '#0a0a0b',
       pointHoverBorderWidth: 2,
+      spanGaps: true,
       fill: !!fill
     })
 
+    /* 点が1〜2個だと Chart.js のY軸が潰れて線が枠線に重なるため、
+       値の上下に余白を持たせた軸範囲を自前で与える */
+    const axisFor = (keys) => {
+      const vals = stats
+        .flatMap((s) => keys.map((k) => Number(s[k])))
+        .filter((v) => !isNaN(v) && v !== 0)
+      if (!vals.length) return {}
+      const min = Math.min(...vals)
+      const max = Math.max(...vals)
+      const pad = max === min ? Math.max(max * 0.12, 1000) : (max - min) * 0.25
+      return { min: Math.max(0, min - pad), max: max + pad }
+    }
+    const withAxis = (keys) => {
+      const a = axisFor(keys)
+      return {
+        ...baseOpts,
+        scales: {
+          ...baseOpts.scales,
+          x: { ...baseOpts.scales.x, offset: few },
+          y: { ...baseOpts.scales.y, ...a }
+        }
+      }
+    }
+
     if (homeEl) {
+      const o = withAxis(['total_assets'])
       new Chart(homeEl, {
         type: 'line',
         data: { labels, datasets: [lineDs('総資産', 'total_assets', BRAND, true)] },
-        options: { ...baseOpts, plugins: { ...baseOpts.plugins, legend: { display: false } } }
+        options: { ...o, plugins: { ...o.plugins, legend: { display: false } } }
       })
     }
     if (assetEl) {
@@ -186,36 +237,45 @@
             lineDs('iDeCo', 'ideco_value', '#71717a', false)
           ]
         },
-        options: baseOpts
+        options: withAxis(['total_assets', 'nisa_value', 'ideco_value'])
       })
     }
     if (lifeEl) {
-      new Chart(lifeEl, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: '生活費',
-              data: stats.map((s) => s.living_cost),
-              backgroundColor: BRAND,
-              borderRadius: 4,
-              maxBarThickness: 20
-            },
-            {
-              label: '手取り収入',
-              data: stats.map((s) => s.income),
-              backgroundColor: 'rgba(255,255,255,0.16)',
-              borderRadius: 4,
-              maxBarThickness: 20
-            }
-          ]
-        },
-        options: baseOpts
-      })
+      // 生活費データが1件も無ければグラフを描かず、代わりに案内を出す
+      const hasLife = stats.some((s) => Number(s.living_cost) > 0)
+      if (!hasLife) {
+        emptyChart(lifeEl, '生活費のデータを登録すると、ここに推移が表示されます')
+      } else {
+        new Chart(lifeEl, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: '生活費',
+                data: stats.map((s) => s.living_cost),
+                backgroundColor: BRAND,
+                borderRadius: 4,
+                maxBarThickness: few ? 48 : 20
+              },
+              {
+                label: '手取り収入',
+                data: stats.map((s) => s.income),
+                backgroundColor: 'rgba(255,255,255,0.16)',
+                borderRadius: 4,
+                maxBarThickness: few ? 48 : 20
+              }
+            ]
+          },
+          options: baseOpts
+        })
+      }
     }
     if (expenseEl) {
       const withExp = stats.filter((s) => s.expense_json)
+      if (!withExp.length) {
+        emptyChart(expenseEl, '費目内訳（JSON）を登録すると、ここに内訳グラフが表示されます')
+      }
       if (withExp.length) {
         let obj = {}
         try {
