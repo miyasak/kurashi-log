@@ -1,5 +1,5 @@
 import type { FC, PropsWithChildren } from 'hono/jsx'
-import { THEMES, SITE, SEO, CATEGORY_MAP, ACCENT } from '../lib/config'
+import { THEMES, SITE, SEO, CATEGORY_MAP } from '../lib/config'
 
 type LayoutProps = PropsWithChildren<{
   title?: string
@@ -30,12 +30,13 @@ export const Layout: FC<LayoutProps> = (props) => {
   const title = props.title ? `${props.title} — ${SITE.title}` : `${SITE.title} — ${SITE.subtitle}`
   const desc = props.description || SITE.description
   const activeTheme = props.activeTheme || CATEGORY_MAP[props.activeCategory || '']?.theme
-  /** カバー画像がないページでも SNS に画像が出るよう、OG画像を自動生成する */
-  const ogImage =
-    props.ogImage ||
-    `/og.png?t=${encodeURIComponent(props.title || SITE.title)}${
-      props.ogType === 'article' ? '' : '&s=1'
-    }`
+  /**
+   * OG画像。記事のカバー画像があればそれを、なければ共通のOG画像を使う。
+   * SNSは絶対パスを要求するため、canonical から origin を組み立てる。
+   */
+  const origin = props.canonical ? new URL(props.canonical).origin : ''
+  const abs = (u: string) => (u.startsWith('http') ? u : `${origin}${u}`)
+  const ogImage = abs(props.ogImage || '/og.png')
   return (
     <html lang="ja" class="dark">
       <head>
@@ -78,10 +79,12 @@ export const Layout: FC<LayoutProps> = (props) => {
         {SEO.googleSiteVerification ? (
           <meta name="google-site-verification" content={SEO.googleSiteVerification} />
         ) : null}
-        <link
-          rel="icon"
-          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23f97316'/><text x='50' y='72' font-size='58' text-anchor='middle' fill='%23fff'>🏍</text></svg>"
-        />
+        {/* 絵文字SVGだと環境によって表示されないため PNG を用意 */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
         {/* 本文フォント：日本語は Noto Sans JP、数字は等幅（Roboto Mono）で桁を揃える */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
@@ -89,35 +92,10 @@ export const Layout: FC<LayoutProps> = (props) => {
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
-        <link
-          href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
-          rel="stylesheet"
-        />
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `tailwind.config={darkMode:'class',theme:{extend:{
-              fontFamily:{
-                sans:['Noto Sans JP','-apple-system','BlinkMacSystemFont','Hiragino Sans','Helvetica Neue','sans-serif'],
-                mono:['Roboto Mono','SFMono-Regular','Menlo','monospace']
-              },
-              colors:{
-                base:'#0a0a0b',
-                panel:'#121214',
-                panel2:'#18181b',
-                edge:'rgba(255,255,255,0.10)',
-                edge2:'rgba(255,255,255,0.06)',
-                ink:'#f5f5f7',
-                sub:'#a1a1aa',
-                mute:'#71717a',
-                brand:'${ACCENT}',
-                brandsoft:'rgba(249,115,22,0.14)'
-              },
-              maxWidth:{page:'1120px',text:'720px'},
-              borderRadius:{apple:'14px',big:'18px'}
-            }}}`
-          }}
-        ></script>
+        {/* Tailwind は CDN(本番非推奨) をやめ、使用クラスだけをビルドしたCSSを読む */}
+        <link rel="stylesheet" href="/static/tw.css" />
+        {/* Font Awesome は使用アイコンのみのサブセット（webフォント読み込みなし） */}
+        <link rel="stylesheet" href="/static/fa.css" />
         <link rel="stylesheet" href="/static/style.css" />
         {props.headExtra ?? null}
       </head>

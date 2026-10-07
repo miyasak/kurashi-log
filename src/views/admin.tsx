@@ -14,10 +14,8 @@ export const AdminApp: FC = () => (
         rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23f97316'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='52'>%F0%9F%9B%A0</text></svg>"
       />
-      <link
-        href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
-        rel="stylesheet"
-      />
+      {/* 公開サイトと同じサブセット（アイコンの見え方を揃える） */}
+      <link rel="stylesheet" href="/static/fa.css" />
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <script src="https://cdn.tailwindcss.com"></script>
       <script

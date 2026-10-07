@@ -19,7 +19,15 @@ import {
   getLinkedPost,
   findFirstPostSlug
 } from './lib/db'
-import { renderMarkdown, stripMd } from './lib/utils'
+import { renderMarkdown, stripMd, applyShortcodes } from './lib/utils'
+import {
+  websiteJsonLd,
+  articleJsonLd,
+  personJsonLd,
+  themeJsonLd,
+  simplePageJsonLd,
+  rssXml
+} from './lib/seo'
 import { isAuthed } from './lib/auth'
 import { api } from './routes/api'
 import { Layout } from './views/layout'
@@ -38,6 +46,26 @@ const canonicalOf = (c: Context) => {
   const u = new URL(c.req.url)
   return u.origin + u.pathname
 }
+const originOf = (c: Context) => new URL(c.req.url).origin
+
+/** DBの日付を ISO8601（JST）にする。article:published_time 用。 */
+const isoDate = (v?: string | null) => {
+  if (!v) return null
+  const s = String(v).replace(' ', 'T')
+  return s.length <= 10 ? `${s}T00:00:00+09:00` : `${s}+09:00`
+}
+
+/** 地図に出せるピン（緯度経度ありの公開記事）の件数 */
+async function countMapPins(db: D1Database) {
+  const r = await db
+    .prepare(
+      `SELECT COUNT(*) AS c FROM posts
+       WHERE status='published' AND lat IS NOT NULL AND lng IS NOT NULL
+         AND category IN ('touring','supermarket')`
+    )
+    .first<{ c: number }>()
+  return r?.c || 0
+}
 
 const CHART_JS = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'
 const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
@@ -50,11 +78,11 @@ app.route('/api', api)
 /* ================= HOME ================= */
 app.get('/', async (c) => {
   const db = c.env.DB
-  const [latest, counts, stats, aboutSlug] = await Promise.all([
+  const [latest, counts, stats, mapPins] = await Promise.all([
     listPosts(db, { limit: 6 }),
     getCategoryCounts(db),
     listMonthlyStats(db),
-    findFirstPostSlug(db, ABOUT_POST_SLUGS)
+    countMapPins(db)
   ])
   const byCategory: Record<string, any[]> = {}
   for (const cat of CATEGORIES) {
@@ -76,7 +104,13 @@ app.get('/', async (c) => {
 
   return doc(
     c,
-    <Layout activePage="home" canonical={canonicalOf(c)} scripts={[CHART_JS, '/static/site.js']}>
+    <Layout
+      activePage="home"
+      canonical={canonicalOf(c)}
+      hasMapPins={mapPins > 0}
+      jsonLd={websiteJsonLd(originOf(c))}
+      scripts={[CHART_JS, '/static/site.js']}
+    >
       <HomePage
         latest={latest}
         byCategory={byCategory}
@@ -85,7 +119,6 @@ app.get('/', async (c) => {
         totalDistance={Math.round(dist?.d || 0)}
         superCount={sup?.c || 0}
         prefCount={pref?.c || 0}
-        aboutHref={aboutSlug ? `/posts/${aboutSlug}` : '/about'}
       />
     </Layout>
   )
@@ -157,7 +190,8 @@ app.get('/theme/:key', async (c) => {
     })
   }
 
-  const needsMap = theme.key === 'touring' && total > 0
+  const mapPins = await countMapPins(db)
+  const needsMap = theme.key === 'touring' && mapPins > 0
   const scripts = [
     ...(needsMap ? [LEAFLET_JS] : []),
     ...(theme.key === 'money' && stats.length ? [CHART_JS] : []),
@@ -171,6 +205,8 @@ app.get('/theme/:key', async (c) => {
       description={theme.description}
       activeTheme={theme.key}
       canonical={canonicalOf(c)}
+      hasMapPins={mapPins > 0}
+      jsonLd={themeJsonLd(originOf(c), theme.key, posts)}
       scripts={scripts}
       headExtra={needsMap ? LEAFLET_CSS : null}
     >
@@ -209,8 +245,11 @@ app.get('/posts/:slug', async (c) => {
   const authed = await isAuthed(c)
   const post = await getPostBySlug(c.env.DB, slug, authed)
   if (!post) return notFound(c)
-  const html = renderMarkdown(post.body)
+  // 本文の {{total_assets}} などを月次データの最新値に置き換えてから描画する
+  const stats = await listMonthlyStats(c.env.DB)
+  const html = renderMarkdown(applyShortcodes(post.body, stats))
   const theme = CATEGORY_MAP[post.category]?.theme
+  // 「次に読む」用に同テーマから2件
   const related = (
     await listPosts(c.env.DB, {
       categories: theme ? THEME_MAP[theme].categories : [post.category],
@@ -218,9 +257,12 @@ app.get('/posts/:slug', async (c) => {
     })
   )
     .filter((p) => p.id !== post.id)
-    .slice(0, 3)
+    .slice(0, 2)
   const hasGeo = post.lat != null && post.lng != null
   const linked = await getLinkedPost(c.env.DB, post)
+  const mapPins = await countMapPins(c.env.DB)
+  const canonical = canonicalOf(c)
+  const ogImg = post.cover_image || `${originOf(c)}/og.png`
 
   return doc(
     c,
@@ -229,7 +271,12 @@ app.get('/posts/:slug', async (c) => {
       description={post.summary || stripMd(post.body, 120)}
       activeCategory={post.category}
       ogImage={post.cover_image}
-      canonical={canonicalOf(c)}
+      ogType="article"
+      publishedTime={isoDate(post.published_at || post.created_at)}
+      modifiedTime={isoDate(post.updated_at || post.published_at)}
+      canonical={canonical}
+      hasMapPins={mapPins > 0}
+      jsonLd={articleJsonLd(originOf(c), post, canonical, ogImg)}
       scripts={[...(hasGeo ? [LEAFLET_JS] : []), '/static/site.js']}
       headExtra={hasGeo ? LEAFLET_CSS : null}
     >
@@ -242,9 +289,16 @@ app.get('/posts/:slug', async (c) => {
 app.get('/tags/:tag', async (c) => {
   const tag = decodeURIComponent(c.req.param('tag'))
   const posts = await listPosts(c.env.DB, { tag, limit: 60 })
+  const mapPins = await countMapPins(c.env.DB)
   return doc(
     c,
-    <Layout title={`#${tag}`} canonical={canonicalOf(c)} scripts={['/static/site.js']}>
+    <Layout
+      title={`#${tag}`}
+      canonical={canonicalOf(c)}
+      hasMapPins={mapPins > 0}
+      jsonLd={simplePageJsonLd(originOf(c), tag, `/tags/${encodeURIComponent(tag)}`)}
+      scripts={['/static/site.js']}
+    >
       <TagPage tag={tag} posts={posts} />
     </Layout>
   )
@@ -262,9 +316,17 @@ app.get('/search', async (c) => {
     tag,
     limit: 60
   })
+  const mapPins = await countMapPins(c.env.DB)
   return doc(
     c,
-    <Layout title="記事を探す" activePage="search" canonical={canonicalOf(c)} scripts={['/static/site.js']}>
+    <Layout
+      title="記事を探す"
+      activePage="search"
+      canonical={canonicalOf(c)}
+      hasMapPins={mapPins > 0}
+      jsonLd={simplePageJsonLd(originOf(c), '記事を探す', '/search')}
+      scripts={['/static/site.js']}
+    >
       <SearchPage posts={posts} q={q} theme={themeKey} tag={tag} total={posts.length} />
     </Layout>
   )
@@ -278,6 +340,7 @@ app.get('/map', async (c) => {
   const s = await c.env.DB.prepare(
     "SELECT COUNT(*) AS c FROM posts WHERE status='published' AND category='supermarket' AND lat IS NOT NULL"
   ).first<{ c: number }>()
+  const pins = (t?.c || 0) + (s?.c || 0)
   return doc(
     c,
     <Layout
@@ -285,8 +348,10 @@ app.get('/map', async (c) => {
       activePage="map"
       description="ツーリング先とご当地スーパーの位置を地図で確認できます。"
       canonical={canonicalOf(c)}
-      scripts={[LEAFLET_JS, '/static/site.js']}
-      headExtra={LEAFLET_CSS}
+      hasMapPins={pins > 0}
+      jsonLd={simplePageJsonLd(originOf(c), 'エリア別マップ', '/map')}
+      scripts={pins > 0 ? [LEAFLET_JS, '/static/site.js'] : ['/static/site.js']}
+      headExtra={pins > 0 ? LEAFLET_CSS : null}
     >
       <MapPage touringCount={t?.c || 0} superCount={s?.c || 0} />
     </Layout>
@@ -294,15 +359,31 @@ app.get('/map', async (c) => {
 })
 
 /* ================= ABOUT =================
-   自己紹介記事があればそこへ転送し、無ければ簡易ページを表示する */
+   固定ページ（プロフィール要約）。
+   自己紹介記事へは「詳しい経緯はこちら」でリンクする（転送しない）。 */
 app.get('/about', async (c) => {
-  const slug = await findFirstPostSlug(c.env.DB, ABOUT_POST_SLUGS)
-  if (slug) return c.redirect(`/posts/${slug}`, 302)
-  const counts = await getCategoryCounts(c.env.DB)
+  const [counts, stats, storySlug, mapPins] = await Promise.all([
+    getCategoryCounts(c.env.DB),
+    listMonthlyStats(c.env.DB),
+    findFirstPostSlug(c.env.DB, ABOUT_POST_SLUGS),
+    countMapPins(c.env.DB)
+  ])
   return doc(
     c,
-    <Layout title="About" activePage="about" canonical={canonicalOf(c)} scripts={['/static/site.js']}>
-      <AboutPage counts={counts} />
+    <Layout
+      title="About"
+      description="60歳で資産1億円を目指す会社員のプロフィールと投資方針。資産構成も公開しています。"
+      activePage="about"
+      canonical={canonicalOf(c)}
+      hasMapPins={mapPins > 0}
+      jsonLd={personJsonLd(originOf(c), stats)}
+      scripts={['/static/site.js']}
+    >
+      <AboutPage
+        counts={counts}
+        stats={stats}
+        storyHref={storySlug ? `/posts/${storySlug}` : null}
+      />
     </Layout>
   )
 })
@@ -325,30 +406,38 @@ app.get('/media/*', async (c) => {
   })
 })
 
-/* ================= sitemap / robots ================= */
+/* ================= sitemap / rss / robots ================= */
 app.get('/sitemap.xml', async (c) => {
   const posts = await listPosts(c.env.DB, { limit: 1000 })
-  const tags = await listTags(c.env.DB)
-  const origin = new URL(c.req.url).origin
+  const origin = originOf(c)
 
   /** 日付を W3C Datetime（YYYY-MM-DD）に整える */
   const day = (v?: string | null) => (v ? String(v).slice(0, 10) : '')
+  const today = new Date().toISOString().slice(0, 10)
+  const newest = day(posts[0]?.updated_at || posts[0]?.published_at) || today
 
-  const newest = day(posts[0]?.updated_at || posts[0]?.published_at)
+  /** 地図に出せるピンがあるか（0件なら /map は出さない） */
+  const mapPins = await countMapPins(c.env.DB)
 
-  type Entry = { loc: string; lastmod?: string; priority: string; freq: string }
+  type Entry = { loc: string; lastmod: string; priority: string; freq: string }
   const entries: Entry[] = [
     { loc: '', lastmod: newest, priority: '1.0', freq: 'daily' },
-    { loc: '/map', lastmod: newest, priority: '0.6', freq: 'weekly' },
-    { loc: '/search', priority: '0.3', freq: 'monthly' }
+    // About は固定ページとして独立させたので必ず載せる
+    { loc: '/about', lastmod: newest, priority: '0.8', freq: 'monthly' },
+    // /search は robots.txt で Disallow しているため sitemap には載せない
   ]
 
-  // テーマ：配下の最新記事日を lastmod に
+  if (mapPins > 0) {
+    entries.push({ loc: '/map', lastmod: newest, priority: '0.6', freq: 'weekly' })
+  }
+
+  // テーマ：記事が1件以上あるものだけ載せる（空ページをインデックスさせない）
   for (const t of THEMES) {
-    const latest = posts.find((p) => t.categories.includes(p.category as any))
+    const inTheme = posts.filter((p) => t.categories.includes(p.category as any))
+    if (!inTheme.length) continue
     entries.push({
       loc: `/theme/${t.key}`,
-      lastmod: day(latest?.updated_at || latest?.published_at),
+      lastmod: day(inTheme[0].updated_at || inTheme[0].published_at) || newest,
       priority: '0.8',
       freq: 'weekly'
     })
@@ -358,38 +447,51 @@ app.get('/sitemap.xml', async (c) => {
   for (const p of posts) {
     entries.push({
       loc: `/posts/${p.slug}`,
-      lastmod: day(p.updated_at || p.published_at),
+      lastmod: day(p.updated_at || p.published_at) || newest,
       priority: '0.9',
       freq: 'monthly'
     })
   }
 
-  // タグ一覧
-  for (const t of tags as any[]) {
-    entries.push({
-      loc: `/tags/${encodeURIComponent(t.name)}`,
-      priority: '0.4',
-      freq: 'weekly'
-    })
-  }
+  // タグページは記事数が少ないうちは薄いページになるので当面除外する
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${entries
   .map(
     (e) =>
-      `  <url><loc>${origin}${e.loc}</loc>${
-        e.lastmod ? `<lastmod>${e.lastmod}</lastmod>` : ''
-      }<changefreq>${e.freq}</changefreq><priority>${e.priority}</priority></url>`
+      `  <url><loc>${origin}${e.loc}</loc><lastmod>${e.lastmod}</lastmod><changefreq>${e.freq}</changefreq><priority>${e.priority}</priority></url>`
   )
   .join('\n')}
 </urlset>`
-  return c.body(xml, 200, { 'Content-Type': 'application/xml' })
+  return c.body(xml, 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 })
 
-app.get('/robots.txt', (c) =>
-  c.text(`User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: ${new URL(c.req.url).origin}/sitemap.xml\n`)
-)
+/* RSS */
+app.get('/rss.xml', async (c) => {
+  const posts = await listPosts(c.env.DB, { limit: 30 })
+  return c.body(rssXml(originOf(c), posts), 200, {
+    'Content-Type': 'application/rss+xml; charset=utf-8'
+  })
+})
+
+app.get('/robots.txt', (c) => {
+  const origin = originOf(c)
+  return c.text(
+    [
+      'User-agent: *',
+      'Allow: /',
+      // 管理画面とAPIはインデックスさせない
+      'Disallow: /admin',
+      'Disallow: /api/',
+      // 検索結果ページは重複コンテンツになるため除外
+      'Disallow: /search',
+      '',
+      `Sitemap: ${origin}/sitemap.xml`,
+      ''
+    ].join('\n')
+  )
+})
 
 function notFound(c: Context<{ Bindings: Bindings }>) {
   return c.html(

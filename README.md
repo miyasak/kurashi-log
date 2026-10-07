@@ -249,3 +249,52 @@ _Last Updated: 2026-08-03_
 - **アクセントを1色（`#f97316`）に統一**（管理画面と同色）
 - フォント: 日本語 **Noto Sans JP** / 数字 **Roboto Mono（等幅・tabular-nums）**
 - 金額・基準価額は大きく表示し「数字で記録するサイト」を前面に
+
+---
+
+## v5 変更（管理画面の入力設計 / About独立 / SEO強化）
+
+### ① 月次データの入力設計
+- **総資産の手入力欄を廃止**。「現金・預金／NISA評価額／iDeCo評価額」の3項目だけを入力し、総資産は**合計として自動計算**。
+- **前月比も自動計算**（前月行との差分）。入力中にリアルタイム表示。
+- 一覧に**「不一致」バッジ**を追加。総資産と内訳の合計がずれている行を警告表示（編集→保存で自動的に整合）。
+- 行の**個別削除**に加え、**まとめて削除**を追加（`2025-12~2026-07` のような範囲指定可）。
+- グラフは**2行でも1行でも破綻しない**実装に変更（1点ならドット表示、2点なら直線、0件なら案内文）。
+- 記事本文で使える**ショートコード**を追加：`{{total_assets}}` `{{cash}}` `{{nisa}}` `{{ideco}}` `{{living_cost}}` `{{diff}}` `{{updated}}` `{{ym}}`。管理画面のボタンから挿入でき、表示時に最新値へ置換されるため記事の数字とトップの数字がずれない。
+
+### ② About の重複解消
+- `/about` を**固定ページとして独立**（プロフィール・資産構成・投資方針6項目・3テーマ）。資産額は月次データから自動表示。
+- 末尾に「**詳しい経緯はこちら**」で `/posts/post-mtzu8ga8` へリンク。
+- トップの導線2本（「はじめての方はこちら」「運営者について読む」）を**どちらも `/about`** に変更。
+- `sitemap.xml` に `/about` を追加。
+
+### ③ 空ページとテーマ宣言
+- `/theme/tech` に他テーマと同じ**空ステートボックス**を追加（他テーマへの導線つき）。
+- `/map` はピン0件時に「**記事が増え次第、順次追加します**」を表示。Leaflet も読み込まない。
+- **フッター／モバイルメニューの「エリア別マップ」は、ピン1件以上になるまで非表示**。
+- トップ本文・フッター説明文を**3テーマ構成に統一**（Money／Touring／Tech）。
+- ヒーローの「Personal Record」を**「Kurashi Log」に統一**。
+- **「公開記事」カウンタは10件に達するまで非表示**。
+
+### ④ 記事テンプレート
+- メタに**最終更新日**を追加（公開日と異なる場合のみ表示。管理画面の編集日時を自動反映）。
+- 末尾に「**次に読む**」（同テーマから2件）を自動表示。
+- 末尾に**定型の免責文**を自動挿入。
+- ツーリング・ご当地スーパーの記事カードは**サムネイル枠を必ず表示**（画像未登録でもプレースホルダー）。
+
+### ⑤ SEO・技術
+- **og:image を生成**し全ページに設定（`public/og.png` 1200×630）。`twitter:card` は `summary_large_image`。
+- 記事ページの `og:type` を **article** にし、`article:published_time` / `article:modified_time` を追加。
+- **JSON-LD** を追加：トップ=WebSite、記事=BlogPosting+BreadcrumbList、/about=Person+BreadcrumbList、テーマ=CollectionPage+BreadcrumbList、下層=BreadcrumbList。
+- **sitemap.xml を整理**：記事0件のテーマと `/tags/*` を除外、全URLに `lastmod` を付与、`/about` を追加。
+- **RSS（`/rss.xml`）** と robots.txt の整備（`/admin` `/api/` `/search` を Disallow）。
+- **Tailwind CDN を廃止**し、使用クラスのみをビルドした `static/tw.css`（31KB）に差し替え。
+- **Font Awesome をサブセット化**（`static/fa.css`／使用32アイコンのみ、webフォント読み込みなし）。
+- **favicon を PNG 化**（32/180/512 + favicon.ico + webmanifest）。絵文字SVG依存を解消。
+
+### 画像・CSSの再生成
+```bash
+npm run build:img   # OG画像・ファビコンを生成
+npm run build:css   # Tailwind + Font Awesomeサブセットを生成
+npm run build       # build:css を含むフルビルド
+```
