@@ -166,7 +166,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
 
                 {/* 目次（見出しが3つ以上ある記事だけ） */}
                 {toc.length >= 3 ? (
-                  <nav class="mt-8 rounded-big border border-edge2 bg-panel p-5">
+                  <nav class="mt-8 rounded-big border border-edge2 bg-panel p-5 lg:hidden">
                     <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
                       Contents
                     </p>
@@ -276,6 +276,23 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
 
               {/* ---------------- 右サイドバー ---------------- */}
               <aside class="lg:sticky lg:top-20 lg:self-start">
+                {/* 目次（PCのみ・サイドバー上部） */}
+                {toc.length >= 3 ? (
+                  <nav class="mb-5 hidden max-h-[60vh] overflow-y-auto rounded-big border border-edge2 bg-panel p-4 lg:block">
+                    <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
+                      Contents
+                    </p>
+                    <ol class="mt-2.5 space-y-1.5">
+                      {toc.map((t) => (
+                        <li class="text-[12px] leading-[1.6]">
+                          <a href={`#${t.id}`} class="text-sub transition hover:text-brand">
+                            {t.text}
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  </nav>
+                ) : null}
                 <SpecCard post={post} />
               </aside>
             </div>
@@ -397,7 +414,7 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
 
       <dl class="divide-y divide-edge2">
         {rows.map((r) => (
-          <div class="grid grid-cols-[86px_minmax(0,1fr)] gap-3 px-5 py-3">
+          <div class={`grid px-5 py-3 ${String(r.value).length > 20 ? 'grid-cols-1 gap-1' : 'grid-cols-[86px_minmax(0,1fr)] gap-3'}`}>
             <dt class="text-[11px] leading-[1.6] text-mute">{r.label}</dt>
             <dd
               class={`text-[12.5px] leading-[1.65] text-ink ${
