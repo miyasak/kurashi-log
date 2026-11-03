@@ -682,8 +682,11 @@
     const lat = parseFloat(p.lat) || 36.5
     const lng = parseFloat(p.lng) || 138
     mapPicker = L.map(el).setView([lat, lng], p.lat ? 12 : 5)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO'
+    // CARTOがAPIキー必須になったため、キー不要のOpenStreetMap標準タイルを使用
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+      className: 'map-dark'
     }).addTo(mapPicker)
     let marker = p.lat ? L.marker([lat, lng]).addTo(mapPicker) : null
     const setPin = (la, ln, zoom) => {

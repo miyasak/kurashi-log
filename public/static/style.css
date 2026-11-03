@@ -513,3 +513,22 @@ input[type='time'].admin-input::-webkit-calendar-picker-indicator {
 .no-scroll {
   overflow: hidden;
 }
+
+/* ---------------- 地図タイル（OpenStreetMap標準）をダークテーマに寄せる ----------------
+   CARTOのダークタイルがAPIキー必須になったため、キー不要のOSM標準タイルを
+   CSSフィルタで暗転させて使う。キー管理が不要になる。 */
+.leaflet-container {
+  background: var(--panel2);
+}
+img.leaflet-tile.map-dark {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.6);
+}
+/* 帰属表示はダーク背景に合わせる */
+.leaflet-control-attribution {
+  background: rgba(10, 10, 11, 0.72) !important;
+  color: var(--mute) !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a {
+  color: var(--sub) !important;
+}

@@ -350,9 +350,12 @@
   }
 
   function tileLayer() {
-    return L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      maxZoom: 19
+    // CARTOがAPIキー必須になったため、キー不要のOpenStreetMap標準タイルを使用。
+    // ダークテーマに合わせるため、CSS側(.map-dark)で色調整している。
+    return L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+      className: 'map-dark'
     })
   }
 
