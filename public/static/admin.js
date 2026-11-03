@@ -18,6 +18,7 @@
     { key: 'asset', name: '資産運用', theme: 'Money', color: '#f97316', icon: 'fa-chart-line' },
     { key: 'life', name: '生活費', theme: 'Money', color: '#f97316', icon: 'fa-receipt' },
     { key: 'touring', name: 'ツーリング記録', theme: 'Touring', color: '#f97316', icon: 'fa-motorcycle' },
+    { key: 'camp', name: 'キャンプ場', theme: 'Touring', color: '#f97316', icon: 'fa-campground' },
     { key: 'supermarket', name: 'ご当地スーパー', theme: 'Touring', color: '#f97316', icon: 'fa-basket-shopping' },
     { key: 'it', name: '業務効率化', theme: 'Tech', color: '#f97316', icon: 'fa-gears' }
   ]
@@ -544,7 +545,7 @@
   function renderCatFields(p) {
     const c = p.category
     let inner = ''
-    if (c === 'touring' || c === 'supermarket') {
+    if (c === 'touring' || c === 'camp' || c === 'supermarket') {
       inner = `
         <div class="grid gap-3 sm:grid-cols-2">
           ${field(c === 'touring' ? 'スポット名' : '店舗名', 'place_name', p.place_name, { ph: c === 'touring' ? '例: 美ヶ原高原' : '例: スーパーいちば 高知店' })}
@@ -643,7 +644,7 @@
         <i class="fa-solid ${catOf(c).icon} mr-1.5"></i>${catOf(c).name} の項目
       </p>${inner}</div>`
 
-    if (c === 'touring' || c === 'supermarket') {
+    if (c === 'touring' || c === 'camp' || c === 'supermarket') {
       initMapPicker(p)
       fillLinkedOptions(c, p.linked_slug)
     }

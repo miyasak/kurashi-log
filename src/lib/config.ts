@@ -5,7 +5,7 @@
    それぞれをテーマ配下の「サブカテゴリ」として扱います。
    ========================================================= */
 
-export type CategoryKey = 'asset' | 'life' | 'touring' | 'supermarket' | 'it'
+export type CategoryKey = 'asset' | 'life' | 'touring' | 'camp' | 'supermarket' | 'it'
 export type ThemeKey = 'money' | 'touring' | 'tech'
 
 export type CategoryDef = {
@@ -80,6 +80,15 @@ export const CATEGORIES: CategoryDef[] = [
     'ルート・走行距離・天気・写真つきのツーリング記録。地図から辿れます。'
   ),
   cat(
+    'camp',
+    'touring',
+    'キャンプ場',
+    'CAMP',
+    'fa-campground',
+    '泊まった場所の設備メモ',
+    '料金・予約の要否・トイレ・炊事場・直火の可否。実際に泊まって確かめた設備を記録します。'
+  ),
+  cat(
     'supermarket',
     'touring',
     'ご当地スーパー',
@@ -145,7 +154,7 @@ export const THEMES: ThemeDef[] = [
     head: '走った道と、寄った店。',
     lead: 'ルート・距離・天気に加えて、旅先で立ち寄ったご当地スーパーも同じ地図に残しています。',
     description: 'ツーリング記録とご当地スーパーのレビュー。ルート・距離・写真・地図つきで残しています。',
-    categories: ['touring', 'supermarket']
+    categories: ['touring', 'camp', 'supermarket']
   },
   {
     key: 'tech',
