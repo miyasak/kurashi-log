@@ -548,13 +548,13 @@
     if (c === 'touring' || c === 'camp' || c === 'supermarket') {
       inner = `
         <div class="grid gap-3 sm:grid-cols-2">
-          ${field(c === 'touring' ? 'スポット名' : '店舗名', 'place_name', p.place_name, { ph: c === 'touring' ? '例: 美ヶ原高原' : '例: スーパーいちば 高知店' })}
+          ${field(c === 'touring' ? 'スポット名' : c === 'camp' ? 'キャンプ場名' : '店舗名', 'place_name', p.place_name, { ph: c === 'touring' ? '例: 美ヶ原高原' : '例: スーパーいちば 高知店' })}
           ${field('都道府県', 'prefecture', p.prefecture, { ph: '例: 長野県' })}
         </div>
         <div class="mt-3 grid gap-3 sm:grid-cols-2">
           ${field('エリア', 'area', p.area, { ph: '例: 東北', hint: '詳細ページで「東北 / 福島県」と表示' })}
           ${field('ジャンル', 'genre', p.genre, {
-            ph: c === 'touring' ? '例: 峠・ワインディング' : '例: 郊外型スーパー',
+            ph: c === 'touring' ? '例: 峠・ワインディング' : c === 'camp' ? '例: フリーサイト（砂地・土・芝）' : '例: 郊外型スーパー',
             hint: '記事上部と DATA カードに表示'
           })}
         </div>
@@ -588,19 +588,19 @@
                   <label class="admin-label">コスパ</label>
                   <select name="cospa" class="admin-input">${starOpts(p.cospa)}</select>
                 </div>
-                ${field('会計金額(円)', 'budget', p.budget, { type: 'number' })}
+                ${field(c === 'camp' ? '料金' : '会計金額（円）', 'budget', p.budget, { type: 'number' })}
                 ${field('訪問日', 'visit_date', p.visit_date, { type: 'date' })}
               </div>
               <div class="mt-3 grid gap-3 sm:grid-cols-2">
                 ${field('住所', 'address', p.address, { ph: '例: 高知県高知市...' })}
-                ${field('営業時間', 'business_hours', p.business_hours, { ph: '例: 9:00-21:00' })}
+                ${field(c === 'camp' ? '開設期間' : '営業時間', 'business_hours', p.business_hours, { ph: c === 'camp' ? '例: 通年（冬期は要確認）' : '例: 9:00-21:00' })}
               </div>
               <div class="mt-3">
                 ${field('アクセス', 'access_text', p.access_text, { ph: '例: 常磐道いわき湯本ICから10分' })}
               </div>
               <div class="mt-3">
-                <label class="admin-label">推し買い</label>
-                <textarea name="recommend_items" rows="3" class="admin-input !font-sans" placeholder="手むすびおにぎり&#10;常磐ものの刺身&#10;メヒカリの唐揚げ">${esc(p.recommend_items)}</textarea>
+                <label class="admin-label">${c === 'camp' ? '設備メモ' : '推し買い'}</label>
+                <textarea name="recommend_items" rows="3" class="admin-input !font-sans" placeholder="${c === 'camp' ? '炊事場なし（立水栓あり）&#10;水洗トイレ&#10;直火不可' : '手むすびおにぎり&#10;常磐ものの刺身&#10;メヒカリの唐揚げ'}">${esc(p.recommend_items)}</textarea>
                 <p class="mt-1 text-[10.5px] text-ink-mute">改行 または「/」区切り。DATAカード内にオレンジのボックスで表示されます</p>
               </div>`
         }
