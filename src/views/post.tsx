@@ -1,7 +1,7 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
 import { CATEGORY_MAP, THEME_MAP, ACCENT, disclaimerOf } from '../lib/config'
-import { formatDate, yen } from '../lib/utils'
+import { formatDate, yen, buildToc } from '../lib/utils'
 import { Stars, PostCard, SectionTitle } from './components'
 import { ArrowLink } from './layout'
 
@@ -20,6 +20,7 @@ const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
 )
 
 export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
+  const { html: bodyHtml, toc } = buildToc(html)  
   const cat = CATEGORY_MAP[post.category]
   const hasGeo = post.lat != null && post.lng != null
   const accent = ACCENT
@@ -163,10 +164,31 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                   </section>
                 ) : null}
 
+                {/* 目次（見出しが3つ以上ある記事だけ） */}
+                {toc.length >= 3 ? (
+                  <nav class="mt-8 rounded-big border border-edge2 bg-panel p-5">
+                    <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
+                      Contents
+                    </p>
+                    <ol class="mt-3 space-y-2">
+                      {toc.map((t, i) => (
+                        <li class="flex gap-2.5 text-[13px] leading-[1.7]">
+                          <span class="pt-[3px] font-mono text-[11px] tabular-nums text-mute">
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <a href={`#${t.id}`} class="text-sub transition hover:text-brand">
+                            {t.text}
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  </nav>
+                ) : null}
+
                 {/* 本文 */}
                 <div
-                  class={`post-body ${post.summary || (post.photos && post.photos.length) ? 'mt-8' : ''}`}
-                  dangerouslySetInnerHTML={{ __html: html }}
+                  class={`post-body ${post.summary || toc.length >= 3 || (post.photos && post.photos.length) ? 'mt-8' : ''}`}
+                  dangerouslySetInnerHTML={{ __html: bodyHtml }}
                 ></div>
 
                 {/* 路面 / 注意事項 */}

@@ -133,3 +133,24 @@ export function safeJson<T>(s: string | null | undefined, fallback: T): T {
     return fallback
   }
 }
+
+/* =========================================================
+   目次
+   本文HTMLの h2 に id を振って、見出しの一覧を作る。
+   マークダウン本文には手を加えない。
+   ========================================================= */
+export function buildToc(html: string): { html: string; toc: { id: string; text: string }[] } {
+  if (!html) return { html: '', toc: [] }
+  const toc: { id: string; text: string }[] = []
+  let i = 0
+  const out = html.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/g, (full, attrs: string, inner: string) => {
+    const text = inner.replace(/<[^>]+>/g, '').trim()
+    if (!text) return full
+    if (/\sid=/.test(attrs)) return full
+    i++
+    const id = `s${i}`
+    toc.push({ id, text })
+    return `<h2 id="${id}" style="scroll-margin-top:90px"${attrs}>${inner}</h2>`
+  })
+  return { html: out, toc }
+}
