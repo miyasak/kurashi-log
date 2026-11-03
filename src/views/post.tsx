@@ -350,6 +350,18 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
     push('ベストシーズン', post.best_season)
     push('天気', post.weather)
     push('使用車両', post.bike)
+  } else if (post.category === 'camp') {
+      heading = 'CAMP DATA'
+      push('訪問日', formatDate(post.visit_date || post.published_at))
+      push('エリア', areaLabel)
+      push('キャンプ場', post.place_name)
+      push('サイト形式', post.genre)
+      push('料金', post.budget ? yen(post.budget) : null)
+      push('開設期間', post.business_hours)
+      push('ベストシーズン', post.best_season)
+      push('天気', post.weather)
+      push('アクセス', post.access_text)
+      push('住所', post.address)
   } else if (post.category === 'supermarket') {
     heading = 'SHOP DATA'
     push('訪問日', formatDate(post.visit_date || post.published_at))
