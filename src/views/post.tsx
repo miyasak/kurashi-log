@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { CATEGORY_MAP, THEME_MAP, ACCENT, DISCLAIMER } from '../lib/config'
+import { CATEGORY_MAP, THEME_MAP, ACCENT, disclaimerOf } from '../lib/config'
 import { formatDate, yen } from '../lib/utils'
 import { Stars, PostCard, SectionTitle } from './components'
 import { ArrowLink } from './layout'
@@ -97,7 +97,9 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
               <span class="inline-flex items-center gap-1.5 font-mono tabular-nums">
                 <i class="fa-regular fa-calendar text-[11px]"></i>
                 {formatDate(post.visit_date || post.published_at || post.created_at)}
-                <span class="ml-0.5 font-sans text-[10.5px] text-white/50">公開</span>
+                <span class="ml-0.5 font-sans text-[10.5px] text-white/50">
+                  {post.visit_date ? '訪問' : '公開'}
+                </span>
               </span>
               {/* 数字を更新していくサイトなので、最終更新日も並べて出す */}
               {showUpdated ? (
@@ -225,11 +227,12 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                 ) : null}
 
                 {/* 免責文（全記事の末尾に自動挿入） */}
-                <p class="mt-8 rounded-xl border border-edge2 bg-panel px-4 py-3.5 text-[11.5px] leading-[1.8] text-mute">
-                  <i class="fa-solid fa-circle-info mr-1.5 text-[11px]"></i>
-                  {DISCLAIMER}
-                </p>
-
+                {disclaimerOf(post.category) ? (
+                  <p class="mt-8 rounded-xl border border-edge2 bg-panel px-4 py-3.5 text-[11.5px] leading-[1.8] text-mute">
+                    <i class="fa-solid fa-circle-info mr-1.5 text-[11px]"></i>
+                    {disclaimerOf(post.category)}
+                  </p>
+                ) : null}
                 {/* シェア */}
                 <div class="mt-6 flex flex-wrap items-center gap-2.5 border-t border-edge2 pt-6">
                   <button

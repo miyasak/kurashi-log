@@ -121,8 +121,8 @@ export function slugify(input: string): string {
     .replace(/[^a-z0-9\u3040-\u30ff\u4e00-\u9faf\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
-  if (/^[a-z0-9-]+$/.test(base) && base.length > 0) return base.slice(0, 60)
-  return 'post-' + Date.now().toString(36)
+    if (/^[a-z0-9\u3040-\u30ff\u4e00-\u9faf-]+$/.test(base) && base.length > 0) return base.slice(0, 60)
+    return 'post-' + Date.now().toString(36)
 }
 
 export function safeJson<T>(s: string | null | undefined, fallback: T): T {

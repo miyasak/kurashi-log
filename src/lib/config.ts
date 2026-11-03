@@ -197,9 +197,22 @@ export const SITE = {
  */
 export const ABOUT_POST_SLUGS = ['post-mtzu8hk0', 'post-mtzu8ga8']
 
-/** 全記事の末尾に自動挿入する免責文 */
-export const DISCLAIMER =
-  '本記事は個人の記録であり、特定の金融商品の推奨や投資助言ではありません。'
+/** カテゴリ別の免責文。空文字のカテゴリは免責文ごと非表示になる */
+export const DISCLAIMERS: Record<string, string> = {
+  asset: '本記事は個人の記録であり、特定の金融商品の推奨や投資助言ではありません。',
+  life: '本記事は個人の記録であり、特定の金融商品の推奨や投資助言ではありません。',
+  touring: '道路状況・施設の営業状況は訪問時点のものです。最新情報は各公式サイトでご確認ください。',
+  supermarket: '価格・品揃え・営業時間は訪問時点のものです。最新情報は各公式サイトでご確認ください。',
+  it: ''
+}
+
+/** 旧実装との互換 */
+export const DISCLAIMER = DISCLAIMERS.asset
+
+/** カテゴリに対応する免責文を返す。未設定なら空文字 */
+export const disclaimerOf = (category?: string | null): string =>
+  (category && DISCLAIMERS[category]) || ''
+
 
 /** トップの「公開記事」カウンタを表示し始める件数 */
 export const POST_COUNT_THRESHOLD = 10
