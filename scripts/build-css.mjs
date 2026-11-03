@@ -53,6 +53,11 @@ for (const f of files) {
     // 同じアイコンが solid / regular 両方で使われる場合は両方必要
     used.set(`${m[1]}:${m[2]}`, { style: m[1], name: m[2] })
   }
+  // config.ts のようにアイコン名だけを文字列で持つ場合も拾う（'fa-mug-hot' など）
+  for (const m of src.matchAll(/['"`]fa-([a-z0-9-]+)['"`]/g)) {
+    if (['solid', 'regular', 'brands', 'fw'].includes(m[1])) continue
+    if (!used.has(`solid:${m[1]}`)) used.set(`solid:${m[1]}`, { style: 'solid', name: m[1] })
+  }
 }
 
 // Font Awesome の SVG ファイルからグリフを読む（svgs/<style>/<name>.svg）

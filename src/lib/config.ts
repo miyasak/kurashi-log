@@ -5,8 +5,8 @@
    それぞれをテーマ配下の「サブカテゴリ」として扱います。
    ========================================================= */
 
-export type CategoryKey = 'asset' | 'life' | 'touring' | 'camp' | 'supermarket' | 'it'
-export type ThemeKey = 'money' | 'touring' | 'tech'
+export type CategoryKey = 'asset' | 'life' | 'touring' | 'camp' | 'supermarket' | 'it' | 'onsen'
+export type ThemeKey = 'money' | 'touring' | 'tech' | 'spa'
 
 export type CategoryDef = {
   key: CategoryKey
@@ -105,6 +105,15 @@ export const CATEGORIES: CategoryDef[] = [
     'fa-gears',
     '作業時間を削った記録',
     'Excel・Python・BIツールで手作業を自動化した記録。再現できる形で書いています。'
+  ),
+  cat(
+    'onsen',
+    'spa',
+    '日帰り温泉',
+    'SPA',
+    'fa-mug-hot',
+    '立ち寄った湯の記録',
+    '泉質・料金・営業時間と、旅の途中での寄りやすさ。実際に入った湯を記録します。'
   )
 ]
 
@@ -166,6 +175,17 @@ export const THEMES: ThemeDef[] = [
     lead: 'Excel・Python・BIツールで作業時間を削った記録。再現できる形で書いています。',
     description: 'Excel・Python・BIツールによる業務効率化と自動化の記録。手順を再現できる形でまとめています。',
     categories: ['it']
+  },
+  {
+    key: 'spa',
+    label: 'Spa',
+    en: 'SPA',
+    name: '日帰り温泉',
+    icon: 'fa-mug-hot',
+    head: '走ったあとに、湯へ寄る。',
+    lead: '旅先で入った日帰り温泉。泉質・料金・営業時間を、入った日の記録として残しています。',
+    description: '日帰り温泉の記録。泉質・料金・営業時間・アクセスをまとめています。',
+    categories: ['onsen']
   }
 ]
 
@@ -191,12 +211,12 @@ export const GROUPS = THEMES.map((t) => ({
 export const SITE = {
   title: 'Kurashi Log',
   /** ロゴ下に出る小さな英字キャプション */
-  caption: 'MONEY · TOURING · TECH',
-  subtitle: 'お金・ツーリング・業務効率化の記録',
+  caption: 'MONEY · TOURING · SPA · TECH',
+  subtitle: 'お金・ツーリング・温泉・業務効率化の記録',
   author: 'Owner',
   /** ナビと同じ 3テーマ构成で統一した説明文 */
   description:
-    'Money（資産運用・生活費）、Touring（ツーリング・ご当地スーパー）、Tech（業務効率化）。3つのテーマを数字で記録している個人サイト。'
+    'Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Spa（日帰り温泉）、Tech（業務効率化）。4つのテーマを数字で記録している個人サイト。'
 }
 
 /**
@@ -212,6 +232,7 @@ export const DISCLAIMERS: Record<string, string> = {
   life: '本記事は個人の記録であり、特定の金融商品の推奨や投資・税務上の助言ではありません。制度の適用可否は個々の状況によって異なります。',
   touring: '道路状況・施設の営業状況は訪問時点のものです。最新情報は各公式サイトでご確認ください。',
   supermarket: '価格・品揃え・営業時間は訪問時点のものです。最新情報は各公式サイトでご確認ください。',
+  onsen: '料金・営業時間・休業日は訪問時点のものです。最新情報は各施設の公式サイトでご確認ください。',
   it: ''
 }
 
