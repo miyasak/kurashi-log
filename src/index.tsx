@@ -262,7 +262,10 @@ app.get('/posts/:slug', async (c) => {
   const linked = await getLinkedPost(c.env.DB, post)
   const mapPins = await countMapPins(c.env.DB)
   const canonical = canonicalOf(c)
-  const ogImg = post.cover_image || `${originOf(c)}/og.png`
+  const cover = post.cover_image
+  ? (post.cover_image.startsWith('http') ? post.cover_image : originOf(c) + post.cover_image)
+  : null
+  const ogImg = cover || `${originOf(c)}/og.png`
 
   return doc(
     c,
@@ -394,10 +397,16 @@ app.get('/admin/*', (c) => doc(c, <AdminApp />))
 
 /* ================= R2 メディア ================= */
 app.get('/media/*', async (c) => {
-  if (!c.env.R2) return c.notFound()
   const key = c.req.path.replace('/media/', '')
-  const obj = await c.env.R2.get(key)
-  if (!obj) return c.notFound()
+  const obj = c.env.R2 ? await c.env.R2.get(key) : null
+  if (!obj) {
+    // ローカル開発時だけ、本番の画像を借りて表示する
+    const origin = new URL(c.req.url).origin
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return fetch('https://97fdf32d-665b-47ba-ae39-073216cebef5.vip.gensparksite.com' + c.req.path)
+    }
+    return c.notFound()
+  }
   return new Response(obj.body, {
     headers: {
       'Content-Type': obj.httpMetadata?.contentType || 'application/octet-stream',
