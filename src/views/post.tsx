@@ -356,7 +356,7 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
       push('エリア', areaLabel)
       push('キャンプ場', post.place_name)
       push('サイト形式', post.genre)
-      push('料金', post.budget ? yen(post.budget) : null)
+      push('料金', post.budget === 0 ? '無料' : post.budget ? yen(post.budget) : null)
       push('開設期間', post.business_hours)
       push('ベストシーズン', post.best_season)
       push('天気', post.weather)
