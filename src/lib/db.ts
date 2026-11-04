@@ -42,6 +42,7 @@ export type Post = {
   updated_at: string
   tags?: string[]
   photos?: { url: string; caption: string | null }[]
+  spots?: { id: number; name: string; lat: number; lng: number; note: string | null; sort_order: number }[]
 }
 
 const POST_FIELDS = [
@@ -163,6 +164,11 @@ export async function getPostBySlug(db: D1Database, slug: string, includeDrafts 
     .bind(post.id)
     .all()
   post.photos = photos.results as any[]
+  const spots = await db
+    .prepare('SELECT id, name, lat, lng, note, sort_order FROM post_spots WHERE post_id = ? ORDER BY sort_order, id')
+    .bind(post.id)
+    .all()
+  post.spots = spots.results as any[]  
   return post
 }
 

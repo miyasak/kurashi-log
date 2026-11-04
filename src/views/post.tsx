@@ -233,6 +233,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                         class="h-[300px] w-full sm:h-[380px]"
                         data-lat={String(post.lat)}
                         data-lng={String(post.lng)}
+                        data-spots={JSON.stringify(post.spots || [])}
                         data-label={post.place_name || post.title}
                         data-cat={post.category}
                       ></div>

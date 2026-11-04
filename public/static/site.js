@@ -380,16 +380,48 @@
     if (typeof L === 'undefined') return
 
     // 記事詳細の地図
-    const postMapEl = document.getElementById('post-map')
-    if (postMapEl) {
-      const lat = parseFloat(postMapEl.dataset.lat)
-      const lng = parseFloat(postMapEl.dataset.lng)
+  const postMapEl = document.getElementById('post-map')
+  if (postMapEl) {
+    let spots = []
+    try { spots = JSON.parse(postMapEl.dataset.spots || '[]') } catch (e) { spots = [] }
+    const lat = parseFloat(postMapEl.dataset.lat)
+    const lng = parseFloat(postMapEl.dataset.lng)
+
+    if (spots.length) {
+      const map = L.map(postMapEl, { scrollWheelZoom: false })
+      tileLayer().addTo(map)
+      const pts = spots.map((s) => [s.lat, s.lng])
+      L.polyline(pts, {
+        color: '#f97316',
+        weight: 3,
+        opacity: 0.6,
+        dashArray: '6 8',
+      }).addTo(map)
+      spots.forEach((s, i) => {
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="width:26px;height:26px;border-radius:50%;background:#f97316;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.45);border:2px solid rgba(255,255,255,.85)">${i + 1}</div>`,
+          iconSize: [26, 26],
+          iconAnchor: [13, 13],
+          popupAnchor: [0, -14],
+        })
+        L.marker([s.lat, s.lng], { icon })
+          .addTo(map)
+          .bindPopup(
+            `<b style="font-size:14px">${i + 1}. ${s.name || ''}</b>` +
+              (s.note ? `<br><span style="font-size:12px;opacity:.8">${s.note}</span>` : '')
+          )
+      })
+      if (spots.length === 1) map.setView(pts[0], 13)
+      else map.fitBounds(L.latLngBounds(pts).pad(0.15))
+    } else {
       const map = L.map(postMapEl, { scrollWheelZoom: false }).setView([lat, lng], 12)
       tileLayer().addTo(map)
       L.marker([lat, lng], { icon: pinIcon(postMapEl.dataset.cat || 'touring') })
         .addTo(map)
         .bindPopup(`<b style="font-size:14px">${postMapEl.dataset.label || ''}</b>`)
     }
+  }
 
     // カテゴリページの地図
     const catMapEl = document.getElementById('cat-map')
