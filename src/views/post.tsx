@@ -23,6 +23,25 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
   const { html: bodyHtml, toc } = buildToc(html)  
   const cat = CATEGORY_MAP[post.category]
   const hasGeo = post.lat != null && post.lng != null
+  /** Googleマップのリンク先。スポットが2件以上ある記事は経路（ルート）で開く */
+  const spots = (post.spots || []).filter((s) => s.lat != null && s.lng != null)
+  const mapsHref = (() => {
+    if (spots.length >= 2) {
+      // 経路URLの経由地は9件までなので、多すぎる場合は先頭9件＋最後だけにする
+      const pts = spots.length <= 10 ? spots : [...spots.slice(0, 9), spots[spots.length - 1]]
+      const q = (s: { lat: number; lng: number }) => `${s.lat},${s.lng}`
+      const way = pts.slice(1, -1).map(q).join('|')
+      return (
+        `https://www.google.com/maps/dir/?api=1&origin=${q(pts[0])}` +
+        `&destination=${q(pts[pts.length - 1])}` +
+        (way ? `&waypoints=${encodeURIComponent(way)}` : '') +
+        `&travelmode=driving`
+      )
+    }
+    const s = spots[0]
+    const query = s ? `${s.lat},${s.lng}` : `${post.lat},${post.lng}`
+    return `https://www.google.com/maps/search/?api=1&query=${query}`
+  })()
   const accent = ACCENT
   const areaLabel = [post.area, post.prefecture].filter(Boolean).join(' / ')
   const theme = cat ? THEME_MAP[cat.theme] : undefined
@@ -239,16 +258,12 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                       ></div>
                     </div>
                     <p class="mt-3.5">
-                      <ArrowLink
-                        href={`https://www.google.com/maps/search/?api=1&query=${post.lat},${post.lng}`}
-                        size="sm"
-                      >
-                        Googleマップで開く
+                      <ArrowLink href={mapsHref} size="sm">
+                        {spots.length >= 2 ? 'Googleマップで立ち寄り地を開く' : 'Googleマップで開く'}                        
                       </ArrowLink>
                     </p>
                   </section>
                 ) : null}
-
                 {/* 免責文（全記事の末尾に自動挿入） */}
                 {disclaimerOf(post.category) ? (
                   <p class="mt-8 rounded-xl border border-edge2 bg-panel px-4 py-3.5 text-[11.5px] leading-[1.8] text-mute">

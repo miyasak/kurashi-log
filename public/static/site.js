@@ -397,6 +397,26 @@
         opacity: 0.6,
         dashArray: '6 8',
       }).addTo(map)
+      // 近すぎるピンは表示だけ少しずらす（点線は実座標のまま引く）
+      const placed = []
+      const shifted = spots.map((s) => {
+        const lat0 = Number(s.lat)
+        const lng0 = Number(s.lng)
+        let lat = lat0
+        let lng = lng0
+        let n = 0
+        while (
+          placed.some((p) => Math.abs(p[0] - lat) < 0.028 && Math.abs(p[1] - lng) < 0.028) &&
+          n < 8
+        ) {
+          const a = (Math.PI / 4) * n
+          lat = lat0 + 0.03 * Math.sin(a)
+          lng = lng0 + 0.03 * Math.cos(a)
+          n++
+        }
+        placed.push([lat, lng])
+        return [lat, lng]
+      })      
       spots.forEach((s, i) => {
         const icon = L.divIcon({
           className: '',
@@ -405,7 +425,7 @@
           iconAnchor: [13, 13],
           popupAnchor: [0, -14],
         })
-        L.marker([s.lat, s.lng], { icon })
+          L.marker(shifted[i], { icon })
           .addTo(map)
           .bindPopup(
             `<b style="font-size:14px">${i + 1}. ${s.name || ''}</b>` +
