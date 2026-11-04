@@ -94,7 +94,8 @@ export const AdminApp: FC = () => (
               { v: 'dashboard', i: 'fa-gauge-high', l: 'ダッシュボード' },
               { v: 'posts', i: 'fa-file-lines', l: '記事管理' },
               { v: 'editor', i: 'fa-pen-to-square', l: '新規作成' },
-              { v: 'stats', i: 'fa-chart-column', l: '月次データ' }
+              { v: 'stats', i: 'fa-chart-column', l: '月次データ' },
+              { v: 'media', i: 'fa-images', l: 'メディア' }
             ].map((n) => (
               <button
                 data-nav={n.v}

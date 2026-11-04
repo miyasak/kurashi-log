@@ -90,7 +90,7 @@
   })
 
   /* ---------- ナビゲーション ---------- */
-  const TITLES = { dashboard: 'ダッシュボード', posts: '記事管理', editor: '記事エディタ', stats: '月次データ' }
+  const TITLES = { dashboard: 'ダッシュボード', posts: '記事管理', editor: '記事エディタ', stats: '月次データ', media: 'メディア' }
 
   function navigate(view) {
     state.view = view
@@ -102,6 +102,7 @@
     else if (view === 'posts') renderPosts()
     else if (view === 'editor') renderEditor(state.editing)
     else if (view === 'stats') renderStats()
+    else if (view === 'media') renderMedia()
   }
 
   document.querySelectorAll('.nav-btn').forEach((b) =>
@@ -203,6 +204,51 @@
     s === 'published'
       ? '<span class="rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-black text-emerald-600">公開</span>'
       : '<span class="rounded-md bg-amber-50 px-2 py-1 text-[10px] font-black text-amber-600">下書き</span>'
+
+  async function renderMedia() {
+    main().innerHTML = '<p class="text-sm text-ink-mute">読み込み中...</p>'
+    const r = await api('/admin/media')
+    if (!r.ok) { main().innerHTML = '<p class="text-sm text-ink-mute">' + esc(r.error || '取得に失敗したにゃ') + '</p>'; return }
+    if (!r.count) { main().innerHTML = '<p class="text-sm text-ink-mute">画像がまだありません。</p>'; return }
+    main().innerHTML = `
+      <p class="text-sm text-ink-mute mb-4">${r.count} 件</p>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        ${r.items.map((it) => `
+          <div class="rounded-big border border-edge2 bg-panel overflow-hidden">
+            <img src="${esc(it.path)}" alt="" class="w-full h-40 object-cover bg-black/30" loading="lazy" />
+            <div class="p-3 space-y-2">
+              <p class="text-[12px] break-all">${esc(it.path)}</p>
+              <p class="text-[11px] text-ink-mute">${new Date(it.uploaded).toLocaleString('ja-JP')} / ${Math.round(it.size / 1024)} KB</p>
+              <div class="flex gap-2">
+                <button class="media-copy text-[11px] px-2.5 py-1 rounded-full border border-white/[0.12] text-ink-soft hover:bg-white/[0.07] transition" data-kind="path" data-path="${esc(it.path)}">パス</button>
+                <button class="media-copy text-[11px] px-2.5 py-1 rounded-full border border-white/[0.12] text-ink-soft hover:bg-white/[0.07] transition" data-kind="tag" data-path="${esc(it.path)}">HTMLタグ</button>
+                <button class="media-del text-[11px] px-2.5 py-1 rounded-full border border-red-500/40 text-red-400 hover:bg-red-500/10 transition ml-auto" data-key="${esc(it.key)}">削除</button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>`
+    document.querySelectorAll('.media-copy').forEach((b) =>
+      b.addEventListener('click', async () => {
+        const p = b.dataset.path
+        const text = b.dataset.kind === 'tag'
+          ? `<p><a href="${p}"><img src="${p}" alt="" style="width:280px;border-radius:10px;"></a></p>`
+          : p
+        try { await navigator.clipboard.writeText(text) } catch (e) { return }
+        const old = b.textContent
+        b.textContent = 'コピーしたにゃ'
+        setTimeout(() => { b.textContent = old }, 1200)
+      })
+    )
+    document.querySelectorAll('.media-del').forEach((b) =>
+      b.addEventListener('click', async () => {
+        if (!confirm('この画像を削除しますか？記事で使っていると表示が消えます。')) return
+        const r2 = await api('/admin/media?key=' + encodeURIComponent(b.dataset.key), { method: 'DELETE' })
+        if (r2 && r2.ok) renderMedia()
+        else alert('削除できませんでした')
+      })
+    )
+  }
 
   /* ================= 記事一覧 ================= */
   async function renderPosts() {

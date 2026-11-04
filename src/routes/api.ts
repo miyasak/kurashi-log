@@ -169,3 +169,27 @@ api.post('/admin/upload', async (c) => {
   })
   return c.json({ ok: true, url: `/media/${key}` })
 })
+
+/** 画像一覧（メディア管理画面用） */
+api.get('/admin/media', async (c) => {
+  if (!c.env.R2) return c.json({ ok: false, error: 'R2バケットが未設定です。', items: [] }, 400)
+  const list = await c.env.R2.list({ prefix: 'uploads/', limit: 1000 })
+  const items = list.objects
+    .map((o) => ({
+      key: o.key,
+      path: `/media/${o.key}`,
+      size: o.size,
+      uploaded: o.uploaded
+    }))
+    .sort((a, b) => String(b.uploaded).localeCompare(String(a.uploaded)))
+  return c.json({ ok: true, count: items.length, items })
+})
+
+/** 画像削除 */
+api.delete('/admin/media', async (c) => {
+  if (!c.env.R2) return c.json({ ok: false, error: 'R2バケットが未設定です。' }, 400)
+  const key = c.req.query('key')
+  if (!key || !key.startsWith('uploads/')) return c.json({ ok: false, error: 'キーが不正です' }, 400)
+  await c.env.R2.delete(key)
+  return c.json({ ok: true })
+})
