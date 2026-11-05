@@ -731,8 +731,14 @@
   }
 
   const starOpts = (v) =>
-    ['', 1, 2, 3, 4, 5]
-      .map((n) => `<option value="${n}" ${String(v ?? '') === String(n) ? 'selected' : ''}>${n === '' ? '未評価' : '★'.repeat(n)}</option>`)
+    ['', 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+      .map((n) => {
+        const label =
+          n === ''
+            ? '未評価'
+            : '★'.repeat(Math.floor(n)) + (n % 1 ? '☆' : '') + ' ' + Number(n).toFixed(1)
+        return `<option value="${n}" ${String(v ?? '') === String(n) ? 'selected' : ''}>${label}</option>`
+      })
       .join('')
 
   function initMapPicker(p) {

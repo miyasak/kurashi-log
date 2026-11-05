@@ -10,10 +10,11 @@ export const Stars: FC<{ value?: number | null; color?: string }> = ({ value }) 
     <span class="inline-flex items-center gap-[3px] align-middle">
       {[1, 2, 3, 4, 5].map((i) => (
         <i
-          class="fa-solid fa-star text-[9.5px]"
-          style={`color:${i <= v ? ACCENT : 'rgba(255,255,255,0.16)'}`}
+          class={`fa-solid ${i - 0.5 === v || (i - v > 0 && i - v < 1) ? 'fa-star-half-stroke' : 'fa-star'} text-[9.5px]`}
+          style={`color:${i - 0.5 <= v ? ACCENT : 'rgba(255,255,255,0.16)'}`}
         ></i>
       ))}
+      {v % 1 ? <span class="ml-1 font-mono text-[10px] tabular-nums text-mute">{v.toFixed(1)}</span> : null}
     </span>
   )
 }

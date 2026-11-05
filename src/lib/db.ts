@@ -214,10 +214,10 @@ export async function upsertPost(db: D1Database, data: any, id?: number) {
   if (payload.status === 'published' && !payload.published_at) {
     payload.published_at = now.slice(0, 10)
   }
-  for (const k of ['lat', 'lng', 'distance_km']) {
+  for (const k of ['rating', 'cospa', 'budget']) {
     payload[k] = payload[k] === '' || payload[k] === null ? null : Number(payload[k])
   }
-  for (const k of ['rating', 'cospa', 'budget']) {
+  for (const k of ['budget']) {
     payload[k] = payload[k] === '' || payload[k] === null ? null : parseInt(payload[k], 10)
   }
 
