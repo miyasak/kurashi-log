@@ -618,9 +618,13 @@
                 <label class="admin-label">ルート</label>
                 <input name="route_text" value="${esc(p.route_text)}" placeholder="例: 福島市 → 高湯温泉 → 浄土平 → 土湯峠" class="admin-input" />
               </div>
-              <div class="mt-3 grid gap-3 sm:grid-cols-2">
+              <div class="mt-3 grid gap-3 sm:grid-cols-3">
                 ${field('ベストシーズン', 'best_season', p.best_season, { ph: '例: 5月〜10月（紅葉は10月上旬）' })}
                 ${field('訪問日', 'visit_date', p.visit_date, { type: 'date' })}
+              <div>
+                <label class="admin-label">総合評価</label>
+                <select name="rating" class="admin-input">${starOpts(p.rating)}</select>
+              </div>
               </div>
               <div class="mt-3">
                 <label class="admin-label">路面・注意事項</label>
