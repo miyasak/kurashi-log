@@ -484,6 +484,8 @@
 
     renderCatFields(p)
     renderPhotos(p.photos || [])
+    if ($('#spot-list')) renderSpots(p.spots || [])
+    if ($('#spot-add')) $('#spot-add').addEventListener('click', () => renderSpots(currentSpots().concat([{ name: '', lat: '', lng: '', note: '' }])))
     $('#cat-select').addEventListener('change', (e) => {
       renderCatFields({ ...collect(), category: e.target.value })
     })
@@ -670,7 +672,17 @@
             ${field('緯度', 'lat', p.lat, { type: 'number', attr: 'step="any"' })}
             ${field('経度', 'lng', p.lng, { type: 'number', attr: 'step="any"' })}
           </div>
-        </div>`
+            <div class="mt-4">
+              <label class="admin-label">立ち寄りスポット（番号順に地図へ表示されます）</label>
+              <div id="spot-list" class="space-y-2"></div>
+              <button type="button" id="spot-add" class="mt-2 rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-bold text-ink-soft hover:border-slate-300">
+                <i class="fa-solid fa-plus mr-1.5"></i>スポットを追加
+              </button>
+              <p class="mt-1 text-[10.5px] text-ink-mute">
+                2件以上でピンが番号付きになり、点線でつながります。上の地図をクリックすると空いている緯度・経度に入ります
+              </p>
+            </div>              
+          </div>`
     } else if (c === 'asset' || c === 'life') {
       inner = `
         <p class="mb-3 text-[11.5px] text-ink-soft">記事上部に大きく表示される数値ハイライトです（任意）。</p>
@@ -821,6 +833,59 @@
     )
   }
 
+  function currentSpots() {
+    return Array.from(main().querySelectorAll('#spot-list [data-spot]')).map((row) => ({
+      name: row.querySelector('.s-name').value,
+      lat: row.querySelector('.s-lat').value,
+      lng: row.querySelector('.s-lng').value,
+      note: row.querySelector('.s-note').value
+    }))
+  }
+
+  function renderSpots(spots) {
+    const el = $('#spot-list')
+    el.innerHTML = spots.length
+      ? spots
+          .map(
+            (s, i) => `
+      <div data-spot="${i}" class="rounded-xl border border-slate-100 bg-slate-50/60 p-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-orange-500 text-[11px] font-bold text-white">${i + 1}</span>
+          <input class="s-name admin-input flex-1 min-w-[160px]" value="${esc(s.name)}" placeholder="スポット名" />
+          <input class="s-lat admin-input w-[110px]" value="${esc(s.lat)}" placeholder="緯度" />
+          <input class="s-lng admin-input w-[110px]" value="${esc(s.lng)}" placeholder="経度" />
+          <button type="button" data-up="${i}" class="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 text-ink-soft" title="上へ"><i class="fa-solid fa-arrow-up text-xs"></i></button>
+          <button type="button" data-down="${i}" class="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 text-ink-soft" title="下へ"><i class="fa-solid fa-arrow-down text-xs"></i></button>
+          <button type="button" data-srm="${i}" class="grid h-9 w-9 place-items-center rounded-xl border border-rose-200 text-rose-500"><i class="fa-solid fa-xmark text-xs"></i></button>
+        </div>
+        <input class="s-note admin-input mt-2 w-full" value="${esc(s.note)}" placeholder="メモ（例: 11:00 うどん500円）" />
+      </div>`
+          )
+          .join('')
+      : '<p class="text-[11.5px] text-ink-mute">スポットは登録されていません</p>'
+
+    const move = (from, to) => {
+      const cur = currentSpots()
+      if (to < 0 || to >= cur.length) return
+      const [x] = cur.splice(from, 1)
+      cur.splice(to, 0, x)
+      renderSpots(cur)
+    }
+    el.querySelectorAll('[data-up]').forEach((b) =>
+      b.addEventListener('click', () => move(Number(b.dataset.up), Number(b.dataset.up) - 1))
+    )
+    el.querySelectorAll('[data-down]').forEach((b) =>
+      b.addEventListener('click', () => move(Number(b.dataset.down), Number(b.dataset.down) + 1))
+    )
+    el.querySelectorAll('[data-srm]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const cur = currentSpots()
+        cur.splice(Number(b.dataset.srm), 1)
+        renderSpots(cur)
+      })
+    )
+  }
+
   /** 画像を R2 にアップロードして公開パスを返す */
   async function uploadImage(file) {
     if (file.size > 10 * 1024 * 1024) {
@@ -853,6 +918,7 @@
       .map((s) => s.trim())
       .filter(Boolean)
     data.photos = currentPhotos().filter((p) => p.url)
+    data.spots = currentSpots().filter((s) => s.name && s.lat && s.lng)
     return data
   }
 

@@ -188,6 +188,11 @@ export async function getPostById(db: D1Database, id: number) {
     .bind(id)
     .all()
   post.photos = photos.results as any[]
+  const spots = await db
+    .prepare('SELECT id, name, lat, lng, note, sort_order FROM post_spots WHERE post_id = ? ORDER BY sort_order, id')
+    .bind(id)
+    .all()
+  post.spots = spots.results as any[]
   return post
 }
 
@@ -267,12 +272,27 @@ export async function upsertPost(db: D1Database, data: any, id?: number) {
         .run()
     }
   }
+  // スポット更新（複数ピンの地図用）
+  if (Array.isArray(data.spots)) {
+    await db.prepare('DELETE FROM post_spots WHERE post_id = ?').bind(postId).run()
+    let j = 0
+    for (const s of data.spots) {
+      const lat = Number(s?.lat)
+      const lng = Number(s?.lng)
+      if (!s?.name || !isFinite(lat) || !isFinite(lng)) continue
+      await db
+        .prepare('INSERT INTO post_spots (post_id, sort_order, name, lat, lng, note) VALUES (?, ?, ?, ?, ?, ?)')
+        .bind(postId, j++, String(s.name), lat, lng, s.note ? String(s.note) : null)
+        .run()
+    }
+  }
   return postId!
 }
 
 export async function deletePost(db: D1Database, id: number) {
   await db.prepare('DELETE FROM post_tags WHERE post_id = ?').bind(id).run()
   await db.prepare('DELETE FROM post_photos WHERE post_id = ?').bind(id).run()
+  await db.prepare('DELETE FROM post_spots WHERE post_id = ?').bind(id).run()  
   await db.prepare('DELETE FROM posts WHERE id = ?').bind(id).run()
 }
 
