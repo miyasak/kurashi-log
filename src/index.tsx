@@ -6,6 +6,7 @@ import {
   THEMES,
   THEME_MAP,
   ABOUT_POST_SLUGS,
+  MAP_CAT_SQL,
   SITE,
   type Bindings
 } from './lib/config'
@@ -61,7 +62,7 @@ async function countMapPins(db: D1Database) {
     .prepare(
       `SELECT COUNT(*) AS c FROM posts
        WHERE status='published' AND lat IS NOT NULL AND lng IS NOT NULL
-         AND category IN ('touring','supermarket')`
+       AND category IN (${MAP_CAT_SQL})`
     )
     .first<{ c: number }>()
   return r?.c || 0
@@ -98,7 +99,7 @@ app.get('/', async (c) => {
     .prepare(
       `SELECT COUNT(DISTINCT prefecture) AS c FROM posts
        WHERE status='published' AND prefecture IS NOT NULL AND prefecture <> ''
-         AND category IN ('touring','supermarket')`
+          AND category IN (${MAP_CAT_SQL})`
     )
     .first<{ c: number }>()
 
@@ -174,7 +175,7 @@ app.get('/theme/:key', async (c) => {
       .prepare(
         `SELECT COALESCE(SUM(distance_km),0) AS d,
                 COUNT(DISTINCT CASE WHEN prefecture <> '' THEN prefecture END) AS p
-         FROM posts WHERE status='published' AND category IN ('touring','supermarket')`
+         FROM posts WHERE status='published' AND category IN (${MAP_CAT_SQL})`
       )
       .first<any>()
     const s = await db
@@ -349,7 +350,7 @@ app.get('/map', async (c) => {
     <Layout
       title="エリア別マップ"
       activePage="map"
-      description="ツーリング先とご当地スーパーの位置を地図で確認できます。"
+      description="ツーリング先やキャンプ場、ご当地スーパーの位置を地図で確認できます。"
       canonical={canonicalOf(c)}
       hasMapPins={pins > 0}
       jsonLd={simplePageJsonLd(originOf(c), 'エリア別マップ', '/map')}

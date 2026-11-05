@@ -282,3 +282,7 @@ export type Bindings = {
   ADMIN_PASSWORD?: string
   SESSION_SECRET?: string
 }
+
+/* 地図に出すカテゴリ（場所のある記事だけ） */
+export const MAP_CATEGORIES = ['touring', 'supermarket', 'camp', 'onsen']
+export const MAP_CAT_SQL = MAP_CATEGORIES.map((c) => `'${c}'`).join(',')

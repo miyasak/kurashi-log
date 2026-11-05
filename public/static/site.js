@@ -14,6 +14,8 @@
     life: { color: BRAND, icon: 'fa-receipt', name: '生活費' },
     touring: { color: BRAND, icon: 'fa-motorcycle', name: 'ツーリング記録' },
     supermarket: { color: BRAND, icon: 'fa-basket-shopping', name: 'ご当地スーパー' },
+    camp: { color: BRAND, icon: 'fa-campground', name: 'キャンプ場' },
+    onsen: { color: BRAND, icon: 'fa-mug-hot', name: '温泉' },
     it: { color: BRAND, icon: 'fa-gears', name: '業務効率化' }
   }
 

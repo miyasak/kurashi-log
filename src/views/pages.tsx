@@ -107,7 +107,7 @@ export const MapPage: FC<{ touringCount: number; superCount: number }> = ({ tour
             走った場所も、寄った店も。
           </h1>
           <p class="mt-3 max-w-[64ch] text-[13.5px] leading-[1.8] text-sub">
-            ツーリングで訪れた場所と、旅先で立ち寄ったご当地スーパーを一枚の地図に。ピンをタップすると記事に移動します。
+            ツーリングで訪れた場所と、泊まったキャンプ場、旅先で立ち寄ったご当地スーパーを一枚の地図に。ピンをタップすると記事に移動します。
           </p>
 
           {hasPins ? (
@@ -137,7 +137,7 @@ export const MapPage: FC<{ touringCount: number; superCount: number }> = ({ tour
                   スーパー
                   <span class="ml-1.5 font-mono tabular-nums opacity-60">{superCount}</span>
                 </button>
-              ) : null}
+              ) : null}              
             </div>
           ) : null}
         </div>
