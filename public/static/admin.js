@@ -749,6 +749,20 @@
     }).addTo(mapPicker)
     let marker = p.lat ? L.marker([lat, lng]).addTo(mapPicker) : null
     const setPin = (la, ln, zoom) => {
+      // スポット欄に座標が空の行があれば、そちらを先に埋める
+      const list = document.getElementById('spot-list')
+      if (list) {
+        const rows = Array.from(list.querySelectorAll('[data-spot]'))
+        const blank = rows.find((r) => !r.querySelector('.s-lat').value.trim() || !r.querySelector('.s-lng').value.trim())
+        if (blank) {
+          blank.querySelector('.s-lat').value = la.toFixed(6)
+          blank.querySelector('.s-lng').value = ln.toFixed(6)
+          renderSpots(currentSpots())
+          if (zoom) mapPicker.setView([la, ln], zoom)
+          toast('スポット' + (rows.indexOf(blank) + 1) + 'に設定しました')
+          return
+        }
+      }
       main().querySelector('[name="lat"]').value = la.toFixed(6)
       main().querySelector('[name="lng"]').value = ln.toFixed(6)
       if (marker) marker.setLatLng([la, ln])

@@ -283,6 +283,16 @@ export async function upsertPost(db: D1Database, data: any, id?: number) {
       await db
         .prepare('INSERT INTO post_spots (post_id, sort_order, name, lat, lng, note) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(postId, j++, String(s.name), lat, lng, s.note ? String(s.note) : null)
+        .run()        
+    }
+    // 記事本体の座標はスポット1番目に合わせる（サイト全体の地図で使われるため）
+    const first = data.spots.find(
+      (s: any) => s?.name && isFinite(Number(s?.lat)) && isFinite(Number(s?.lng))
+    )
+    if (first) {
+      await db
+        .prepare('UPDATE posts SET lat = ?, lng = ? WHERE id = ?')
+        .bind(Number(first.lat), Number(first.lng), postId)
         .run()
     }
   }
