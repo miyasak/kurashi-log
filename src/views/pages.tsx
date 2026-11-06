@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { THEMES, SITE } from '../lib/config'
+import { THEMES, SITE, MAP_CATEGORIES, CATEGORY_MAP } from '../lib/config'
 import { PostCard, EmptyState, SectionTitle } from './components'
 import { ArrowLink, PillButton } from './layout'
 import { yen } from '../lib/utils'
@@ -88,8 +88,9 @@ export const SearchPage: FC<{
 /* =========================================================
    マップ
    ========================================================= */
-export const MapPage: FC<{ touringCount: number; superCount: number }> = ({ touringCount, superCount }) => {
-  const hasPins = touringCount + superCount > 0
+export const MapPage: FC<{ counts: Record<string, number> }> = ({ counts }) => {
+  const cats = MAP_CATEGORIES.map((k) => CATEGORY_MAP[k]).filter((c) => c && counts[c.key])
+  const hasPins = cats.length > 0
   return (
     <>
       <section class="border-b border-edge2 bg-base">
@@ -107,7 +108,7 @@ export const MapPage: FC<{ touringCount: number; superCount: number }> = ({ tour
             走った場所も、寄った店も。
           </h1>
           <p class="mt-3 max-w-[64ch] text-[13.5px] leading-[1.8] text-sub">
-            ツーリングで訪れた場所と、泊まったキャンプ場、旅先で立ち寄ったご当地スーパーを一枚の地図に。ピンをタップすると記事に移動します。
+            走った道、泊まったキャンプ場、立ち寄ったスーパーや温泉を一枚の地図に。ピンをタップすると記事に移動します。
           </p>
 
           {hasPins ? (
@@ -118,26 +119,16 @@ export const MapPage: FC<{ touringCount: number; superCount: number }> = ({ tour
               >
                 すべて
               </button>
-              {touringCount ? (
+              {cats.map((cat) => (
                 <button
                   class="map-filter rounded-full border border-edge2 bg-panel px-4 py-2 text-[12.5px] text-sub transition hover:text-ink"
-                  data-filter="touring"
+                  data-filter={cat.key}
                 >
-                  <i class="fa-solid fa-motorcycle mr-1.5 text-[10.5px] text-brand"></i>
-                  ツーリング
-                  <span class="ml-1.5 font-mono tabular-nums opacity-60">{touringCount}</span>
+                  <i class={`fa-solid ${cat.icon} mr-1.5 text-[10.5px] text-brand`}></i>
+                  {cat.name}
+                  <span class="ml-1.5 font-mono tabular-nums opacity-60">{counts[cat.key]}</span>
                 </button>
-              ) : null}
-              {superCount ? (
-                <button
-                  class="map-filter rounded-full border border-edge2 bg-panel px-4 py-2 text-[12.5px] text-sub transition hover:text-ink"
-                  data-filter="supermarket"
-                >
-                  <i class="fa-solid fa-basket-shopping mr-1.5 text-[10.5px] text-brand"></i>
-                  スーパー
-                  <span class="ml-1.5 font-mono tabular-nums opacity-60">{superCount}</span>
-                </button>
-              ) : null}              
+              ))}
             </div>
           ) : null}
         </div>

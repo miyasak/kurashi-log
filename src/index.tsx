@@ -338,26 +338,28 @@ app.get('/search', async (c) => {
 
 /* ================= MAP ================= */
 app.get('/map', async (c) => {
-  const t = await c.env.DB.prepare(
-    "SELECT COUNT(*) AS c FROM posts WHERE status='published' AND category='touring' AND lat IS NOT NULL"
-  ).first<{ c: number }>()
-  const s = await c.env.DB.prepare(
-    "SELECT COUNT(*) AS c FROM posts WHERE status='published' AND category='supermarket' AND lat IS NOT NULL"
-  ).first<{ c: number }>()
-  const pins = (t?.c || 0) + (s?.c || 0)
+  const rows = await c.env.DB.prepare(
+    `SELECT category, COUNT(*) AS c FROM posts
+     WHERE status='published' AND lat IS NOT NULL AND lng IS NOT NULL
+       AND category IN (${MAP_CAT_SQL})
+     GROUP BY category`
+  ).all<{ category: string; c: number }>()
+  const counts: Record<string, number> = {}
+  for (const r of rows.results || []) counts[r.category] = r.c
+  const pins = Object.values(counts).reduce((a, b) => a + b, 0)
   return doc(
     c,
     <Layout
       title="エリア別マップ"
       activePage="map"
-      description="ツーリング先やキャンプ場、ご当地スーパーの位置を地図で確認できます。"
+      description="ツーリングで走った場所、泊まったキャンプ場、立ち寄ったご当地スーパーや日帰り温泉を地図で確認できます。"
       canonical={canonicalOf(c)}
       hasMapPins={pins > 0}
       jsonLd={simplePageJsonLd(originOf(c), 'エリア別マップ', '/map')}
       scripts={pins > 0 ? [LEAFLET_JS, '/static/site.js'] : ['/static/site.js']}
       headExtra={pins > 0 ? LEAFLET_CSS : null}
     >
-      <MapPage touringCount={t?.c || 0} superCount={s?.c || 0} />
+      <MapPage counts={counts} />
     </Layout>
   )
 })
