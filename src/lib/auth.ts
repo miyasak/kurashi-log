@@ -3,8 +3,6 @@ import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
 import type { Bindings } from './config'
 
 export const SESSION_COOKIE = 'kl_session'
-const DEFAULT_PASSWORD = 'admin1234'
-const DEFAULT_SECRET = 'kurashi-log-dev-secret'
 
 function b64url(buf: ArrayBuffer): string {
   const bytes = new Uint8Array(buf)
@@ -26,11 +24,14 @@ async function hmac(secret: string, data: string): Promise<string> {
 }
 
 function getSecret(env: Bindings): string {
-  return (env.SESSION_SECRET || env.ADMIN_PASSWORD || DEFAULT_SECRET) + '::kl'
+  const s = env.SESSION_SECRET || env.ADMIN_PASSWORD
+  if (!s) throw new Error('SESSION_SECRET が未設定です')
+  // パスワードも混ぜる：変更すると既存セッションが無効になる
+  return `${s}::${env.ADMIN_PASSWORD || ''}::kl`
 }
 
-export function getPassword(env: Bindings): string {
-  return env.ADMIN_PASSWORD || DEFAULT_PASSWORD
+export function getPassword(env: Bindings): string | null {
+  return env.ADMIN_PASSWORD || null
 }
 
 export async function createToken(env: Bindings): Promise<string> {
