@@ -15,6 +15,18 @@ import {
 import { isAuthed, getPassword, createToken, setSessionCookie, clearSessionCookie } from '../lib/auth'
 
 export const api = new Hono<{ Bindings: Bindings }>()
+/* ログイン試行の制限（1つのWorkerインスタンス内でのみ有効な簡易版） */
+const loginTries = new Map<string, { n: number; until: number }>()
+function tooManyTries(ip: string): boolean {
+  const now = Date.now()
+  const rec = loginTries.get(ip)
+  if (!rec || now > rec.until) {
+    loginTries.set(ip, { n: 1, until: now + 10 * 60 * 1000 })
+    return false
+  }
+  rec.n++
+  return rec.n > 10
+}
 
 /* ========== 公開API ========== */
 api.get('/posts', async (c) => {
@@ -51,7 +63,13 @@ api.get('/map/points', async (c) => {
 /* ========== 認証 ========== */
 api.post('/admin/login', async (c) => {
   const body = await c.req.json<{ password?: string }>().catch(() => ({}) as any)
-  if (!body.password || body.password !== getPassword(c.env)) {
+  const ip = c.req.header('cf-connecting-ip') || 'local'
+  if (tooManyTries(ip)) {
+    return c.json({ ok: false, error: '試行回数が多すぎます。しばらく待ってください' }, 429)
+  }
+  const pw = getPassword(c.env)
+  if (!pw) return c.json({ ok: false, error: '管理画面が未設定です' }, 503)  
+  if (!body.password || body.password !== pw) { 
     return c.json({ ok: false, error: 'パスワードが違います' }, 401)
   }
   const token = await createToken(c.env)
