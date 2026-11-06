@@ -67,6 +67,8 @@ type ListOptions = {
   tag?: string
   q?: string
   limit?: number
+  /** limit の上限を広げたいときだけ指定（sitemap用）。既定は100 */
+  maxLimit?: number
   offset?: number
   includeDrafts?: boolean
   featuredOnly?: boolean
@@ -99,7 +101,7 @@ export async function listPosts(db: D1Database, opts: ListOptions = {}) {
     )
     binds.push(opts.tag, opts.tag)
   }
-  const limit = Math.min(opts.limit ?? 20, 100)
+  const limit = Math.min(opts.limit ?? 20, opts.maxLimit ?? 100)
   const offset = opts.offset ?? 0
   const sql = `
     SELECT p.*, (

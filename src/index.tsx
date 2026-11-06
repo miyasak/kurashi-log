@@ -150,13 +150,7 @@ app.get('/theme/:key', async (c) => {
   const tags = await listTags(db, undefined, cats)
 
   // フィルタ付きの総件数
-  let total: number
-  if (q || tag) {
-    const all = await listPosts(db, { categories: cats, q, tag, limit: 100 })
-    total = all.length
-  } else {
-    total = await countPosts(db, { categories: cats })
-  }
+  const total = await countPosts(db, { categories: cats, q, tag })
 
   const stats = theme.key === 'money' ? await listMonthlyStats(db) : []
 
@@ -426,7 +420,7 @@ app.get('/media/*', async (c) => {
 
 /* ================= sitemap / rss / robots ================= */
 app.get('/sitemap.xml', async (c) => {
-  const posts = await listPosts(c.env.DB, { limit: 1000 })
+  const posts = await listPosts(c.env.DB, { limit: 1000, maxLimit: 5000 })
   const origin = originOf(c)
 
   /** 日付を W3C Datetime（YYYY-MM-DD）に整える */
