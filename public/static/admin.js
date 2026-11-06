@@ -63,7 +63,7 @@
     el.style.background = type === 'error' ? '#e11d48' : '#0f172a'
     el.classList.remove('hidden')
     clearTimeout(el._t)
-    el._t = setTimeout(() => el.classList.add('hidden'), 2400)
+    el._t = setTimeout(() => el.classList.add('hidden'), 3500)
   }
 
   async function api(path, opts = {}) {

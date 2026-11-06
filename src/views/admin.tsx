@@ -146,7 +146,8 @@ export const AdminApp: FC = () => (
 
       <div
         id="toast"
-        class="pointer-events-none fixed bottom-6 left-1/2 z-[60] hidden -translate-x-1/2 rounded-full border border-white/10 bg-panel2 px-5 py-2.5 text-[13px] text-ink shadow-2xl backdrop-blur"
+        style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999 }}
+        class="pointer-events-none hidden rounded-full border border-white/10 bg-panel2 px-5 py-2.5 text-[13px] text-ink shadow-2xl backdrop-blur"
       ></div>
 
       <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
