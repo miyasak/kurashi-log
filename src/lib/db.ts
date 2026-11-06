@@ -257,6 +257,10 @@ export async function upsertPost(db: D1Database, data: any, id?: number) {
           .run()
       }
     }
+    // 参照ゼロになったタグを掃除（ゴーストタグ対策）
+    await db
+      .prepare('DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = tags.id)')
+      .run()
   }
 
   // 写真更新
@@ -304,6 +308,9 @@ export async function deletePost(db: D1Database, id: number) {
   await db.prepare('DELETE FROM post_photos WHERE post_id = ?').bind(id).run()
   await db.prepare('DELETE FROM post_spots WHERE post_id = ?').bind(id).run()  
   await db.prepare('DELETE FROM posts WHERE id = ?').bind(id).run()
+  await db
+    .prepare('DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = tags.id)')
+    .run()  
 }
 
 export async function listTags(db: D1Database, category?: string, categories?: string[]) {
