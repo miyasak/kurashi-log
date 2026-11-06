@@ -408,10 +408,11 @@ app.get('/media/*', async (c) => {
   const key = c.req.path.replace('/media/', '')
   const obj = c.env.R2 ? await c.env.R2.get(key) : null
   if (!obj) {
-    // ローカル開発時だけ、本番の画像を借りて表示する
+    // ローカル開発だけ、別環境の画像を借りて表示する（.dev.vars の DEV_MEDIA_ORIGIN）
     const origin = new URL(c.req.url).origin
-    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-      return fetch('https://97fdf32d-665b-47ba-ae39-073216cebef5.vip.gensparksite.com' + c.req.path)
+    const isLocal = origin.includes('localhost') || origin.includes('127.0.0.1')
+    if (isLocal && c.env.DEV_MEDIA_ORIGIN) {
+      return fetch(c.env.DEV_MEDIA_ORIGIN.replace(/\/$/, '') + c.req.path)
     }
     return c.notFound()
   }

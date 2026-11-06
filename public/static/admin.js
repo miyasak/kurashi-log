@@ -19,10 +19,31 @@
     { key: 'life', name: '生活費', theme: 'Money', color: '#f97316', icon: 'fa-receipt' },
     { key: 'touring', name: 'ツーリング記録', theme: 'Touring', color: '#f97316', icon: 'fa-motorcycle' },
     { key: 'camp', name: 'キャンプ場', theme: 'Touring', color: '#f97316', icon: 'fa-campground' },
-    { key: 'onsen', name: '日帰り温泉', theme: 'Spa', color: '#f97316', icon: 'fa-mug-hot' },    
+    { key: 'onsen', name: '日帰り温泉', theme: 'Spa', color: '#f97316', icon: 'fa-mug-hot' },
     { key: 'supermarket', name: 'ご当地スーパー', theme: 'Touring', color: '#f97316', icon: 'fa-basket-shopping' },
     { key: 'it', name: '業務効率化', theme: 'Tech', color: '#f97316', icon: 'fa-gears' }
   ]
+    /** カテゴリ別・本文のひな形（サイドバーで入力する項目は入れない） */
+  const BODY_TEMPLATES = {
+    camp: ['## サイトと地面', '## トイレ・炊事場', '## 買い出しと風呂', '## 客層と混雑', '## その他メモ'],
+    touring: [
+      '## ざっくり基本ルート',
+      '## タイムライン',
+      '| 時刻 | 場所 | メモ |\n|---|---|---|\n|  |  |  |\n|  |  |  |\n|  |  |  |',
+      '## 走ってみて'
+    ],
+    onsen: ['## 湯のこと', '## 設備と使い勝手', '## 混雑と時間帯', '## 周辺のこと'],
+    supermarket: ['## 品揃えの特徴', '## 買ったもの', '## 値引きの時間帯', '## 店の雰囲気'],
+    asset: ['## 結論', '## そう考えた理由', '## 数字', '## 注意点'],
+    life: ['## 結論', '## そう考えた理由', '## 数字', '## 注意点'],
+    it: ['## 結論', '## そう考えた理由', '## 数字', '## 注意点']
+  }
+
+  /** ひな形を1本のテキストに組み立てる */
+  function templateFor(cat) {
+    const t = BODY_TEMPLATES[cat]
+    return t ? t.join('\n\n') + '\n' : ''
+  }
   const catOf = (k) => CATS.find((c) => c.key === k) || CATS[0]
 
   const $ = (s) => document.querySelector(s)
@@ -410,6 +431,7 @@
               ${['## 見出し', '### 小見出し', '**太字**', '- リスト', '> 引用', '| 表 |', '![画像](URL)', '[リンク](URL)']
                 .map((t) => `<button type="button" data-insert="${esc(t)}" class="rounded-md bg-slate-100 px-2 py-1 text-[10.5px] font-bold text-ink-soft hover:bg-slate-200">${esc(t)}</button>`)
                 .join('')}
+            <button type="button" id="md-tpl" class="rounded-md bg-slate-900 px-2 py-1 text-[10.5px] font-bold text-white hover:bg-slate-700">ひな形</button>
             </div>
             <!-- ショートコード：クリックで本文に挿入 -->
             <div class="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -487,9 +509,35 @@
     renderPhotos(p.photos || [])
     if ($('#spot-list')) renderSpots(p.spots || [])
     if ($('#spot-add')) $('#spot-add').addEventListener('click', () => renderSpots(currentSpots().concat([{ name: '', lat: '', lng: '', note: '' }])))
+    let lastTpl = ''
     $('#cat-select').addEventListener('change', (e) => {
-      renderCatFields({ ...collect(), category: e.target.value })
+      const cat = e.target.value
+      renderCatFields({ ...collect(), category: cat })
+      const ta = $('#md-input')
+      if (!ta) return
+      const cur = ta.value.trim()
+      if (cur && cur !== lastTpl.trim()) return // 書きかけは触らない
+      lastTpl = templateFor(cat)
+      ta.value = lastTpl
     })
+
+    // ひな形ボタン
+    const tplBtn = $('#md-tpl')
+    if (tplBtn)
+      tplBtn.addEventListener('click', () => {
+        const ta = $('#md-input')
+        const t = templateFor($('#cat-select').value)
+        if (!ta || !t) return
+        if (!ta.value.trim()) {
+          ta.value = t
+          lastTpl = t
+        } else {
+          if (!confirm('本文の末尾にひな形を追記しますか？')) return
+          ta.value = ta.value.replace(/\s*$/, '') + '\n\n' + t
+          lastTpl = ''
+        }
+        ta.focus()
+      })
 
     // Markdown プレビュー
     $('#md-prev').addEventListener('click', () => {

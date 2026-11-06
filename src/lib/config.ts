@@ -279,6 +279,7 @@ export const SEO = {
 export type Bindings = {
   DB: D1Database
   R2?: R2Bucket
+  DEV_MEDIA_ORIGIN?: string
   ADMIN_PASSWORD?: string
   SESSION_SECRET?: string
 }

@@ -33,3 +33,8 @@ SELECT id, slug FROM posts WHERE id IN (23,26,29,30,31,33,34,41,42) ORDER BY id
 - ADMIN_PASSWORD と SESSION_SECRET を移行先に設定する（未設定だと管理画面に入れない）。
 
 DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = tags.id);
+
+## ローカル開発の画像について
+- /media は本番R2から配信。ローカルR2に無い画像は .dev.vars の DEV_MEDIA_ORIGIN から借りて表示する
+- 独自ドメイン移行後は DEV_MEDIA_ORIGIN を新ドメインに書き換える
+- 本番環境には DEV_MEDIA_ORIGIN を設定しないこと
