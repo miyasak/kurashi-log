@@ -320,6 +320,11 @@ app.get('/search', async (c) => {
     tag,
     limit: 60
   })
+  const total = await countPosts(c.env.DB, {
+    q,
+    categories: theme ? theme.categories : undefined,
+    tag
+  })
   const mapPins = await countMapPins(c.env.DB)
   return doc(
     c,
@@ -331,7 +336,7 @@ app.get('/search', async (c) => {
       jsonLd={simplePageJsonLd(originOf(c), '記事を探す', '/search')}
       scripts={['/static/site.js']}
     >
-      <SearchPage posts={posts} q={q} theme={themeKey} tag={tag} total={posts.length} />
+      <SearchPage posts={posts} q={q} theme={themeKey} tag={tag} total={total} />
     </Layout>
   )
 })

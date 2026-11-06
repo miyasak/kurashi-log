@@ -55,6 +55,11 @@ const POST_FIELDS = [
   'meta'
 ]
 
+/** LIKE のワイルドカード（% _ \）を打ち消す */
+function likeEscape(s: string) {
+  return s.replace(/[\\%_]/g, (m) => '\\' + m)
+}
+
 type ListOptions = {
   category?: string
   /** 複数カテゴリ（テーマ単位の絞り込み用） */
@@ -82,8 +87,10 @@ export async function listPosts(db: D1Database, opts: ListOptions = {}) {
   if (opts.featuredOnly) where.push('p.featured = 1')
   if (opts.withGeo) where.push('p.lat IS NOT NULL AND p.lng IS NOT NULL')
   if (opts.q) {
-    where.push('(p.title LIKE ? OR p.summary LIKE ? OR p.body LIKE ? OR p.place_name LIKE ?)')
-    const like = `%${opts.q}%`
+    where.push(
+      "(p.title LIKE ? ESCAPE '\\' OR p.summary LIKE ? ESCAPE '\\' OR p.body LIKE ? ESCAPE '\\' OR p.place_name LIKE ? ESCAPE '\\')"
+    )
+    const like = `%${likeEscape(opts.q.trim().slice(0, 50))}%`
     binds.push(like, like, like, like)
   }
   if (opts.tag) {
@@ -117,6 +124,19 @@ export async function countPosts(db: D1Database, opts: ListOptions = {}) {
   } else if (opts.categories && opts.categories.length) {
     where.push(`category IN (${opts.categories.map(() => '?').join(',')})`)
     binds.push(...opts.categories)
+  }
+  if (opts.q) {
+    where.push(
+      "(title LIKE ? ESCAPE '\\' OR summary LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\' OR place_name LIKE ? ESCAPE '\\')"
+    )
+    const like = `%${likeEscape(opts.q.trim().slice(0, 50))}%`
+    binds.push(like, like, like, like)
+  }
+  if (opts.tag) {
+    where.push(
+      'id IN (SELECT pt.post_id FROM post_tags pt JOIN tags t ON t.id = pt.tag_id WHERE t.slug = ? OR t.name = ?)'
+    )
+    binds.push(opts.tag, opts.tag)
   }
   const r = await db
     .prepare(`SELECT COUNT(*) AS c FROM posts ${where.length ? 'WHERE ' + where.join(' AND ') : ''}`)

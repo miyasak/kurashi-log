@@ -31,3 +31,5 @@ SELECT id, slug FROM posts WHERE id IN (23,26,29,30,31,33,34,41,42) ORDER BY id
 ## 4. 独自ドメイン移行時にやること
 - src/index.tsx の /media/* に Genspark の本番URLが直書きされている。要修正。
 - ADMIN_PASSWORD と SESSION_SECRET を移行先に設定する（未設定だと管理画面に入れない）。
+
+DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = tags.id);
