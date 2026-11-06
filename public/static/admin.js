@@ -19,6 +19,7 @@
     { key: 'life', name: '生活費', theme: 'Money', color: '#f97316', icon: 'fa-receipt' },
     { key: 'touring', name: 'ツーリング記録', theme: 'Touring', color: '#f97316', icon: 'fa-motorcycle' },
     { key: 'camp', name: 'キャンプ場', theme: 'Touring', color: '#f97316', icon: 'fa-campground' },
+    { key: 'onsen', name: '日帰り温泉', theme: 'Spa', color: '#f97316', icon: 'fa-mug-hot' },    
     { key: 'supermarket', name: 'ご当地スーパー', theme: 'Touring', color: '#f97316', icon: 'fa-basket-shopping' },
     { key: 'it', name: '業務効率化', theme: 'Tech', color: '#f97316', icon: 'fa-gears' }
   ]
@@ -593,16 +594,16 @@
   function renderCatFields(p) {
     const c = p.category
     let inner = ''
-    if (c === 'touring' || c === 'camp' || c === 'supermarket') {
-      inner = `
+    if (c === 'touring' || c === 'camp' || c === 'supermarket' || c === 'onsen') {
+    inner = `
         <div class="grid gap-3 sm:grid-cols-2">
-          ${field(c === 'touring' ? 'スポット名' : c === 'camp' ? 'キャンプ場名' : '店舗名', 'place_name', p.place_name, { ph: c === 'touring' ? '例: 美ヶ原高原' : '例: スーパーいちば 高知店' })}
+          ${field(c === 'touring' ? 'スポット名' : c === 'camp' ? 'キャンプ場名' : c === 'onsen' ? '施設名' : '店舗名', 'place_name', p.place_name, { ph: c === 'touring' ? '例: 美ヶ原高原' : c === 'onsen' ? '例: 道後温泉本館' : '例: スーパーいちば 高知店' })}
           ${field('都道府県', 'prefecture', p.prefecture, { ph: '例: 長野県' })}
         </div>
         <div class="mt-3 grid gap-3 sm:grid-cols-2">
           ${field('エリア', 'area', p.area, { ph: '例: 東北', hint: '詳細ページで「東北 / 福島県」と表示' })}
           ${field('ジャンル', 'genre', p.genre, {
-            ph: c === 'touring' ? '例: 峠・ワインディング' : c === 'camp' ? '例: フリーサイト（砂地・土・芝）' : '例: 郊外型スーパー',
+            ph: c === 'touring' ? '例: 峠・ワインディング' : c === 'camp' ? '例: フリーサイト（砂地・土・芝）' : c === 'onsen' ? '例: 単純温泉・露天あり' : '例: 郊外型スーパー',
             hint: '記事上部と DATA カードに表示'
           })}
         </div>
@@ -640,19 +641,19 @@
                   <label class="admin-label">コスパ</label>
                   <select name="cospa" class="admin-input">${starOpts(p.cospa)}</select>
                 </div>
-                ${field(c === 'camp' ? '料金' : '会計金額（円）', 'budget', p.budget, { type: 'number' })}
+                ${field(c === 'camp' ? '料金' : c === 'onsen' ? '入浴料' : '会計金額（円）', 'budget', p.budget, { type: 'number' })}
                 ${field('訪問日', 'visit_date', p.visit_date, { type: 'date' })}
               </div>
               <div class="mt-3 grid gap-3 sm:grid-cols-2">
                 ${field('住所', 'address', p.address, { ph: '例: 高知県高知市...' })}
-                ${field(c === 'camp' ? '開設期間' : '営業時間', 'business_hours', p.business_hours, { ph: c === 'camp' ? '例: 通年（冬期は要確認）' : '例: 9:00-21:00' })}
+                ${field(c === 'camp' ? '開設期間' : '営業時間', 'business_hours', p.business_hours, { ph: c === 'camp' ? '例: 通年（冬期は要確認）' : c === 'onsen' ? '例: 10:00-21:00（第3水曜休）' : '例: 9:00-21:00' })}
               </div>
               <div class="mt-3">
                 ${field('アクセス', 'access_text', p.access_text, { ph: '例: 常磐道いわき湯本ICから10分' })}
               </div>
               <div class="mt-3">
-                <label class="admin-label">${c === 'camp' ? '設備メモ' : '推し買い'}</label>
-                <textarea name="recommend_items" rows="3" class="admin-input !font-sans" placeholder="${c === 'camp' ? '炊事場なし（立水栓あり）&#10;水洗トイレ&#10;直火不可' : '手むすびおにぎり&#10;常磐ものの刺身&#10;メヒカリの唐揚げ'}">${esc(p.recommend_items)}</textarea>
+                <label class="admin-label">${c === 'camp' ? '設備メモ' : c === 'onsen' ? '泉質・設備メモ' : '推し買い'}</label>
+                <textarea name="recommend_items" rows="3" class="admin-input !font-sans" placeholder="${c === 'onsen' ? '単純温泉&#10;露天あり&#10;サウナなし&#10;シャンプー備付' : '手むすびおにぎり&#10;常磐ものの刺身&#10;メヒカリの唐揚げ'}">${esc(p.recommend_items)}</textarea>
                 <p class="mt-1 text-[10.5px] text-ink-mute">改行 または「/」区切り。DATAカード内にオレンジのボックスで表示されます</p>
               </div>`
         }
@@ -706,7 +707,7 @@
         <i class="fa-solid ${catOf(c).icon} mr-1.5"></i>${catOf(c).name} の項目
       </p>${inner}</div>`
 
-    if (c === 'touring' || c === 'camp' || c === 'supermarket') {
+    if (c === 'touring' || c === 'camp' || c === 'supermarket' || c === 'onsen') {
       initMapPicker(p)
       fillLinkedOptions(c, p.linked_slug)
     }
