@@ -102,7 +102,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
               <span class="text-white/80">{post.place_name || post.title}</span>
             </nav>
 
-            <h1 class="mt-3.5 max-w-[26ch] text-[24px] font-bold leading-[1.22] tracking-[-0.03em] text-white sm:text-[34px]">
+            <h1 class="mt-3.5 max-w-[48ch] text-[24px] font-bold leading-[1.22] tracking-[-0.03em] text-white [word-break:auto-phrase] sm:text-[36px]">
               {post.title}
             </h1>
 

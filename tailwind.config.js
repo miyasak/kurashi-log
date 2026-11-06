@@ -41,7 +41,7 @@ module.exports = {
         brand: '#f97316',
         brandsoft: 'rgba(249,115,22,0.14)'
       },
-      maxWidth: { page: '1280px', text: '720px' },
+      maxWidth: { page: 'clamp(1280px, 86vw, 1760px)', text: '800px' },
       borderRadius: { apple: '14px', big: '18px' }
     }
   }
