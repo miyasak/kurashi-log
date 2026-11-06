@@ -54,7 +54,11 @@ export async function verifyToken(env: Bindings, token?: string): Promise<boolea
 }
 
 export async function isAuthed(c: Context<{ Bindings: Bindings }>): Promise<boolean> {
-  return verifyToken(c.env, getCookie(c, SESSION_COOKIE))
+  try {
+    return await verifyToken(c.env, getCookie(c, SESSION_COOKIE))
+  } catch {
+    return false
+  }
 }
 
 export function setSessionCookie(c: Context, token: string) {
