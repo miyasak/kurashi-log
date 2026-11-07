@@ -493,3 +493,50 @@ export const TagPage: FC<{ tag: string; posts: Post[] }> = ({ tag, posts }) => (
     </section>
   </>
 )
+export const SupermarketListPage: FC<{
+  items: {
+    slug: string
+    title: string
+    place_name: string | null
+    prefecture: string | null
+    visit_date: string | null
+    rating: number | null
+  }[]
+}> = ({ items }) => {
+  const stars = (n: number) => '★'.repeat(Math.floor(n)) + (n % 1 ? '☆' : '')
+  return (
+    <main class="mx-auto max-w-page px-6 py-10">
+      <h1 class="text-[22px] font-bold tracking-[-0.02em] text-ink sm:text-[26px]">
+        ご当地スーパー一覧
+      </h1>
+      <p class="mt-2 text-[13px] leading-[1.8] text-sub">
+        ツーリングの途中で立ち寄ったご当地スーパーの記録です。訪問日の新しい順に並んでいます。
+      </p>
+      {items.length ? (
+        <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
+          {items.map((it) => (
+            <a
+              href={`/posts/${it.slug}`}
+              class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-white/5"
+            >
+              <span class="min-w-0 flex-1 text-[14px] font-bold text-ink">
+                {it.place_name || it.title}
+              </span>
+              <span class="w-24 text-[12px] text-mute">{it.prefecture || '—'}</span>
+              <span class="w-24 font-mono text-[12px] tabular-nums text-mute">
+                {it.visit_date || '—'}
+              </span>
+              <span class="w-20 text-[12px] text-brand">
+                {it.rating ? stars(Number(it.rating)) : '—'}
+              </span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="mt-6 rounded-big border border-edge2 bg-panel px-4 py-8 text-center text-[13px] text-mute">
+          まだ記事がありません。
+        </p>
+      )}
+    </main>
+  )
+}

@@ -9,7 +9,7 @@ type LayoutProps = PropsWithChildren<{
   /** 大テーマ（money / touring / tech）を直接指定 */
   activeTheme?: string
   /** ホーム/マップなど、ナビでハイライトする固定ページ */
-  activePage?: 'home' | 'map' | 'about' | 'search'
+  activePage?: 'home' | 'map' | 'about' | 'search' | 'supermarket'
   ogImage?: string | null
   scripts?: string[]
   headExtra?: any
@@ -151,6 +151,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
 
   const items = [
     ...THEMES.map((t) => ({ href: `/theme/${t.key}`, label: t.label, active: activeTheme === t.key })),
+    { href: '/supermarket', label: 'Super', active: activePage === 'supermarket' },
     { href: '/about', label: 'About', active: activePage === 'about' }
   ]
 

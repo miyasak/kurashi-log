@@ -35,7 +35,7 @@ import { Layout } from './views/layout'
 import { HomePage } from './views/home'
 import { ThemePage } from './views/theme'
 import { PostPage } from './views/post'
-import { SearchPage, MapPage, AboutPage, NotFoundPage, TagPage } from './views/pages'
+import { SearchPage, MapPage, SupermarketListPage, AboutPage, NotFoundPage, TagPage } from './views/pages'
 import { AdminApp } from './views/admin'
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -359,6 +359,36 @@ app.get('/map', async (c) => {
       headExtra={pins > 0 ? LEAFLET_CSS : null}
     >
       <MapPage counts={counts} />
+    </Layout>
+  )
+})
+
+/* ================== ご当地スーパー一覧 ================== */
+app.get('/supermarket', async (c) => {
+  const rows = await c.env.DB.prepare(
+    `SELECT slug, title, place_name, prefecture, visit_date, rating
+       FROM posts
+      WHERE status='published' AND category='supermarket'
+      ORDER BY visit_date DESC, published_at DESC`
+  ).all<{
+    slug: string
+    title: string
+    place_name: string | null
+    prefecture: string | null
+    visit_date: string | null
+    rating: number | null
+  }>()
+  return doc(
+    c,
+    <Layout
+      title="ご当地スーパー一覧"
+      activePage="supermarket"
+      description="ツーリング中に立ち寄ったご当地スーパーの一覧です。県・訪問日・評価から記事を探せます。"
+      canonical={canonicalOf(c)}
+      jsonLd={simplePageJsonLd(originOf(c), 'ご当地スーパー一覧', '/supermarket')}
+      scripts={['/static/site.js']}
+    >
+      <SupermarketListPage items={rows.results || []} />
     </Layout>
   )
 })
