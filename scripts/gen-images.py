@@ -23,16 +23,26 @@ PANEL = (18, 18, 20)
 INK = (245, 245, 247)
 SUB = (161, 161, 170)
 
-FONT_BOLD = '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc'
-FONT_REG = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
+# Mac と Linux の両方で動くように候補を並べる（上から順に探す）
+FONT_BOLD = [
+    '/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc',
+    '/System/Library/Fonts/Hiragino Sans GB.ttc',
+    '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc',
+]
+FONT_REG = [
+    '/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc',
+    '/System/Library/Fonts/Hiragino Sans GB.ttc',
+    '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+]
 
 
-def font(path, size):
-    try:
-        return ImageFont.truetype(path, size)
-    except Exception:
-        return ImageFont.load_default()
-
+def font(paths, size):
+    for p in paths:
+        try:
+            return ImageFont.truetype(p, size)
+        except Exception:
+            continue
+    raise SystemExit('日本語フォントが見つからないにゃ: ' + str(paths))
 
 # ---------------------------------------------------------------- OG画像
 def make_og():
@@ -67,13 +77,13 @@ def make_og():
     # ロゴ（角丸の四角 + K）
     d.rounded_rectangle([80, 70, 132, 122], radius=14, fill=BRAND)
     f_logo = font(FONT_BOLD, 28)
-    d.text((106, 96), 'K', font=f_logo, fill=(255, 255, 255), anchor='mm')
+    d.text((106, 96), 'T', font=f_logo, fill=(255, 255, 255), anchor='mm')
     f_brand = font(FONT_BOLD, 27)
-    d.text((148, 96), 'Kurashi Log', font=f_brand, fill=INK, anchor='lm')
+    d.text((148, 96), 'Tadoreru', font=f_brand, fill=INK, anchor='lm')
 
     # メインコピー
     f_title = font(FONT_BOLD, 72)
-    lines = ['数字で記録する、', 'お金とツーリングと仕事。']
+    lines = ['数字で記録する、', 'お金と道と暮らし。']
     y = 268
     for ln in lines:
         d.text((80, y), ln, font=f_title, fill=INK)
@@ -81,12 +91,9 @@ def make_og():
 
     # サブコピー
     f_sub = font(FONT_REG, 26)
-    d.text(
-        (80, 512),
-        'Money（資産運用・生活費）／ Touring（ツーリング）／ Tech（業務効率化）',
-        font=f_sub,
-        fill=SUB,
-    )
+    f_sub = font(FONT_REG, 25)
+    d.text((80, 478), 'Money（資産運用・生活費）／ Touring（ツーリング・キャンプ場）', font=f_sub, fill=SUB)
+    d.text((80, 516), 'Spa（日帰り温泉）／ Tech（業務効率化）', font=f_sub, fill=SUB)
 
     # 下部のアクセント
     d.rounded_rectangle([80, 566, 168, 571], radius=3, fill=BRAND)

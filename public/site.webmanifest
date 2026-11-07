@@ -1,7 +1,7 @@
 {
-  "name": "Kurashi Log",
-  "short_name": "Kurashi Log",
-  "description": "Money（資産運用・生活費）、Touring（ツーリング・ご当地スーパー）、Tech（業務効率化）。3つのテーマを数字で記録している個人サイト。",
+  "name": "Tadoreru",
+  "short_name": "Tadoreru",
+  "description": "Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Spa（日帰り温泉）、Tech（業務効率化）。4つのテーマを数字で記録している個人サイト。",
   "lang": "ja",
   "start_url": "/",
   "display": "standalone",

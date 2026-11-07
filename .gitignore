@@ -37,3 +37,4 @@ lerna-debug.log*
 media-backup/
 backup_local.sql
 media-list.txt
+.venv/
