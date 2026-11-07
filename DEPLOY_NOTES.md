@@ -1,68 +1,72 @@
-# 本番反映メモ
+# 運用メモ
 
-## 0. 反映前に必ずやること（最優先）
+## 環境
 
-### 環境変数
-ADMIN_PASSWORD と SESSION_SECRET の両方を本番に設定する。
-auth.ts は SESSION_SECRET が無いと例外を投げるので、未設定のまま
-反映すると管理画面にログインできなくなる。
+- Cloudflareアカウント: tgmiyasaka@gmail.com（2FAあり、リカバリコードは別途保管）
+- 公開URL: https://tadoreru.com
+- Pagesプロジェクト: tadoreru（本番ブランチ main、既定URL tadoreru-eh9.pages.dev）
+- D1: tadoreru / 6de3e843-fbac-4574-9d3a-f57fe835637a
+- R2: tadoreru-media（画像は uploads/ 配下）
+- バインディングは wrangler.jsonc に記載（D1は DB、R2は R2）
 
-SESSION_SECRET の値は openssl rand -base64 32 で生成する。
-画面共有やスクショに映さないこと。
-ADMIN_PASSWORD を変更すると署名が変わり既存セッションは無効になる（再ログインが必要）。
+## 反映手順
+npm run build npx wrangler pages deploy dist --project-name=tadoreru
+これだけ。自分のアカウントなので回数制限はない。
 
-### バックアップ
-npx wrangler d1 export webapp-production --remote --output=backup_YYYYMMDD.sql
+## ローカル開発
+npm run build npm run dev:sandbox
 
-### --remote を忘れない
-wrangler のコマンドは既定でローカルDBを見る。本番に当てるときは必ず --remote を付ける。
+http://localhost:3000 で確認。管理画面は .dev.vars の ADMIN_PASSWORD（localtest）で入る。
+.dev.vars は3行（ADMIN_PASSWORD / SESSION_SECRET / DEV_MEDIA_ORIGIN）。本番とは別の値にすること。
+.gitignore で除外済みなのでGitHubには上がらない。
 
-## 1. 適用済みマイグレーションの確認
-本番D1に 0004 以降が当たっているか不明。
-本番ダッシュボードのタグ数が99のままなら 0004 は未適用。
-未適用なら 0004 → 0005 → 0006 → 0007 → 0008 の順で流す（順番厳守）。
-0009 は別扱い。下の「0009_image_width.sql の注意」を読むこと。
+ローカルR2は空なので、画像は DEV_MEDIA_ORIGIN（https://tadoreru.com）から借りて表示している。
 
-## 2. 0006 を流す前に必ず確認
-0006_camp_data.sql は id 直書き。本番のidがずれていると別記事を壊す。
-下記の対応が本番でも一致することを確認してから実行する。
+## シークレット
 
-| id | slug |
-|----|------|
-| 23 | post-mvl30i62 |
-| 26 | post-mvnrc3hv |
-| 29 | post-mvpd1b6k |
-| 30 | post-mvqq733y |
-| 31 | post-mvs1isix |
-| 33 | post-mvtll4bp |
-| 34 | post-mvtmw6m3 |
-| 41 | post-mvxng9x3 |
-| 42 | post-mvxtvmom |
+本番の ADMIN_PASSWORD と SESSION_SECRET は Pages のシークレットに登録済み。
+auth.ts は SESSION_SECRET が無いと例外を投げるので、両方必須。
 
-確認コマンド:
-SELECT id, slug FROM posts WHERE id IN (23,26,29,30,31,33,34,41,42) ORDER BY id
+変更する場合:
+npx wrangler pages secret put SESSION_SECRET --project-name=tadoreru npx wrangler pages secret put ADMIN_PASSWORD --project-name=tadoreru
 
-一致しない場合は 0006 を流さず、slug 指定に書き直してから実行する。
+値は openssl rand -base64 32 で生成し、画面に出さない。
+一度入れると読み出せない。忘れても put し直せば復旧できる（ログイン中のセッションは切れる）。
+ADMIN_PASSWORD を変えると既存セッションが無効になる仕様。
+シークレット変更後は一度デプロイし直すこと。
 
-## 3. 0008 は slug 指定なのでそのまま流してよい
+## マイグレーション
 
-## 4. 独自ドメイン移行時にやること
-- src/index.tsx の /media/* に Genspark の本番URLが直書きされている。要修正。
-- ADMIN_PASSWORD と SESSION_SECRET を移行先に設定する（未設定だと管理画面に入れない）。
+0001〜0009 は本番に適用済み。新しく追加したときは、
+npx wrangler d1 migrations apply tadoreru --local npx wrangler d1 migrations apply tadoreru --remote
 
-## 5. ゴーストタグの掃除（反映後に1回）
-upsertPost 側は修正済みだが、過去に溜まった参照ゼロのタグは残っている。
-反映後に1回だけ流す。
 
-DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = tags.id);
+--remote を付けないとローカルDBしか変わらない。
 
-## ローカル開発の画像について
-- /media は本番R2から配信。ローカルR2に無い画像は .dev.vars の DEV_MEDIA_ORIGIN から借りて表示する
-- 独自ドメイン移行後は DEV_MEDIA_ORIGIN を新ドメインに書き換える
-- 本番環境には DEV_MEDIA_ORIGIN を設定しないこと
+0009_image_width.sql は本文を丸ごとUPDATEする内容なので、作り直したくなったら
+scripts/fix-image-width.mjs で生成し直すこと（既存のSQLをそのまま流さない）。
 
-## 0009_image_width.sql の注意
-本文を丸ごと UPDATE するマイグレーション。手元のDBの本文内容で上書きするので、
-本番の本文が手元と違う場合は事故になる。本番へは 0009 をそのまま流さず、
-本番側で scripts/fix-image-width.mjs を流し直して作り直したSQLを使うこと。
-（ORIGIN=https://本番URL node scripts/fix-image-width.mjs）
+## バックアップ
+
+npx wrangler d1 export tadoreru --remote --output=backup_YYYYMMDD.sql
+
+
+画像は media-backup/ にローカル控えあり（158枚）。
+どちらも .gitignore 済み。
+
+## ゴーストタグの掃除
+
+upsertPost / deletePost で自動掃除するようにしたので通常は不要。
+手動でやるなら、
+
+```sql
+DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = tags.id)
+
+## 残りの宿題
+
+favicon とアプリアイコンがバイクのまま
+カテゴリ管理画面（今は config.ts 直書き）
+記事末の免責文を管理画面から編集できるようにする
+/about の文言を管理画面から編集できるようにする
+関連記事を1〜3件選べるようにする（今は linked_slug で1件のみ）
+本文画像の max-height
