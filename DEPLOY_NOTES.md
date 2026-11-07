@@ -1,9 +1,27 @@
 # 本番反映メモ
 
+## 0. 反映前に必ずやること（最優先）
+
+### 環境変数
+ADMIN_PASSWORD と SESSION_SECRET の両方を本番に設定する。
+auth.ts は SESSION_SECRET が無いと例外を投げるので、未設定のまま
+反映すると管理画面にログインできなくなる。
+
+SESSION_SECRET の値は openssl rand -base64 32 で生成する。
+画面共有やスクショに映さないこと。
+ADMIN_PASSWORD を変更すると署名が変わり既存セッションは無効になる（再ログインが必要）。
+
+### バックアップ
+npx wrangler d1 export webapp-production --remote --output=backup_YYYYMMDD.sql
+
+### --remote を忘れない
+wrangler のコマンドは既定でローカルDBを見る。本番に当てるときは必ず --remote を付ける。
+
 ## 1. 適用済みマイグレーションの確認
 本番D1に 0004 以降が当たっているか不明。
 本番ダッシュボードのタグ数が99のままなら 0004 は未適用。
 未適用なら 0004 → 0005 → 0006 → 0007 → 0008 の順で流す（順番厳守）。
+0009 は別扱い。下の「0009_image_width.sql の注意」を読むこと。
 
 ## 2. 0006 を流す前に必ず確認
 0006_camp_data.sql は id 直書き。本番のidがずれていると別記事を壊す。
@@ -32,9 +50,19 @@ SELECT id, slug FROM posts WHERE id IN (23,26,29,30,31,33,34,41,42) ORDER BY id
 - src/index.tsx の /media/* に Genspark の本番URLが直書きされている。要修正。
 - ADMIN_PASSWORD と SESSION_SECRET を移行先に設定する（未設定だと管理画面に入れない）。
 
+## 5. ゴーストタグの掃除（反映後に1回）
+upsertPost 側は修正済みだが、過去に溜まった参照ゼロのタグは残っている。
+反映後に1回だけ流す。
+
 DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = tags.id);
 
 ## ローカル開発の画像について
 - /media は本番R2から配信。ローカルR2に無い画像は .dev.vars の DEV_MEDIA_ORIGIN から借りて表示する
 - 独自ドメイン移行後は DEV_MEDIA_ORIGIN を新ドメインに書き換える
 - 本番環境には DEV_MEDIA_ORIGIN を設定しないこと
+
+## 0009_image_width.sql の注意
+本文を丸ごと UPDATE するマイグレーション。手元のDBの本文内容で上書きするので、
+本番の本文が手元と違う場合は事故になる。本番へは 0009 をそのまま流さず、
+本番側で scripts/fix-image-width.mjs を流し直して作り直したSQLを使うこと。
+（ORIGIN=https://本番URL node scripts/fix-image-width.mjs）

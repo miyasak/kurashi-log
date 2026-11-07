@@ -458,11 +458,9 @@
       tileLayer().addTo(map)
       const res = await fetch('/api/map/points')
       const { points } = await res.json()
-      // data-category が空ならツーリング系すべて（テーマ表示）
+      // data-category が空なら地図対象カテゴリすべて（テーマ表示）
       const want = catMapEl.dataset.category
-      const target = want
-        ? points.filter((p) => p.category === want)
-        : points.filter((p) => p.category === 'touring' || p.category === 'supermarket')
+      const target = want ? points.filter((p) => p.category === want) : points
       const group = []
       target.forEach((p) => {
         group.push(L.marker([p.lat, p.lng], { icon: pinIcon(p.category) }).addTo(map).bindPopup(popupHtml(p)))
