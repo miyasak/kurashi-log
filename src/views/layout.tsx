@@ -165,7 +165,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
           {/* 左：サイト名 */}
           <a href="/" class="flex items-center gap-2.5 transition hover:opacity-80" aria-label={SITE.title}>
             <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">
-              <i class="fa-solid fa-motorcycle text-[13px]"></i>
+              <svg viewBox="0 0 100 100" class="h-[13px] w-[13px] fill-current" aria-hidden="true"><rect x="20" y="62" width="60" height="7.2" rx="3.6"/><rect x="20" y="46" width="42" height="7.2" rx="3.6"/><rect x="20" y="30" width="24" height="7.2" rx="3.6"/><circle cx="76" cy="27.5" r="7.2"/></svg>
             </span>
             <span class="text-[15px] font-bold tracking-tight">{SITE.title}</span>
           </a>
