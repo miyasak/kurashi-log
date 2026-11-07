@@ -181,7 +181,14 @@ api.post('/admin/upload', async (c) => {
   const form = await c.req.formData()
   const file = form.get('file') as File | null
   if (!file) return c.json({ ok: false, error: 'ファイルがありません' }, 400)
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+  if (!file.type.startsWith('image/')) {
+    return c.json({ ok: false, error: '画像ファイルだけアップロードできます' }, 400)
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    return c.json({ ok: false, error: 'ファイルが大きすぎます（10MBまで）' }, 400)
+  }
+  const raw = (file.name.split('.').pop() || '').toLowerCase()
+  const ext = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif'].includes(raw) ? raw : 'jpg'
   const key = `uploads/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
   await c.env.R2.put(key, await file.arrayBuffer(), {
     httpMetadata: { contentType: file.type || 'image/jpeg' }
