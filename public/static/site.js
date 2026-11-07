@@ -525,3 +525,49 @@
   initCharts()
   initMaps()
 })()
+/* ================== 画像の拡大表示（ライトボックス） ================== */
+;(function () {
+  'use strict'
+  var overlay = null
+
+  function close() {
+    if (!overlay) return
+    var el = overlay
+    overlay = null
+    el.classList.remove('is-open')
+    document.body.style.overflow = ''
+    setTimeout(function () {
+      el.remove()
+    }, 180)
+  }
+
+  function open(src, alt) {
+    close()
+    overlay = document.createElement('div')
+    overlay.className = 'lb-overlay'
+    overlay.innerHTML =
+      '<button class="lb-close" aria-label="閉じる">&times;</button><img src="" alt="">'
+    var img = overlay.querySelector('img')
+    img.src = src
+    img.alt = alt || ''
+    document.body.appendChild(overlay)
+    document.body.style.overflow = 'hidden'
+    requestAnimationFrame(function () {
+      if (overlay) overlay.classList.add('is-open')
+    })
+    overlay.addEventListener('click', close)
+  }
+
+  document.addEventListener('click', function (e) {
+    if (!e.target || !e.target.closest) return
+    var a = e.target.closest('.post-body a[href^="/media/"]')
+    if (!a) return
+    e.preventDefault()
+    var im = a.querySelector('img')
+    open(a.getAttribute('href'), im ? im.alt : '')
+  })
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close()
+  })
+})()
