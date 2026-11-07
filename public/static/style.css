@@ -527,7 +527,7 @@ input[type='time'].admin-input::-webkit-calendar-picker-indicator {
 .leaflet-container {
   background: var(--panel2);
 }
-img.leaflet-tile.map-dark {
+.map-dark img.leaflet-tile {
   filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.6);
 }
 /* 帰属表示はダーク背景に合わせる */
