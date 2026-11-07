@@ -73,12 +73,13 @@ export const HomePage: FC<Props> = ({
           </p>
           <h1 class="mt-4 text-[26px] font-bold leading-[1.28] tracking-[-0.03em] text-ink sm:text-[36px]">
             <span class="block">数字で記録する、</span>
-            <span class="block">お金とツーリングと仕事。</span>
+            <span class="block">お金と道と暮らし。</span>
           </h1>
-          {/* ナビと同じ 3テーマ构成で統一 */}
+          {/* ナビと同じ 4テーマ構成で統一 */}
           <p class="mt-4 max-w-[64ch] text-[13.5px] leading-[1.85] text-sub sm:text-[14.5px]">
             <span class="font-medium text-ink">Money</span>（資産運用・生活費）、
-            <span class="font-medium text-ink">Touring</span>（ツーリング・ご当地スーパー）、
+            <span class="font-medium text-ink">Touring</span>（ツーリング・キャンプ場・ご当地スーパー）、
+            <span class="font-medium text-ink">Spa</span>（日帰り温泉）、
             <span class="font-medium text-ink">Tech</span>（業務効率化）。
             感覚ではなく<span class="font-medium text-ink">実額と実測値</span>で、あとから辿れるように残しています。
           </p>
@@ -250,8 +251,8 @@ export const HomePage: FC<Props> = ({
               このサイトについて
             </h2>
             <p class="mt-3 max-w-[66ch] text-[13px] leading-[1.85] text-sub">
-              Money（資産運用・生活費）、Touring（ツーリング・ご当地スーパー）、Tech（業務効率化）。
-              数字と写真で「あとから見返せる」ことを大切にして記録しています。
+              Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Spa（日帰り温泉）、Tech（業務効率化）。
+              数字と写真で「あとから辿れる」ことを大切にして記録しています。
               運営者のプロフィールと投資方針は About にまとめています。
             </p>
             <div class="mt-5 flex flex-wrap items-center gap-2.5">

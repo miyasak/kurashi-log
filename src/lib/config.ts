@@ -209,12 +209,12 @@ export const GROUPS = THEMES.map((t) => ({
 
 /** サイト名やキャッチコピーはここを書き換えるだけで全ページに反映されます */
 export const SITE = {
-  title: 'Kurashi Log',
+  title: 'Tadoreru',
   /** ロゴ下に出る小さな英字キャプション */
   caption: 'MONEY · TOURING · SPA · TECH',
-  subtitle: 'お金・ツーリング・温泉・業務効率化の記録',
+  subtitle: '走った道も、積み上げた数字も、あとから辿れるように。',
   author: 'Owner',
-  /** ナビと同じ 3テーマ构成で統一した説明文 */
+  /** ナビと同じ 4テーマ構成で統一した説明文 */
   description:
     'Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Spa（日帰り温泉）、Tech（業務効率化）。4つのテーマを数字で記録している個人サイト。'
 }
