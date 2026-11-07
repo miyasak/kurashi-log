@@ -61,6 +61,21 @@ export const HomePage: FC<Props> = ({
 
   const moneyBlock = themeBlocks.find((b) => b.theme.key === 'money')
 
+  /** トップの入口カード。テーマごとに「そのテーマの数字」だけを見せる */
+  const themeCards = THEMES.map((t) => {
+    const count = t.categories.reduce((s, k) => s + (counts[k] || 0), 0)
+    const stats =
+      t.key === 'money'
+        ? validSpecs([{ label: '総資産', value: last?.total_assets ? yen(last.total_assets) : '' }])
+        : t.key === 'touring'
+          ? validSpecs([
+              { label: '走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
+              { label: '都道府県', value: prefCount ? `${prefCount}` : '' }
+            ])
+          : []
+    return { theme: t, count, stats }
+  }).filter((c) => c.count > 0)
+
   return (
     <>
       {/* ==================== ヒーロー ==================== */}
@@ -95,15 +110,49 @@ export const HomePage: FC<Props> = ({
               <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
             </a>
           </p>
-
-          {/* 数字（0件の項目は非表示。全て0ならブロック自体が出ない） */}
-          {heroSpecs.length ? (
-            <div class="mt-7">
-              <SpecRow items={heroSpecs} />
-            </div>
-          ) : null}
         </div>
       </section>
+
+      {/* ==================== テーマの入口 ==================== */}
+      {themeCards.length ? (
+        <section class="border-b border-edge2 bg-panel">
+          <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {themeCards.map((c) => (
+                <a
+                  href={`/theme/${c.theme.key}`}
+                  class="group flex flex-col rounded-big border border-edge2 bg-base p-5 transition duration-300 hover:border-brand/40 sm:p-6"
+                >
+                  <span class="grid h-10 w-10 place-items-center rounded-lg bg-brandsoft text-brand">
+                    <i class={`fa-solid ${c.theme.icon} text-[15px]`}></i>
+                  </span>
+                  <h2 class="mt-4 text-[17px] font-bold tracking-[-0.02em] text-ink">
+                    {c.theme.label}
+                    <span class="ml-2 text-[12.5px] font-medium text-mute">{c.theme.name}</span>
+                  </h2>
+                  <p class="mt-2 text-[12.5px] leading-[1.7] text-sub">{c.theme.description}</p>
+                  {c.stats.length ? (
+                    <dl class="mt-5 flex flex-wrap gap-x-7 gap-y-3">
+                      {c.stats.map((s) => (
+                        <div>
+                          <dt class="text-[10px] font-bold uppercase tracking-[0.12em] text-mute">{s.label}</dt>
+                          <dd class="mt-1 font-mono text-[19px] font-bold leading-none tabular-nums tracking-tight text-ink">
+                            {s.value}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+                  <p class="mt-auto pt-5 flex items-center gap-1.5 text-[12.5px] font-medium text-brand">
+                    <span class="font-mono tabular-nums">{c.count}</span> 件の記録を見る
+                    <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
+                  </p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* ==================== 新着記事 ==================== */}
       {latest.length ? (

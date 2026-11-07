@@ -225,6 +225,18 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
               <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
             </a>
           ))}
+
+          <a href="/supermarket" class="flex items-center justify-between border-b border-edge2 py-4">
+            <span class="min-w-0">
+              <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
+                <i class={`fa-solid ${CATEGORY_MAP['supermarket']?.icon || 'fa-cart-shopping'} w-5 text-[13px] text-brand`}></i>
+                Super
+              </span>
+              <span class="mt-1 block pl-8 text-[12px] text-mute">ご当地スーパー</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
+          </a>
+
           <a href="/about" class="flex items-center justify-between border-b border-edge2 py-4">
             <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
               <i class="fa-solid fa-circle-info w-5 text-[13px] text-brand"></i>About
@@ -259,7 +271,7 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
     <div class="mx-auto max-w-page px-4 py-10 sm:px-6">
       <div class="flex items-center gap-2.5">
         <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">
-          <i class="fa-solid fa-motorcycle text-[13px]"></i>
+          <svg viewBox="0 0 100 100" class="h-[13px] w-[13px] fill-current" aria-hidden="true"><rect x="20" y="62" width="60" height="7.2" rx="3.6"/><rect x="20" y="46" width="42" height="7.2" rx="3.6"/><rect x="20" y="30" width="24" height="7.2" rx="3.6"/><circle cx="76" cy="27.5" r="7.2"/></svg>
         </span>
         <span class="text-[15px] font-bold tracking-tight">{SITE.title}</span>
       </div>
