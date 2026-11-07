@@ -573,9 +573,11 @@
         if (!file) return
         const url = await uploadImage(file)
         if (!url) return
+        const w = await imageWidth(file)
+        const alt = (prompt('画像の説明（alt）。空でもOK', '') || '').replace(/"/g, '&quot;')
         const ta = $('#md-input')
         const pos = ta.selectionStart
-        const text = `\n![${file.name.replace(/\.[^.]+$/, '')}](${url})\n`
+        const text = `\n<p><a href="${url}"><img src="${url}" alt="${alt}" style="width:${w}px;border-radius:10px;"></a></p>\n`
         ta.value = ta.value.slice(0, pos) + text + ta.value.slice(pos)
         ta.focus()
         ta.selectionStart = ta.selectionEnd = pos + text.length
@@ -957,6 +959,24 @@
         renderSpots(cur)
       })
     )
+  }
+
+  /** 画像の縦横を測って本文用の幅を決める（横長360 / 縦長260 / 正方形300） */
+  function imageWidth(file) {
+    return new Promise((resolve) => {
+      const img = new Image()
+      const u = URL.createObjectURL(file)
+      img.onload = () => {
+        const r = img.naturalWidth / img.naturalHeight
+        URL.revokeObjectURL(u)
+        resolve(r > 1.15 ? 360 : r < 0.85 ? 260 : 300)
+      }
+      img.onerror = () => {
+        URL.revokeObjectURL(u)
+        resolve(360)
+      }
+      img.src = u
+    })
   }
 
   /** 画像を R2 にアップロードして公開パスを返す */
