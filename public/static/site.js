@@ -561,10 +561,17 @@
   document.addEventListener('click', function (e) {
     if (!e.target || !e.target.closest) return
     var a = e.target.closest('.post-body a[href^="/media/"]')
-    if (!a) return
-    e.preventDefault()
-    var im = a.querySelector('img')
-    open(a.getAttribute('href'), im ? im.alt : '')
+    if (a) {
+      e.preventDefault()
+      var im = a.querySelector('img')
+      open(a.getAttribute('href'), im ? im.alt : '')
+      return
+    }
+    var g = e.target.closest('img.lb-img')
+    if (g) {
+      e.preventDefault()
+      open(g.getAttribute('src'), g.alt)
+    }
   })
 
   document.addEventListener('keydown', function (e) {

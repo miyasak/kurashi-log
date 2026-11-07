@@ -170,7 +170,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                             src={ph.url}
                             alt={ph.caption || ''}
                             loading="lazy"
-                            class="aspect-[4/3] w-full object-cover"
+                            class="lb-img aspect-[4/3] w-full cursor-zoom-in object-cover"
                           />
                           {ph.caption ? (
                             <figcaption class="px-4 py-3 text-[12.5px] leading-relaxed text-mute">
