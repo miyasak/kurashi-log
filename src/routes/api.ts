@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import type { Bindings } from '../lib/config'
+import { MAP_CAT_SQL } from '../lib/config'
 import {
   listPosts,
   countPosts,
@@ -54,7 +55,7 @@ api.get('/stats/monthly', async (c) => {
 api.get('/map/points', async (c) => {
   const rows = await c.env.DB.prepare(
     `SELECT slug, title, category, place_name, prefecture, lat, lng, rating, cospa, budget, distance_km, cover_image
-     FROM posts WHERE status='published' AND lat IS NOT NULL AND lng IS NOT NULL
+     FROM posts WHERE status='published' AND lat IS NOT NULL AND lng IS NOT NULL AND category IN (${MAP_CAT_SQL})     
      ORDER BY COALESCE(published_at, created_at) DESC`
   ).all()
   return c.json({ points: rows.results })

@@ -363,13 +363,19 @@
 
   function popupHtml(p) {
     const c = CAT[p.category] || {}
-    const extra =
-      p.category === 'supermarket'
-        ? `<div style="margin-top:5px;color:${MUTE};font-size:11px">${'★'.repeat(p.rating || 0)}${p.budget ? ' / ' + yen(p.budget) : ''}</div>`
-        : p.distance_km
-          ? `<div style="margin-top:5px;color:${MUTE};font-size:11px">${p.distance_km} km</div>`
+    const stars = (n) => '★'.repeat(Math.floor(n)) + (n % 1 ? '☆' : '')
+    const bits = []
+    if (p.rating) bits.push(`${stars(p.rating)} ${Number(p.rating).toFixed(1)}`)
+    if (p.budget != null) bits.push(yen(p.budget))
+    if (p.distance_km) bits.push(`${p.distance_km} km`)
+          const extra = bits.length
+          ? `<div style="margin-top:5px;color:${MUTE};font-size:11px">${bits.join(' ・ ')}</div>`
           : ''
-    return `<div style="min-width:180px">
+          const thumb = p.cover_image
+          ? `<a href="/posts/${p.slug}" style="display:block;margin-bottom:8px"><img src="${p.cover_image}" alt="" loading="lazy" style="display:block;width:100%;height:92px;object-fit:cover;border-radius:8px"></a>`
+          : ''
+    return `<div style="min-width:200px">
+      ${thumb}
       <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${BRAND}">${c.name || ''}</div>
       <a href="/posts/${p.slug}" style="display:block;margin-top:4px;font-size:14px;font-weight:700;letter-spacing:-.01em;color:${INK};text-decoration:none">${p.title}</a>
       ${p.place_name ? `<div style="color:${MUTE};font-size:11px;margin-top:3px">${p.place_name}</div>` : ''}
