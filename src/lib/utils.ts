@@ -90,10 +90,24 @@ export function escapeHtml(s: string | null | undefined): string {
 
 export function stripMd(md: string, len = 110): string {
   const text = (md || '')
+    // コードブロック
     .replace(/```[\s\S]*?```/g, '')
+    // HTMLコメント
+    .replace(/<!--[\s\S]*?-->/g, '')
+    // 本文に直接書いたHTMLタグ（img や a を抜粋に出さない）
+    .replace(/<[^>]*>/g, ' ')
+    // マークダウンの画像とリンク
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    // 残った記号
     .replace(/[#>*_`~\-|]/g, '')
+    // 実体参照を戻す
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
     .replace(/\s+/g, ' ')
     .trim()
   return text.length > len ? text.slice(0, len) + '…' : text

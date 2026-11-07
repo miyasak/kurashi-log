@@ -162,7 +162,7 @@ export const THEMES: ThemeDef[] = [
     icon: 'fa-motorcycle',
     head: '走った道と、寄った店。',
     lead: 'ルート・距離・天気に加えて、旅先で立ち寄ったご当地スーパーも同じ地図に残しています。',
-    description: 'ツーリング記録とご当地スーパーのレビュー。ルート・距離・写真・地図つきで残しています。',
+    description: 'ツーリング記録・キャンプ場・ご当地スーパーのレビュー。ルート・距離・写真・地図つきで残しています。',
     categories: ['touring', 'camp', 'supermarket']
   },
   {
