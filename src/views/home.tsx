@@ -115,13 +115,13 @@ export const HomePage: FC<Props> = ({
 
       {/* ==================== テーマの入口 ==================== */}
       {themeCards.length ? (
-        <section class="border-b border-edge2 bg-panel">
+        <section class="border-b border-edge2 bg-base">
           <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
             <div class={`grid grid-cols-1 gap-4 ${themeCards.length === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'}`}>
               {themeCards.map((c) => (
                 <a
                   href={`/theme/${c.theme.key}`}
-                  class="group flex flex-col rounded-big border border-edge2 bg-base p-5 transition duration-300 hover:border-brand/40 sm:p-6"
+                  class="group flex flex-col rounded-big border border-edge2 bg-panel p-5 transition duration-300 hover:border-brand/40 sm:p-6"
                 >
                   <span class="grid h-10 w-10 place-items-center rounded-lg bg-brandsoft text-brand">
                     <i class={`fa-solid ${c.theme.icon} text-[15px]`}></i>
@@ -175,7 +175,7 @@ export const HomePage: FC<Props> = ({
 
       {/* ==================== 資産の推移（データがある時のみ） ==================== */}
       {stats.length ? (
-        <section class="border-b border-edge2 bg-panel">
+        <section class="border-b border-edge2 bg-base">
           <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
             <SectionTitle
               eyebrow="Money"
@@ -185,7 +185,7 @@ export const HomePage: FC<Props> = ({
               action={<ArrowLink href="/theme/money">お金の記録へ</ArrowLink>}
             />
 
-            <div class="mt-6 rounded-big border border-edge2 bg-base p-4 sm:p-6">
+            <div class="mt-6 rounded-big border border-edge2 bg-panel p-4 sm:p-6">
               {/* 大きな数字を主役に */}
               <div class="flex flex-wrap items-end gap-x-9 gap-y-5">
                 <div>
@@ -247,7 +247,7 @@ export const HomePage: FC<Props> = ({
       {themeBlocks
         .filter((b) => !(b.theme.key === 'money' && stats.length))
         .map((b, i) => (
-          <section class={`border-b border-edge2 ${i % 2 === 0 ? 'bg-base' : 'bg-panel'}`}>
+          <section class={`border-b border-edge2 bg-base`}>
             <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
               <SectionTitle
                 eyebrow={b.theme.label}

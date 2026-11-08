@@ -70,8 +70,8 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                   alt=""
                   class="h-full w-full object-cover"
                 />
-                <div class="absolute inset-0 bg-gradient-to-t from-base via-base/55 to-base/70"></div>
-                <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-base to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/35"></div>
+                <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/80 to-transparent"></div>
               </>
             ) : (
               <div

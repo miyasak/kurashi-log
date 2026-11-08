@@ -51,7 +51,7 @@ export const AdminApp: FC = () => (
     <body class="admin-body bg-base text-ink antialiased">
       {/* ===== ログイン ===== */}
       <div id="login-view" class="hidden min-h-screen place-items-center px-5">
-        <div class="w-full max-w-[380px] rounded-big border border-white/10 bg-panel p-9">
+        <div class="w-full max-w-[380px] rounded-big border border-black/10 bg-panel p-9">
           <div class="grid h-12 w-12 place-items-center rounded-2xl bg-brand text-white">
             <i class="fa-solid fa-lock text-[15px]"></i>
           </div>
@@ -63,7 +63,7 @@ export const AdminApp: FC = () => (
               id="login-password"
               placeholder="パスワード"
               autocomplete="current-password"
-              class="w-full rounded-full border border-white/[0.08] bg-base px-5 py-3 text-[14px] text-ink outline-none transition placeholder:text-ink-mute focus:border-brand/60"
+              class="w-full rounded-full border border-black/[0.10] bg-base px-5 py-3 text-[14px] text-ink outline-none transition placeholder:text-ink-mute focus:border-brand/60"
             />
             <p id="login-error" class="hidden text-[12px] text-rose-500"></p>
             <button class="w-full rounded-full bg-brand py-3 text-[14px] font-medium text-white transition hover:brightness-110">
@@ -81,9 +81,9 @@ export const AdminApp: FC = () => (
         {/* サイドバー */}
         <aside
           id="sidebar"
-          class="fixed inset-y-0 left-0 z-40 w-60 -translate-x-full border-r border-white/[0.07] bg-panel transition-transform lg:static lg:translate-x-0"
+          class="fixed inset-y-0 left-0 z-40 w-60 -translate-x-full border-r border-black/[0.09] bg-panel transition-transform lg:static lg:translate-x-0"
         >
-          <div class="flex h-14 items-center gap-2.5 border-b border-white/[0.07] px-5">
+          <div class="flex h-14 items-center gap-2.5 border-b border-black/[0.09] px-5">
             <span class="grid h-7 w-7 place-items-center rounded-lg bg-brand text-white">
               <i class="fa-solid fa-motorcycle text-[11px]"></i>
             </span>
@@ -99,17 +99,17 @@ export const AdminApp: FC = () => (
             ].map((n) => (
               <button
                 data-nav={n.v}
-                class="nav-btn flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-[13px] text-ink-soft transition hover:bg-white/[0.07] hover:text-ink"
+                class="nav-btn flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-[13px] text-ink-soft transition hover:bg-black/[0.05] hover:text-ink"
               >
                 <i class={`fa-solid ${n.i} w-4 text-[11px]`}></i>
                 {n.l}
               </button>
             ))}
-            <hr class="my-3 border-white/[0.07]" />
+            <hr class="my-3 border-black/[0.09]" />
             <a
               href="/"
               target="_blank"
-              class="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-[13px] text-ink-soft transition hover:bg-white/[0.07] hover:text-ink"
+              class="flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-[13px] text-ink-soft transition hover:bg-black/[0.05] hover:text-ink"
             >
               <i class="fa-solid fa-arrow-up-right-from-square w-4 text-[11px]"></i>サイトを見る
             </a>
@@ -125,10 +125,10 @@ export const AdminApp: FC = () => (
 
         {/* メイン */}
         <div class="flex-1 lg:ml-0">
-          <header class="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-white/[0.07] bg-base/85 px-4 backdrop-blur-xl sm:px-6">
+          <header class="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-black/[0.09] bg-base/85 px-4 backdrop-blur-xl sm:px-6">
             <button
               id="sidebar-toggle"
-              class="grid h-9 w-9 place-items-center rounded-full text-ink-soft hover:bg-white/[0.07] hover:text-ink lg:hidden"
+              class="grid h-9 w-9 place-items-center rounded-full text-ink-soft hover:bg-black/[0.05] hover:text-ink lg:hidden"
             >
               <i class="fa-solid fa-bars text-[13px]"></i>
             </button>
@@ -147,7 +147,7 @@ export const AdminApp: FC = () => (
       <div
         id="toast"
         style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999 }}
-        class="pointer-events-none hidden rounded-full border border-white/10 bg-panel2 px-5 py-2.5 text-[13px] text-ink shadow-2xl backdrop-blur"
+        class="pointer-events-none hidden rounded-full border border-black/10 bg-panel2 px-5 py-2.5 text-[13px] text-ink shadow-2xl backdrop-blur"
       ></div>
 
       <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>

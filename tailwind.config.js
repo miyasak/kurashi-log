@@ -29,17 +29,19 @@ module.exports = {
         ],
         mono: ['Roboto Mono', 'SFMono-Regular', 'Menlo', 'monospace']
       },
+      /* public/static/style.css の :root と同じ値にすること。
+         片方だけ変えると CSS側とTailwind側で色がズレる */
       colors: {
-        base: '#0a0a0b',
-        panel: '#121214',
-        panel2: '#18181b',
-        edge: 'rgba(255,255,255,0.10)',
-        edge2: 'rgba(255,255,255,0.06)',
-        ink: '#f5f5f7',
-        sub: '#a1a1aa',
-        mute: '#71717a',
-        brand: '#f97316',
-        brandsoft: 'rgba(249,115,22,0.14)'
+        base: '#f1f1ec',
+        panel: '#ffffff',
+        panel2: '#e8e8e2',
+        edge: 'rgba(0,0,0,0.16)',
+        edge2: 'rgba(0,0,0,0.11)',
+        ink: '#1a1a19',
+        sub: '#5c5c58',
+        mute: '#8c8c87',
+        brand: '#ea580c',
+        brandsoft: 'rgba(234,88,12,0.10)'
       },
       maxWidth: { page: 'clamp(1280px, 86vw, 1760px)', text: '800px' },
       borderRadius: { apple: '14px', big: '18px' }

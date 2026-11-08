@@ -293,7 +293,7 @@ export const ThemePage: FC<Props> = ({
                   {OTHER_THEMES(theme.key).map((t) => (
                     <a
                       href={`/theme/${t.key}`}
-                      class="inline-flex items-center gap-2 rounded-full bg-white/[0.07] px-4 py-2 text-[12.5px] font-medium text-ink ring-1 ring-inset ring-white/12 transition hover:bg-white/[0.12]"
+                      class="inline-flex items-center gap-2 rounded-full bg-black/[0.04] px-4 py-2 text-[12.5px] font-medium text-ink ring-1 ring-inset ring-black/10 transition hover:bg-black/[0.08]"
                     >
                       <i class={`fa-solid ${t.icon} text-[11px]`}></i>
                       {t.label}の記事を見る

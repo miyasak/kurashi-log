@@ -38,14 +38,14 @@ export const Layout: FC<LayoutProps> = (props) => {
   const abs = (u: string) => (u.startsWith('http') ? u : `${origin}${u}`)
   const ogImage = abs(props.ogImage || '/og.png')
   return (
-    <html lang="ja" class="dark">
+    <html lang="ja">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         <title>{title}</title>
         <meta name="description" content={desc} />
-        <meta name="theme-color" content="#0a0a0b" />
-        <meta name="color-scheme" content="dark" />
+        <meta name="theme-color" content="#f1f1ec" />
+        <meta name="color-scheme" content="light" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={desc} />
         <meta property="og:type" content={props.ogType || 'website'} />
@@ -342,7 +342,7 @@ export const PillButton: FC<{ href: string; children?: any; variant?: 'brand' | 
 }) => {
   const styles = {
     brand: 'bg-brand text-white hover:brightness-110',
-    ghost: 'bg-white/[0.07] text-ink ring-1 ring-inset ring-white/12 hover:bg-white/[0.12]',
+    ghost: 'bg-black/[0.04] text-ink ring-1 ring-inset ring-black/10 hover:bg-black/[0.08]',
     light: 'bg-ink text-base hover:opacity-90'
   }[variant]
   return (

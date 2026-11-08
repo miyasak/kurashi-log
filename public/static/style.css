@@ -1,17 +1,17 @@
 /* =========================================================
-   Kurashi Log — Dark theme (black base + orange accent)
+   Tadoreru — Light theme (off-white base + orange accent)
    ========================================================= */
 
 :root {
-  --base: #0a0a0b;
-  --panel: #121214;
-  --panel2: #18181b;
-  --edge: rgba(255, 255, 255, 0.10);
-  --edge2: rgba(255, 255, 255, 0.06);
-  --ink: #f5f5f7;
-  --sub: #a1a1aa;
-  --mute: #71717a;
-  --brand: #f97316;
+  --base: #f1f1ec;
+  --panel: #ffffff;
+  --panel2: #e8e8e2;
+  --edge: rgba(0, 0, 0, 0.16);
+  --edge2: rgba(0, 0, 0, 0.11);
+  --ink: #1a1a19;
+  --sub: #5c5c58;
+  --mute: #8c8c87;
+  --brand: #ea580c;
 }
 
 html {
@@ -133,7 +133,7 @@ table th {
 .post-body {
   font-size: 15.5px;
   line-height: 1.95;
-  color: #e4e4e7;
+  color: var(--ink);
   letter-spacing: 0.012em;
   /* 日本語の可読幅（1行50文字前後）に抑える。写真ギャラリーは枠外なので影響しない */
   max-width: 50em;
@@ -155,7 +155,7 @@ table th {
   font-size: 0.86em;
 }
 .post-body p {
-  color: #d4d4d8;
+  color: var(--ink);
   /* 日本語を文節単位で折り返す。英数字・記号の途中では切らない */
   word-break: auto-phrase;
   line-break: strict;
@@ -186,25 +186,25 @@ table th {
   color: var(--ink);
 }
 .post-body a {
-  color: #fdba74;
+  color: #c2410c;
   text-decoration: none;
-  border-bottom: 1px solid rgba(253, 186, 116, 0.4);
+  border-bottom: 1px solid rgba(194, 65, 12, 0.3);
 }
 .post-body a:hover {
   color: var(--brand);
   border-bottom-color: var(--brand);
 }
 .post-body strong {
-  color: #fff;
+  color: var(--ink);
   font-weight: 700;
 }
 .post-body em {
-  color: #fff;
+  color: var(--ink);
 }
 .post-body ul,
 .post-body ol {
   padding-left: 1.35em;
-  color: #d4d4d8;
+  color: var(--ink);
 }
 .post-body ul {
   list-style: disc;
@@ -230,17 +230,17 @@ table th {
   color: var(--sub);
 }
 .post-body code {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fdba74;
+  background: rgba(0, 0, 0, 0.05);
+  color: #c2410c;
   border-radius: 6px;
   padding: 0.15em 0.42em;
   font-size: 0.88em;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 .post-body pre {
-  background: #08080a;
+  background: var(--panel2);
   border: 1px solid var(--edge2);
-  color: #e4e4e7;
+  color: var(--ink);
   border-radius: 14px;
   padding: 18px 20px;
   overflow-x: auto;
@@ -289,19 +289,14 @@ table th {
   font-weight: 700;
 }
 .post-body td {
-  color: #d4d4d8;
+  color: var(--ink);
 }
 
-/* ---------------- Leaflet (dark) ---------------- */
-.leaflet-container {
-  background: #0e0e10;
-  font-family: inherit;
-}
 .leaflet-container a {
-  color: #fdba74;
+  color: #c2410c;
 }
 .leaflet-control-attribution {
-  background: rgba(10, 10, 11, 0.75) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
   color: var(--mute) !important;
   font-size: 10px !important;
   border-radius: 6px 0 0 0;
@@ -332,7 +327,7 @@ table th {
   color: var(--ink) !important;
   border: 1px solid var(--edge) !important;
   border-radius: 14px !important;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.14) !important;
 }
 .leaflet-popup-content {
   margin: 12px 14px !important;
@@ -361,7 +356,7 @@ table th {
   color: #fff;
   font-size: 11px;
   border: 2px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* ---------------- Admin (dark) ---------------- */
@@ -424,7 +419,7 @@ textarea.admin-input {
 .md-preview {
   font-size: 14px;
   line-height: 1.85;
-  color: #d4d4d8;
+  color: var(--ink);
 }
 .md-preview > * + * {
   margin-top: 1em;
@@ -444,7 +439,7 @@ textarea.admin-input {
   margin-top: 1.3em;
 }
 .md-preview a {
-  color: #fdba74;
+  color: #c2410c;
 }
 .md-preview ul {
   list-style: disc;
@@ -455,16 +450,16 @@ textarea.admin-input {
   padding-left: 1.3em;
 }
 .md-preview code {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fdba74;
+  background: rgba(0, 0, 0, 0.05);
+  color: #c2410c;
   border-radius: 5px;
   padding: 0.1em 0.35em;
   font-size: 0.88em;
 }
 .md-preview pre {
-  background: #08080a;
+  background: var(--panel2);
   border: 1px solid var(--edge2);
-  color: #e4e4e7;
+  color: var(--ink);
   border-radius: 12px;
   padding: 14px;
   overflow-x: auto;
@@ -509,18 +504,18 @@ textarea.admin-input {
   background: var(--base);
 }
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: #c9c9c2;   /* つまみ */
   border-radius: 8px;
   border: 2px solid var(--base);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: #a8a8a1;   /* つまみにカーソルを乗せたとき */
 }
 
 /* ---------------- misc ---------------- */
 input[type='date'].admin-input::-webkit-calendar-picker-indicator,
 input[type='time'].admin-input::-webkit-calendar-picker-indicator {
-  filter: invert(1) opacity(0.55);
+  filter: opacity(0.55);
   cursor: pointer;
 }
 .no-scroll {
@@ -534,11 +529,11 @@ input[type='time'].admin-input::-webkit-calendar-picker-indicator {
   background: var(--panel2);
 }
 .map-dark img.leaflet-tile {
-  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.6);
+  filter: saturate(0.72) brightness(1.03);
 }
 /* 帰属表示はダーク背景に合わせる */
 .leaflet-control-attribution {
-  background: rgba(10, 10, 11, 0.72) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
   color: var(--mute) !important;
   font-size: 10px !important;
 }
@@ -592,4 +587,22 @@ input[type='time'].admin-input::-webkit-calendar-picker-indicator {
 .leaflet-container {
   position: relative;
   z-index: 0;
+}
+/* 明るい背景ではカードを塗りの差ではなく影で浮かせる */
+.rounded-big,
+.rounded-apple {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+/* ヘッダーだけ暗くして画面の上端を締める */
+#global-nav {
+  background: rgba(24, 24, 23, 0.92) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.10) !important;
+}
+#global-nav a,
+#global-nav button {
+  color: #f0f0ee;
+}
+#global-nav a:hover,
+#global-nav button:hover {
+  color: var(--brand);
 }
