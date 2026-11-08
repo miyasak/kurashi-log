@@ -53,3 +53,16 @@ npx wrangler d1 execute tadoreru --remote --command="INSERT OR IGNORE INTO tags 
 公開前に `visit_date` 順で並べて確認する。
 
 npx wrangler d1 execute tadoreru --local --command="SELECT visit_date, substr(title,1,30) FROM posts WHERE status='published' AND visit_date<>'' ORDER BY visit_date"
+
+## タイトル
+
+30〜35文字に収める。区切り（｜）は2つまで。
+
+Googleの検索結果はPCで全角32文字前後、スマホで40文字前後で切られる。
+カードの見出しは2行までなので、40文字を超えた分は表示されない。
+
+形は「県名｜何をしたか」が基本。見どころを3つ並べたくなるが、2つに絞る。
+残りは本文で書けばよい。
+
+お金系の記事は数字が主役なので、文字数より数字を優先してよい。
+（例：ツーリング9日間の現地出費が25,500円だった話）
