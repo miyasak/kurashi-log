@@ -117,7 +117,7 @@ export const HomePage: FC<Props> = ({
       {themeCards.length ? (
         <section class="border-b border-edge2 bg-panel">
           <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class={`grid grid-cols-1 gap-4 ${themeCards.length === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'}`}>
               {themeCards.map((c) => (
                 <a
                   href={`/theme/${c.theme.key}`}

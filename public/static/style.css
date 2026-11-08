@@ -587,3 +587,9 @@ input[type='time'].admin-input::-webkit-calendar-picker-indicator {
   border-bottom: 0;
   cursor: zoom-in;
 }
+/* 地図の内部z-index（最大1000）が固定ヘッダー（z-50）を突き抜けるのを防ぐ。
+   外枠に重なりの階層を作ると、中の数字は外に影響しなくなる */
+.leaflet-container {
+  position: relative;
+  z-index: 0;
+}

@@ -115,6 +115,11 @@ export const ThemePage: FC<Props> = ({
               })}
             </div>
           ) : null}
+          {theme.key === 'touring' ? (
+            <p class="mt-5">
+              <ArrowLink href="/supermarket">ご当地スーパーを一覧で見る（店名・訪問時刻・評価つき）</ArrowLink>
+            </p>
+          ) : null}          
         </div>
       </section>
 

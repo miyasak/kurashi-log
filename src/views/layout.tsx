@@ -151,7 +151,6 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
 
   const items = [
     ...THEMES.map((t) => ({ href: `/theme/${t.key}`, label: t.label, active: activeTheme === t.key })),
-    { href: '/supermarket', label: 'Super', active: activePage === 'supermarket' },
     { href: '/about', label: 'About', active: activePage === 'about' }
   ]
 
@@ -226,17 +225,6 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
             </a>
           ))}
 
-          <a href="/supermarket" class="flex items-center justify-between border-b border-edge2 py-4">
-            <span class="min-w-0">
-              <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
-                <i class={`fa-solid ${CATEGORY_MAP['supermarket']?.icon || 'fa-cart-shopping'} w-5 text-[13px] text-brand`}></i>
-                Super
-              </span>
-              <span class="mt-1 block pl-8 text-[12px] text-mute">ご当地スーパー</span>
-            </span>
-            <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
-          </a>
-
           <a href="/about" class="flex items-center justify-between border-b border-edge2 py-4">
             <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
               <i class="fa-solid fa-circle-info w-5 text-[13px] text-brand"></i>About
@@ -301,7 +289,8 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
             {hasMapPins ? (
               <li><a href="/map" class="text-[13px] text-sub transition hover:text-ink">エリア別マップ</a></li>
             ) : null}
-            <li><a href="/search" class="text-[13px] text-sub transition hover:text-ink">記事を探す</a></li>
+              <li><a href="/supermarket" class="text-[13px] text-sub transition hover:text-ink">ご当地スーパー</a></li>
+              <li><a href="/search" class="text-[13px] text-sub transition hover:text-ink">記事を探す</a></li>
           </ul>
         </div>
         <div>
