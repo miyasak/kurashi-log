@@ -91,7 +91,7 @@ export const HomePage: FC<Props> = ({
             <span class="block">お金と道と暮らし。</span>
           </h1>
           {/* ナビと同じ 4テーマ構成で統一 */}
-          <p class="mt-4 max-w-[64ch] text-[13.5px] leading-[1.85] text-sub sm:text-[14.5px]">
+          <p class="mt-4 max-w-[64ch] text-[14.5px] leading-[1.85] text-sub sm:text-[14.5px]">
             <span class="font-medium text-ink">Money</span>（資産運用・生活費）、
             <span class="font-medium text-ink">Touring</span>（ツーリング・キャンプ場・ご当地スーパー）、
             <span class="font-medium text-ink">Spa</span>（日帰り温泉）、
@@ -103,7 +103,7 @@ export const HomePage: FC<Props> = ({
           <p class="mt-4">
             <a
               href="/about"
-              class="group inline-flex items-center gap-2 text-[12.5px] font-medium text-brand transition hover:opacity-80"
+              class="group inline-flex items-center gap-2 text-[13.5px] font-medium text-brand transition hover:opacity-80"
             >
               <i class="fa-solid fa-circle-info text-[11px]"></i>
               はじめての方はこちら
@@ -128,9 +128,9 @@ export const HomePage: FC<Props> = ({
                   </span>
                   <h2 class="mt-4 text-[17px] font-bold tracking-[-0.02em] text-ink">
                     {c.theme.label}
-                    <span class="ml-2 text-[12.5px] font-medium text-mute">{c.theme.name}</span>
+                    <span class="ml-2 text-[13.5px] font-medium text-mute">{c.theme.name}</span>
                   </h2>
-                  <p class="mt-2 text-[12.5px] leading-[1.7] text-sub">{c.theme.description}</p>
+                  <p class="mt-2 text-[13.5px] leading-[1.7] text-sub">{c.theme.description}</p>
                   {c.stats.length ? (
                     <dl class="mt-5 flex flex-wrap gap-x-7 gap-y-3">
                       {c.stats.map((s) => (
@@ -143,7 +143,7 @@ export const HomePage: FC<Props> = ({
                       ))}
                     </dl>
                   ) : null}
-                  <p class="mt-auto pt-5 flex items-center gap-1.5 text-[12.5px] font-medium text-brand">
+                  <p class="mt-auto pt-5 flex items-center gap-1.5 text-[13.5px] font-medium text-brand">
                     <span class="font-mono tabular-nums">{c.count}</span> 件の記録を見る
                     <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
                   </p>
@@ -197,7 +197,7 @@ export const HomePage: FC<Props> = ({
                   </p>
                   {diff ? (
                     <p
-                      class="mt-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[12px] font-bold tabular-nums"
+                      class="mt-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[13px] font-bold tabular-nums"
                       style={`background:${
                         diff > 0 ? 'rgba(249,115,22,.14)' : 'rgba(161,161,170,.14)'
                       };color:${diff > 0 ? '#f97316' : '#a1a1aa'}`}
@@ -299,7 +299,7 @@ export const HomePage: FC<Props> = ({
             <h2 class="mt-2 text-[19px] font-bold leading-tight tracking-[-0.02em] sm:text-[23px]">
               このサイトについて
             </h2>
-            <p class="mt-3 max-w-[66ch] text-[13px] leading-[1.85] text-sub">
+            <p class="mt-3 max-w-[66ch] text-[14px] leading-[1.85] text-sub">
               Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Spa（日帰り温泉）、Tech（業務効率化）。
               数字と写真で「あとから辿れる」ことを大切にして記録しています。
               運営者のプロフィールと投資方針は About にまとめています。

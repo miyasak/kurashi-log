@@ -37,7 +37,7 @@ export const SectionTitle: FC<{
       <h2 class="mt-0 text-[19px] font-bold leading-tight tracking-[-0.02em] text-ink sm:text-[23px]">
         {title}
       </h2>
-      {desc ? <p class="mt-2 max-w-[62ch] text-[13px] leading-[1.75] text-sub">{desc}</p> : null}
+      {desc ? <p class="mt-2 max-w-[62ch] text-[14px] leading-[1.75] text-sub">{desc}</p> : null}
     </div>
     {action ? <div class="shrink-0">{action}</div> : null}
   </div>
@@ -138,7 +138,7 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
         {/* リード文（画像枠がない場合は3行まで見せる） */}
         {lead ? (
           <p
-            class={`mt-2 text-[12.5px] leading-[1.7] text-sub ${
+            class={`mt-2 text-[13.5px] leading-[1.7] text-sub ${
               showFrame ? 'line-clamp-2' : 'line-clamp-3'
             }`}
           >
@@ -181,7 +181,7 @@ export const PostGrid: FC<{ posts: Post[]; showCategory?: boolean }> = ({ posts,
 export const EmptyState: FC<{ text?: string; light?: boolean }> = ({ text }) => (
   <div class="rounded-big border border-edge2 bg-panel px-5 py-10 text-center">
     <i class="fa-regular fa-folder-open text-[20px] text-mute"></i>
-    <p class="mt-3 text-[13.5px] text-sub">{text || '該当する記事が見つかりませんでした'}</p>
+    <p class="mt-3 text-[14.5px] text-sub">{text || '該当する記事が見つかりませんでした'}</p>
   </div>
 )
 

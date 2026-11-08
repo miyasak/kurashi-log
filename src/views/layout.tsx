@@ -145,7 +145,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
   hasMapPins
 }) => {
   const link = (isActive: boolean) =>
-    `rounded-full px-3.5 py-1.5 text-[13.5px] font-medium tracking-tight transition ${
+    `rounded-full px-3.5 py-1.5 text-[14.5px] font-medium tracking-tight transition ${
       isActive ? 'bg-brand text-white' : 'text-sub hover:bg-white/[0.07] hover:text-ink'
     }`
 
@@ -181,7 +181,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
               class="ml-1 grid h-8 w-8 place-items-center rounded-full text-sub transition hover:bg-white/[0.07] hover:text-ink"
               aria-label="検索"
             >
-              <i class="fa-solid fa-magnifying-glass text-[12.5px]"></i>
+              <i class="fa-solid fa-magnifying-glass text-[13.5px]"></i>
             </a>
           </nav>
 
@@ -192,7 +192,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
               class="grid h-9 w-9 place-items-center rounded-full text-sub transition hover:bg-white/[0.07]"
               aria-label="検索"
             >
-              <i class="fa-solid fa-magnifying-glass text-[13px]"></i>
+              <i class="fa-solid fa-magnifying-glass text-[14px]"></i>
             </a>
             <button
               id="menu-toggle"
@@ -216,10 +216,10 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
             >
               <span class="min-w-0">
                 <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
-                  <i class={`fa-solid ${t.icon} w-5 text-[13px] text-brand`}></i>
+                  <i class={`fa-solid ${t.icon} w-5 text-[14px] text-brand`}></i>
                   {t.label}
                 </span>
-                <span class="mt-1 block pl-8 text-[12px] text-mute">{t.name}</span>
+                <span class="mt-1 block pl-8 text-[13px] text-mute">{t.name}</span>
               </span>
               <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
             </a>
@@ -227,7 +227,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
 
           <a href="/about" class="flex items-center justify-between border-b border-edge2 py-4">
             <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
-              <i class="fa-solid fa-circle-info w-5 text-[13px] text-brand"></i>About
+              <i class="fa-solid fa-circle-info w-5 text-[14px] text-brand"></i>About
             </span>
             <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
           </a>
@@ -235,14 +235,14 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
           {hasMapPins ? (
             <a href="/map" class="flex items-center justify-between border-b border-edge2 py-4">
               <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
-                <i class="fa-solid fa-map-location-dot w-5 text-[13px] text-brand"></i>エリア別
+                <i class="fa-solid fa-map-location-dot w-5 text-[14px] text-brand"></i>エリア別
               </span>
               <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
             </a>
           ) : null}
           <a href="/search" class="flex items-center justify-between py-4">
             <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
-              <i class="fa-solid fa-magnifying-glass w-5 text-[13px] text-brand"></i>記事を探す
+              <i class="fa-solid fa-magnifying-glass w-5 text-[14px] text-brand"></i>記事を探す
             </span>
             <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
           </a>
@@ -264,7 +264,7 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
         <span class="text-[15px] font-bold tracking-tight">{SITE.title}</span>
       </div>
       {/* 説明文はナビと同じ3テーマ構成で統一 */}
-      <p class="mt-4 max-w-xl text-[12.5px] leading-relaxed text-mute">{SITE.description}</p>
+      <p class="mt-4 max-w-xl text-[13.5px] leading-relaxed text-mute">{SITE.description}</p>
 
       <div class="mt-8 grid gap-7 border-t border-edge2 pt-8 sm:grid-cols-3">
         <div>
@@ -272,7 +272,7 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
           <ul class="mt-3 space-y-2.5">
             {THEMES.map((t) => (
               <li>
-                <a href={`/theme/${t.key}`} class="text-[13px] text-sub transition hover:text-ink">
+                <a href={`/theme/${t.key}`} class="text-[14px] text-sub transition hover:text-ink">
                   {t.label}
                   <span class="ml-2 text-[11.5px] text-mute">{t.name}</span>
                 </a>
@@ -283,21 +283,21 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
         <div>
           <p class="text-[10.5px] font-bold uppercase tracking-[0.14em] text-mute">Site</p>
           <ul class="mt-3 space-y-2.5">
-            <li><a href="/" class="text-[13px] text-sub transition hover:text-ink">ホーム</a></li>
-            <li><a href="/about" class="text-[13px] text-sub transition hover:text-ink">About</a></li>
+            <li><a href="/" class="text-[14px] text-sub transition hover:text-ink">ホーム</a></li>
+            <li><a href="/about" class="text-[14px] text-sub transition hover:text-ink">About</a></li>
             {/* マップはピンが1件以上になるまで出さない */}
             {hasMapPins ? (
-              <li><a href="/map" class="text-[13px] text-sub transition hover:text-ink">エリア別マップ</a></li>
+              <li><a href="/map" class="text-[14px] text-sub transition hover:text-ink">エリア別マップ</a></li>
             ) : null}
-              <li><a href="/supermarket" class="text-[13px] text-sub transition hover:text-ink">ご当地スーパー</a></li>
-              <li><a href="/search" class="text-[13px] text-sub transition hover:text-ink">記事を探す</a></li>
+              <li><a href="/supermarket" class="text-[14px] text-sub transition hover:text-ink">ご当地スーパー</a></li>
+              <li><a href="/search" class="text-[14px] text-sub transition hover:text-ink">記事を探す</a></li>
           </ul>
         </div>
         <div>
           <p class="text-[10.5px] font-bold uppercase tracking-[0.14em] text-mute">Info</p>
           <ul class="mt-3 space-y-2.5">
-            <li><a href="/sitemap.xml" class="text-[13px] text-sub transition hover:text-ink">サイトマップ</a></li>
-            <li><a href="/rss.xml" class="text-[13px] text-sub transition hover:text-ink">RSS</a></li>
+            <li><a href="/sitemap.xml" class="text-[14px] text-sub transition hover:text-ink">サイトマップ</a></li>
+            <li><a href="/rss.xml" class="text-[14px] text-sub transition hover:text-ink">RSS</a></li>
           </ul>
         </div>
       </div>
@@ -325,7 +325,7 @@ export const ArrowLink: FC<{ href: string; children?: any; size?: 'sm' | 'md'; c
   <a
     href={href}
     class={`group inline-flex items-center gap-1.5 font-medium tracking-tight text-brand transition hover:opacity-80 ${
-      size === 'sm' ? 'text-[12.5px]' : 'text-[13.5px]'
+      size === 'sm' ? 'text-[13.5px]' : 'text-[14.5px]'
     }`}
   >
     {children}
@@ -348,7 +348,7 @@ export const PillButton: FC<{ href: string; children?: any; variant?: 'brand' | 
   return (
     <a
       href={href}
-      class={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[13.5px] font-medium tracking-tight transition ${styles}`}
+      class={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[14.5px] font-medium tracking-tight transition ${styles}`}
     >
       {icon ? <i class={`fa-solid ${icon} text-[11.5px]`}></i> : null}
       {children}

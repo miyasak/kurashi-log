@@ -606,3 +606,20 @@ input[type='time'].admin-input::-webkit-calendar-picker-indicator {
 #global-nav button:hover {
   color: var(--brand);
 }
+/* フッターもヘッダーと揃えて暗くし、ページを上下で挟む */
+footer {
+  background: #18181b !important;
+  border-top-color: rgba(255, 255, 255, 0.10) !important;
+}
+footer a,
+footer p,
+footer span {
+  color: #d6d6d2 !important;
+}
+footer a:hover {
+  color: var(--brand) !important;
+}
+footer .border-t,
+footer .border-edge2 {
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}

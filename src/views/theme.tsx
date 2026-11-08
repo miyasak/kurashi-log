@@ -76,7 +76,7 @@ export const ThemePage: FC<Props> = ({
           <h1 class="mt-1.5 max-w-[26ch] text-[24px] font-bold leading-[1.22] tracking-[-0.03em] text-ink sm:text-[32px]">
             {theme.head}
           </h1>
-          <p class="mt-3 max-w-[66ch] text-[13.5px] leading-[1.8] text-sub">{theme.lead}</p>
+          <p class="mt-3 max-w-[66ch] text-[14.5px] leading-[1.8] text-sub">{theme.lead}</p>
 
           {specs.length ? (
             <div class="mt-6">
@@ -89,7 +89,7 @@ export const ThemePage: FC<Props> = ({
             <div class="mt-6 flex flex-wrap gap-2">
               <a
                 href={`${base}${qsOf({ cat: '' })}`}
-                class={`rounded-full px-3.5 py-1.5 text-[12.5px] font-medium transition ${
+                class={`rounded-full px-3.5 py-1.5 text-[13.5px] font-medium transition ${
                   !activeCat ? 'bg-brand text-white' : 'border border-edge2 bg-panel text-sub hover:text-ink'
                 }`}
               >
@@ -103,7 +103,7 @@ export const ThemePage: FC<Props> = ({
                 return (
                   <a
                     href={`${base}?cat=${k}`}
-                    class={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12.5px] font-medium transition ${
+                    class={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13.5px] font-medium transition ${
                       activeCat === k ? 'bg-brand text-white' : 'border border-edge2 bg-panel text-sub hover:text-ink'
                     }`}
                   >
@@ -151,7 +151,7 @@ export const ThemePage: FC<Props> = ({
             {/* 月次テーブル（金額を等幅で縦に揃える） */}
             <div class="mt-4 overflow-hidden rounded-big border border-edge2 bg-base">
               <div class="overflow-x-auto">
-                <table class="w-full text-left text-[13px]">
+                <table class="w-full text-left text-[14px]">
                   <thead>
                     <tr class="border-b border-edge2 text-mute">
                       <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.1em]">月</th>
@@ -171,17 +171,17 @@ export const ThemePage: FC<Props> = ({
                       .reverse()
                       .map((s: any) => (
                         <tr class="border-b border-edge2 last:border-0">
-                          <td class="px-4 py-3 font-mono text-[12.5px] tabular-nums font-medium">{s.ym}</td>
-                          <td class="px-4 py-3 text-right font-mono text-[13.5px] font-bold tabular-nums text-brand">
+                          <td class="px-4 py-3 font-mono text-[13.5px] tabular-nums font-medium">{s.ym}</td>
+                          <td class="px-4 py-3 text-right font-mono text-[14.5px] font-bold tabular-nums text-brand">
                             {yen(s.total_assets)}
                           </td>
-                          <td class="px-4 py-3 text-right font-mono text-[12.5px] tabular-nums text-sub">
+                          <td class="px-4 py-3 text-right font-mono text-[13.5px] tabular-nums text-sub">
                             {yen(s.nisa_value)}
                           </td>
-                          <td class="hidden px-4 py-3 text-right font-mono text-[12.5px] tabular-nums text-sub sm:table-cell">
+                          <td class="hidden px-4 py-3 text-right font-mono text-[13.5px] tabular-nums text-sub sm:table-cell">
                             {yen(s.ideco_value)}
                           </td>
-                          <td class="hidden px-4 py-3 text-right font-mono text-[12.5px] tabular-nums text-sub sm:table-cell">
+                          <td class="hidden px-4 py-3 text-right font-mono text-[13.5px] tabular-nums text-sub sm:table-cell">
                             {yen(s.living_cost)}
                           </td>
                         </tr>
@@ -234,10 +234,10 @@ export const ThemePage: FC<Props> = ({
                   name="q"
                   value={q || ''}
                   placeholder={`${theme.label} の記事を検索`}
-                  class="w-full rounded-full border border-edge2 bg-panel py-2.5 pl-9 pr-4 text-[13px] tracking-tight text-ink outline-none transition placeholder:text-mute focus:border-brand/50"
+                  class="w-full rounded-full border border-edge2 bg-panel py-2.5 pl-9 pr-4 text-[14px] tracking-tight text-ink outline-none transition placeholder:text-mute focus:border-brand/50"
                 />
               </div>
-              <button class="rounded-full bg-brand px-4 py-2.5 text-[12.5px] font-medium text-white transition hover:brightness-110">
+              <button class="rounded-full bg-brand px-4 py-2.5 text-[13.5px] font-medium text-white transition hover:brightness-110">
                 検索
               </button>
             </form>
@@ -285,7 +285,7 @@ export const ThemePage: FC<Props> = ({
                 <p class="mt-3.5 text-[14px] font-bold tracking-tight text-sub">
                   このテーマの記事は準備中です
                 </p>
-                <p class="mx-auto mt-2 max-w-[48ch] text-[12.5px] leading-[1.8] text-mute">
+                <p class="mx-auto mt-2 max-w-[48ch] text-[13.5px] leading-[1.8] text-mute">
                   {theme.lead}
                   記事を公開すると、ここに一覧が表示されます。
                 </p>
@@ -293,7 +293,7 @@ export const ThemePage: FC<Props> = ({
                   {OTHER_THEMES(theme.key).map((t) => (
                     <a
                       href={`/theme/${t.key}`}
-                      class="inline-flex items-center gap-2 rounded-full bg-black/[0.04] px-4 py-2 text-[12.5px] font-medium text-ink ring-1 ring-inset ring-black/10 transition hover:bg-black/[0.08]"
+                      class="inline-flex items-center gap-2 rounded-full bg-black/[0.04] px-4 py-2 text-[13.5px] font-medium text-ink ring-1 ring-inset ring-black/10 transition hover:bg-black/[0.08]"
                     >
                       <i class={`fa-solid ${t.icon} text-[11px]`}></i>
                       {t.label}の記事を見る
@@ -311,7 +311,7 @@ export const ThemePage: FC<Props> = ({
                 return (
                   <a
                     href={`${base}${qsOf({ page: String(n) })}`}
-                    class={`grid h-8 min-w-8 place-items-center rounded-full px-2.5 font-mono text-[12.5px] tabular-nums transition ${
+                    class={`grid h-8 min-w-8 place-items-center rounded-full px-2.5 font-mono text-[13.5px] tabular-nums transition ${
                       n === page
                         ? 'bg-brand font-bold text-white'
                         : 'border border-edge2 bg-panel text-sub hover:text-ink'

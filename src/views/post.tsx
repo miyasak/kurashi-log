@@ -106,7 +106,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
             </h1>
 
             {/* メタ行：場所 / 日付 / ジャンル / 評価 */}
-            <div class="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-white/70">
+            <div class="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-white/70">
               {areaLabel || post.place_name ? (
                 <span class="inline-flex items-center gap-1.5">
                   <i class="fa-solid fa-location-dot text-[11px]" style={`color:${accent}`}></i>
@@ -172,7 +172,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                             class="lb-img aspect-[4/3] w-full cursor-zoom-in object-cover"
                           />
                           {ph.caption ? (
-                            <figcaption class="px-4 py-3 text-[12.5px] leading-relaxed text-mute">
+                            <figcaption class="px-4 py-3 text-[13.5px] leading-relaxed text-mute">
                               {ph.caption}
                             </figcaption>
                           ) : null}
@@ -190,7 +190,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                     </p>
                     <ol class="mt-3 space-y-2">
                       {toc.map((t, i) => (
-                        <li class="flex gap-2.5 text-[13px] leading-[1.7]">
+                        <li class="flex gap-2.5 text-[14px] leading-[1.7]">
                           <span class="pt-[3px] font-mono text-[11px] tabular-nums text-mute">
                             {String(i + 1).padStart(2, '0')}
                           </span>
@@ -216,7 +216,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                       <i class="fa-solid fa-triangle-exclamation text-[10.5px]"></i>
                       Road Note
                     </p>
-                    <p class="mt-2 text-[13px] leading-[1.85] text-ink">{post.road_note}</p>
+                    <p class="mt-2 text-[14px] leading-[1.85] text-ink">{post.road_note}</p>
                   </div>
                 ) : null}
 
@@ -273,12 +273,12 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                 {/* シェア */}
                 <div class="mt-6 flex flex-wrap items-center gap-2.5 border-t border-edge2 pt-6">
                   <button
-                    class="js-share rounded-full border border-edge bg-panel px-4 py-2 text-[12.5px] text-ink transition hover:bg-panel2"
+                    class="js-share rounded-full border border-edge bg-panel px-4 py-2 text-[13.5px] text-ink transition hover:bg-panel2"
                     data-title={post.title}
                   >
                     <i class="fa-solid fa-share-nodes mr-2 text-[11px]"></i>共有する
                   </button>
-                  <button class="js-copy rounded-full border border-edge bg-panel px-4 py-2 text-[12.5px] text-ink transition hover:bg-panel2">
+                  <button class="js-copy rounded-full border border-edge bg-panel px-4 py-2 text-[13.5px] text-ink transition hover:bg-panel2">
                     <i class="fa-regular fa-copy mr-2 text-[11px]"></i>URLをコピー
                   </button>
                   <span class="ml-auto">
@@ -299,7 +299,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                     </p>
                     <ol class="mt-2.5 space-y-1.5">
                       {toc.map((t) => (
-                        <li class="text-[12px] leading-[1.6]">
+                        <li class="text-[13px] leading-[1.6]">
                           <a href={`#${t.id}`} class="text-sub transition hover:text-brand">
                             {t.text}
                           </a>
@@ -432,7 +432,7 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
           <div class={`grid px-5 py-3 ${String(r.value).length > 20 ? 'grid-cols-1 gap-1' : 'grid-cols-[86px_minmax(0,1fr)] gap-3'}`}>
             <dt class="text-[11px] leading-[1.6] text-mute">{r.label}</dt>
             <dd
-              class={`text-[12.5px] leading-[1.65] text-ink ${
+              class={`text-[13.5px] leading-[1.65] text-ink ${
                 NUMERIC.has(r.label) ? 'font-mono tabular-nums font-medium' : ''
               }`}
             >
@@ -470,7 +470,7 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
             </p>
             <ul class="mt-2 space-y-1.5">
               {items.map((it) => (
-                <li class="text-[12px] leading-[1.6] text-ink">{it}</li>
+                <li class="text-[13px] leading-[1.6] text-ink">{it}</li>
               ))}
             </ul>
           </div>
@@ -549,7 +549,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
           ) : null}
 
           {linked.summary ? (
-            <p class="mt-3 text-[12.5px] leading-[1.8] text-sub">「{linked.summary}」</p>
+            <p class="mt-3 text-[13.5px] leading-[1.8] text-sub">「{linked.summary}」</p>
           ) : null}
 
           {/* 推し買い */}
@@ -559,7 +559,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
                 <i class="fa-solid fa-cart-shopping text-[9px]"></i>
                 推し買い
               </p>
-              <p class="mt-1.5 text-[12px] leading-[1.7] text-ink">{items.join(' / ')}</p>
+              <p class="mt-1.5 text-[13px] leading-[1.7] text-ink">{items.join(' / ')}</p>
             </div>
           ) : null}
 

@@ -33,13 +33,13 @@ export const SearchPage: FC<{
 
         <form action="/search" method="get" class="mt-6 max-w-[560px]">
           <div class="relative">
-            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[12px] text-mute"></i>
+            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[13px] text-mute"></i>
             <input
               type="search"
               name="q"
               value={q || ''}
               placeholder="キーワード（例: NISA、ビーナスライン、Python）"
-              class="w-full rounded-full border border-edge2 bg-panel py-3 pl-10 pr-4 text-[13.5px] text-ink outline-none transition placeholder:text-mute focus:border-brand/50"
+              class="w-full rounded-full border border-edge2 bg-panel py-3 pl-10 pr-4 text-[14.5px] text-ink outline-none transition placeholder:text-mute focus:border-brand/50"
             />
           </div>
           <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -47,7 +47,7 @@ export const SearchPage: FC<{
             <select
               id="search-theme"
               name="theme"
-              class="rounded-full border border-edge2 bg-panel px-4 py-2 text-[12.5px] text-ink outline-none transition focus:border-edge"
+              class="rounded-full border border-edge2 bg-panel px-4 py-2 text-[13.5px] text-ink outline-none transition focus:border-edge"
             >
               <option value="">すべてのテーマ</option>
               {THEMES.map((t) => (
@@ -56,13 +56,13 @@ export const SearchPage: FC<{
                 </option>
               ))}
             </select>
-            <button class="rounded-full bg-brand px-5 py-2 text-[12.5px] font-medium text-white transition hover:brightness-110">
+            <button class="rounded-full bg-brand px-5 py-2 text-[13.5px] font-medium text-white transition hover:brightness-110">
               検索する
             </button>
           </div>
         </form>
 
-        {tag ? <p class="mt-4 text-[12px] text-mute">タグ: {tag}</p> : null}
+        {tag ? <p class="mt-4 text-[13px] text-mute">タグ: {tag}</p> : null}
       </div>
     </section>
 
@@ -107,21 +107,21 @@ export const MapPage: FC<{ counts: Record<string, number> }> = ({ counts }) => {
           <h1 class="mt-1.5 text-[24px] font-bold leading-tight tracking-[-0.03em] text-ink sm:text-[30px]">
             走った場所も、寄った店も。
           </h1>
-          <p class="mt-3 max-w-[64ch] text-[13.5px] leading-[1.8] text-sub">
+          <p class="mt-3 max-w-[64ch] text-[14.5px] leading-[1.8] text-sub">
             走った道、泊まったキャンプ場、立ち寄ったスーパーや温泉を一枚の地図に。ピンをタップすると記事に移動します。
           </p>
 
           {hasPins ? (
             <div class="mt-5 flex flex-wrap items-center gap-2">
               <button
-                class="map-filter rounded-full bg-brand px-4 py-2 text-[12.5px] font-medium text-white transition"
+                class="map-filter rounded-full bg-brand px-4 py-2 text-[13.5px] font-medium text-white transition"
                 data-filter="all"
               >
                 すべて
               </button>
               {cats.map((cat) => (
                 <button
-                  class="map-filter rounded-full border border-edge2 bg-panel px-4 py-2 text-[12.5px] text-sub transition hover:text-ink"
+                  class="map-filter rounded-full border border-edge2 bg-panel px-4 py-2 text-[13.5px] text-sub transition hover:text-ink"
                   data-filter={cat.key}
                 >
                   <i class={`fa-solid ${cat.icon} mr-1.5 text-[10.5px] text-brand`}></i>
@@ -160,7 +160,7 @@ export const MapPage: FC<{ counts: Record<string, number> }> = ({ counts }) => {
               <p class="mt-3.5 text-[14px] font-bold tracking-tight text-sub">
                 記事が増え次第、順次追加します
               </p>
-              <p class="mx-auto mt-2 max-w-[46ch] text-[12.5px] leading-[1.8] text-mute">
+              <p class="mx-auto mt-2 max-w-[46ch] text-[13.5px] leading-[1.8] text-mute">
                 ツーリングやご当地スーパーの記事に位置情報を登録すると、ここに地図とピンが表示されます。
               </p>
               <div class="mt-5 flex flex-wrap items-center justify-center gap-2.5">
@@ -232,7 +232,7 @@ export const AboutPage: FC<{
             <br class="hidden sm:block" />
             会社員の記録です。
           </h1>
-          <p class="mt-3 max-w-[66ch] text-[13.5px] leading-[1.85] text-sub">
+          <p class="mt-3 max-w-[66ch] text-[14.5px] leading-[1.85] text-sub">
             {SITE.title} は、資産運用と生活費、ツーリングとキャンプ場、ご当地スーパーと日帰り温泉、
             業務効率化の記録をまとめた個人サイトです。特別な経歴はなく、使っているのは誰でも同じ条件で
             使える制度と時間だけ。感覚ではなく実額で記録し、あとから辿れることを大切にしています。
@@ -249,15 +249,15 @@ export const AboutPage: FC<{
               {profile.map(([k, v]) => (
                 <div class="grid grid-cols-[88px_minmax(0,1fr)] gap-3 py-3.5">
                   <dt class="text-[11.5px] text-mute">{k}</dt>
-                  <dd class="text-[13px] leading-[1.7] text-ink">{v}</dd>
+                  <dd class="text-[14px] leading-[1.7] text-ink">{v}</dd>
                 </div>
               ))}
               <div class="grid grid-cols-[88px_minmax(0,1fr)] gap-3 py-3.5">
                 <dt class="text-[11.5px] text-mute">目標</dt>
-                <dd class="text-[13px] leading-[1.7] text-ink">
+                <dd class="text-[14px] leading-[1.7] text-ink">
                   60歳で資産1億円
                   {total ? (
-                    <span class="ml-2 font-mono text-[12.5px] tabular-nums text-brand">
+                    <span class="ml-2 font-mono text-[13.5px] tabular-nums text-brand">
                       （現在 {yen(total)}）
                     </span>
                   ) : null}
@@ -282,7 +282,7 @@ export const AboutPage: FC<{
                   {breakdown.map((b) => (
                     <div class="flex items-baseline justify-between py-2.5">
                       <dt class="text-[11.5px] text-mute">{b.label}</dt>
-                      <dd class="font-mono text-[13px] font-bold tabular-nums text-ink">{yen(b.value)}</dd>
+                      <dd class="font-mono text-[14px] font-bold tabular-nums text-ink">{yen(b.value)}</dd>
                     </div>
                   ))}
                 </dl>
@@ -339,10 +339,10 @@ export const AboutPage: FC<{
             ].map((x) => (
               <div class="rounded-big border border-edge2 bg-base p-5">
                 <span class="grid h-9 w-9 place-items-center rounded-lg bg-brandsoft text-brand">
-                  <i class={`fa-solid ${x.icon} text-[13px]`}></i>
+                  <i class={`fa-solid ${x.icon} text-[14px]`}></i>
                 </span>
                 <h3 class="mt-3.5 text-[14.5px] font-bold tracking-tight">{x.t}</h3>
-                <p class="mt-2 text-[12.5px] leading-[1.75] text-sub">{x.d}</p>
+                <p class="mt-2 text-[13.5px] leading-[1.75] text-sub">{x.d}</p>
               </div>
             ))}
           </div>
@@ -366,10 +366,10 @@ export const AboutPage: FC<{
                   </span>
                   <h3 class="mt-3.5 text-[16px] font-bold tracking-[-0.02em]">
                     {t.label}
-                    <span class="ml-2 text-[12.5px] font-medium text-mute">{t.name}</span>
+                    <span class="ml-2 text-[13.5px] font-medium text-mute">{t.name}</span>
                   </h3>
-                  <p class="mt-2 text-[12.5px] leading-[1.7] text-sub">{t.description}</p>
-                  <p class="mt-4 flex items-center gap-1.5 text-[12.5px] font-medium text-brand">
+                  <p class="mt-2 text-[13.5px] leading-[1.7] text-sub">{t.description}</p>
+                  <p class="mt-4 flex items-center gap-1.5 text-[13.5px] font-medium text-brand">
                     <span class="font-mono tabular-nums">{num}</span> 件を見る
                     <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
                   </p>
@@ -389,7 +389,7 @@ export const AboutPage: FC<{
               <h2 class="mt-1.5 text-[17px] font-bold leading-snug tracking-[-0.02em] sm:text-[20px]">
                 詳しい経緯はこちら
               </h2>
-              <p class="mt-2.5 max-w-[62ch] text-[13px] leading-[1.8] text-sub">
+              <p class="mt-2.5 max-w-[62ch] text-[14px] leading-[1.8] text-sub">
                 貯金が2万円だった時期から現在までの14年間、どうやって積み上げたのか。
                 収入の推移や実家を出たタイミングまで含めて、1本の記事にまとめています。
               </p>
@@ -404,7 +404,7 @@ export const AboutPage: FC<{
           <div class="mt-4 rounded-big border border-edge2 bg-panel p-5 sm:p-6">
             <p class="text-[10.5px] font-bold uppercase tracking-[0.14em] text-brand">Site</p>
             <h2 class="mt-1.5 text-[16px] font-bold tracking-[-0.02em]">このサイトの構成</h2>
-            <dl class="mt-4 divide-y divide-edge2 text-[13px]">
+            <dl class="mt-4 divide-y divide-edge2 text-[14px]">
               {[
                 ['公開記事', `${Object.values(counts).reduce((a, b) => a + b, 0)} 件`],
                 ['構成', 'Hono / Cloudflare Workers'],
@@ -414,7 +414,7 @@ export const AboutPage: FC<{
               ].map(([k, v]) => (
                 <div class="flex gap-5 py-3 first:pt-0 last:pb-0">
                   <dt class="w-28 shrink-0 text-mute">{k}</dt>
-                  <dd class="font-mono text-[12.5px] tabular-nums text-ink">{v}</dd>
+                  <dd class="font-mono text-[13.5px] tabular-nums text-ink">{v}</dd>
                 </div>
               ))}
             </dl>
@@ -442,7 +442,7 @@ export const NotFoundPage: FC = () => (
     <h1 class="mt-2 text-[24px] font-bold leading-tight tracking-[-0.025em] text-ink sm:text-[30px]">
       ページが見つかりません。
     </h1>
-    <p class="mt-3 text-[13.5px] leading-relaxed text-sub">URLが変更されたか、削除された可能性があります。</p>
+    <p class="mt-3 text-[14.5px] leading-relaxed text-sub">URLが変更されたか、削除された可能性があります。</p>
     <div class="mt-6 flex flex-wrap items-center gap-2.5">
       <PillButton href="/" icon="fa-house">
         ホームへ戻る
@@ -470,7 +470,7 @@ export const TagPage: FC<{ tag: string; posts: Post[] }> = ({ tag, posts }) => (
           <i class="fa-solid fa-tag text-[10px]"></i>Tag
         </p>
         <h1 class="mt-1.5 text-[24px] font-bold leading-tight tracking-[-0.03em] text-ink sm:text-[30px]">{tag}</h1>
-        <p class="mt-2 font-mono text-[12px] tabular-nums text-mute">{posts.length} 件の記事</p>
+        <p class="mt-2 font-mono text-[13px] tabular-nums text-mute">{posts.length} 件の記事</p>
       </div>
     </section>
     <section class="bg-base">
@@ -509,7 +509,7 @@ export const SupermarketListPage: FC<{
       <h1 class="text-[22px] font-bold tracking-[-0.02em] text-ink sm:text-[26px]">
         ご当地スーパー一覧
       </h1>
-      <p class="mt-2 text-[13px] leading-[1.8] text-sub">
+      <p class="mt-2 text-[14px] leading-[1.8] text-sub">
         ツーリングの途中で立ち寄ったご当地スーパーの記録です。訪問日の新しい順に並んでいます。
       </p>
       {items.length ? (
@@ -522,18 +522,18 @@ export const SupermarketListPage: FC<{
               <span class="min-w-0 flex-1 text-[14px] font-bold text-ink">
                 {it.place_name || it.title}
               </span>
-              <span class="w-24 text-[12px] text-mute">{it.prefecture || '—'}</span>
-              <span class="w-24 font-mono text-[12px] tabular-nums text-mute">
+              <span class="w-24 text-[13px] text-mute">{it.prefecture || '—'}</span>
+              <span class="w-24 font-mono text-[13px] tabular-nums text-mute">
                 {it.visit_date || '—'}
               </span>
-              <span class="w-20 text-[12px] text-brand">
+              <span class="w-20 text-[13px] text-brand">
                 {it.rating ? stars(Number(it.rating)) : '—'}
               </span>
             </a>
           ))}
         </div>
       ) : (
-        <p class="mt-6 rounded-big border border-edge2 bg-panel px-4 py-8 text-center text-[13px] text-mute">
+        <p class="mt-6 rounded-big border border-edge2 bg-panel px-4 py-8 text-center text-[14px] text-mute">
           まだ記事がありません。
         </p>
       )}
