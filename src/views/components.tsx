@@ -123,7 +123,11 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
               {c?.name}
             </span>
           ) : null}
-          <time class="font-mono text-[11px] tabular-nums text-mute">{formatDate(post.published_at)}</time>
+          <time class="font-mono text-[11px] tabular-nums text-mute">
+            {post.visit_date
+              ? `${post.category === 'supermarket' ? '訪問' : '走行'} ${formatDate(post.visit_date)}`
+              : formatDate(post.published_at)}
+          </time>
         </div>
 
         {/* タイトル：画像枠がない記事は少し大きく見せる */}
