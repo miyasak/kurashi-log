@@ -14,7 +14,6 @@ const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
   accent
 }) => (
   <div class="mb-4">
-    <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">{eyebrow}</p>
     <h2 class="mt-1 text-[16px] font-bold tracking-[-0.01em] text-ink sm:text-[18px]">{title}</h2>
   </div>
 )

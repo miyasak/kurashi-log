@@ -34,13 +34,7 @@ export const SectionTitle: FC<{
 }> = ({ eyebrow, title, desc, icon, action }) => (
   <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
     <div class="min-w-0">
-      {eyebrow ? (
-        <p class="flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
-          {icon ? <i class={`fa-solid ${icon} text-[10px]`}></i> : null}
-          {eyebrow}
-        </p>
-      ) : null}
-      <h2 class="mt-1.5 text-[19px] font-bold leading-tight tracking-[-0.02em] text-ink sm:text-[23px]">
+      <h2 class="mt-0 text-[19px] font-bold leading-tight tracking-[-0.02em] text-ink sm:text-[23px]">
         {title}
       </h2>
       {desc ? <p class="mt-2 max-w-[62ch] text-[13px] leading-[1.75] text-sub">{desc}</p> : null}
