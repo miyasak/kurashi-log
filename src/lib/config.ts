@@ -149,7 +149,7 @@ export const THEMES: ThemeDef[] = [
     en: 'MONEY',
     name: 'お金の記録',
     icon: 'fa-coins',
-    head: '積み上げた数字を、そのまま置く。',
+    head: '積み上げた数字を、そのまま置く',
     lead: '資産運用と生活費。評価額・積立額・支出を、感覚ではなく実額で記録しています。',
     description: '資産運用（NISA / iDeCo）と生活費の記録。総資産・評価額・毎月の支出を実額で公開しています。',
     categories: ['asset', 'life']
@@ -160,7 +160,7 @@ export const THEMES: ThemeDef[] = [
     en: 'TOURING',
     name: 'ツーリング',
     icon: 'fa-motorcycle',
-    head: '走った道と、寄った店。',
+    head: '走った道と、寄った店',
     lead: 'ルート・距離・天気に加えて、旅先で立ち寄ったご当地スーパーも同じ地図に残しています。',
     description: 'ツーリング記録・キャンプ場・ご当地スーパーのレビュー。ルート・距離・写真・地図つきで残しています。',
     categories: ['touring', 'camp', 'supermarket']
@@ -171,7 +171,7 @@ export const THEMES: ThemeDef[] = [
     en: 'TECH',
     name: '業務効率化',
     icon: 'fa-gears',
-    head: '手作業を、自動化する。',
+    head: '手作業を、自動化する',
     lead: 'Excel・Python・BIツールで作業時間を削った記録。再現できる形で書いています。',
     description: 'Excel・Python・BIツールによる業務効率化と自動化の記録。手順を再現できる形でまとめています。',
     categories: ['it']
@@ -182,7 +182,7 @@ export const THEMES: ThemeDef[] = [
     en: 'SPA',
     name: '日帰り温泉',
     icon: 'fa-mug-hot',
-    head: '走ったあとに、湯へ寄る。',
+    head: '走ったあとに、湯へ寄る',
     lead: '旅先で入った日帰り温泉。泉質・料金・営業時間を、入った日の記録として残しています。',
     description: '日帰り温泉の記録。泉質・料金・営業時間・アクセスをまとめています。',
     categories: ['onsen']

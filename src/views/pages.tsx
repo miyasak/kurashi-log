@@ -105,7 +105,7 @@ export const MapPage: FC<{ counts: Record<string, number> }> = ({ counts }) => {
             <i class="fa-solid fa-map-location-dot text-[10px]"></i>Map
           </p>
           <h1 class="mt-1.5 text-[24px] font-bold leading-tight tracking-[-0.03em] text-ink sm:text-[30px]">
-            走った場所も、寄った店も。
+            地図から探す
           </h1>
           <p class="mt-3 max-w-[64ch] text-[14.5px] leading-[1.8] text-sub">
             走った道、泊まったキャンプ場、立ち寄ったスーパーや温泉を一枚の地図に。ピンをタップすると記事に移動します。
@@ -227,10 +227,8 @@ export const AboutPage: FC<{
           <p class="mt-4 flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
             <i class="fa-solid fa-circle-info text-[10px]"></i>About
           </p>
-          <h1 class="mt-1.5 max-w-[24ch] text-[24px] font-bold leading-[1.22] tracking-[-0.03em] text-ink sm:text-[32px]">
-            60歳で資産1億円を目指す、
-            <br class="hidden sm:block" />
-            会社員の記録です。
+          <h1 class="mt-1.5 text-[24px] font-bold leading-[1.22] tracking-[-0.03em] text-ink sm:text-[32px]">
+            60歳で資産1億円を目指す、会社員の記録です。
           </h1>
           <p class="mt-3 max-w-[66ch] text-[14.5px] leading-[1.85] text-sub">
             {SITE.title} は、資産運用と生活費、ツーリングとキャンプ場、ご当地スーパーと日帰り温泉、

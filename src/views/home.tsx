@@ -87,8 +87,7 @@ export const HomePage: FC<Props> = ({
             {SITE.title}
           </p>
           <h1 class="mt-4 text-[26px] font-bold leading-[1.28] tracking-[-0.03em] text-ink sm:text-[36px]">
-            <span class="block">数字で記録する、</span>
-            <span class="block">お金と道と暮らし。</span>
+            お金と道と暮らしを、数字で残しています
           </h1>
           {/* ナビと同じ 4テーマ構成で統一 */}
           <p class="mt-4 max-w-[64ch] text-[14.5px] leading-[1.85] text-sub sm:text-[14.5px]">
