@@ -8,8 +8,12 @@
     { code: 'cash', label: '現金・預金' },
     { code: 'nisa', label: 'NISA評価額' },
     { code: 'ideco', label: 'iDeCo評価額' },
+    { code: 'nisa_contribution', label: 'NISA累計投資額' },
+    { code: 'ideco_contribution', label: 'iDeCo累計拠出額' },
     { code: 'living_cost', label: '直近の生活費' },
+    { code: 'income', label: '直近の手取り収入' },
     { code: 'diff', label: '総資産の前月比（±付き）' },
+    { code: 'ym', label: '対象年月（例: 2026-07）' },
     { code: 'updated', label: 'データの更新月（例: 2026年7月）' }
   ]
 
@@ -448,6 +452,25 @@
                     `<button type="button" data-insert="{{${s.code}}}" title="${esc(s.label)}"
                        class="rounded-md border border-slate-300 bg-white px-2 py-1 font-mono text-[10.5px] font-bold text-slate-700 hover:border-brand hover:text-brand">{{${s.code}}}</button>`
                 ).join('')}
+              </div>
+              <div class="mt-2.5 rounded-lg border border-slate-200 bg-white p-2.5">
+                <p class="text-[10px] font-bold text-ink-mute">書き方の例 1（総資産まわり）</p>
+                <p class="mt-1 font-mono text-[10.5px] leading-relaxed text-slate-700">
+                  総資産は {{total_assets}}（前月比 {{diff}}）、内訳は現金 {{cash}}・NISA {{nisa}}・iDeCo {{ideco}}。
+                </p>
+                <p class="mt-0.5 text-[10.5px] leading-relaxed text-ink-mute">
+                  → 総資産は ¥22,820,103（前月比 +¥123,456）、内訳は現金 ¥12,447,037・NISA ¥9,695,676・iDeCo ¥677,390。
+                </p>
+                <p class="mt-3 text-[10px] font-bold text-ink-mute">書き方の例 2（積立と家計）</p>
+                <p class="mt-1 font-mono text-[10.5px] leading-relaxed text-slate-700">
+                  {{ym}} の手取りは {{income}}、生活費は {{living_cost}}。NISAは累計 {{nisa_contribution}} を投じて評価額 {{nisa}}、iDeCoは {{ideco_contribution}} 拠出して {{ideco}}。（{{updated}} 時点）
+                </p>
+                <p class="mt-0.5 text-[10.5px] leading-relaxed text-ink-mute">
+                  → 2026-10 の手取りは ¥380,000、生活費は ¥210,000。NISAは累計 ¥8,400,000 を投じて評価額 ¥9,695,676、iDeCoは ¥620,000 拠出して ¥677,390。（2026年10月 時点）
+                </p>
+                <p class="mt-3 text-[10px] leading-relaxed text-ink-mute">
+                  ¥記号と桁区切りは自動。{{diff}} は増減の符号（+ / − / ±）が付きます。{{ym}} は 2026-10 形式、{{updated}} は 2026年10月 形式。データが無い項目は — になります。※例の金額はサンプルです。
+                </p>
               </div>
             </div>
             <textarea name="body" id="md-input" rows="20" class="admin-input mt-2" placeholder="Markdownで記述できます">${esc(p.body)}</textarea>

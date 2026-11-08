@@ -153,7 +153,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
               {/* ---------------- 左カラム ---------------- */}
               <div class="min-w-0">
                 {post.summary ? (
-                  <p class="border-l-2 border-brand/50 pl-4 text-[14px] leading-[1.9] text-sub sm:text-[15px]">
+                  <p class="max-w-[875px] border-l-2 border-brand/50 pl-4 text-[14px] leading-[1.9] text-sub sm:text-[15px]">
                     {post.summary}
                   </p>
                 ) : null}

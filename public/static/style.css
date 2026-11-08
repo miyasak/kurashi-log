@@ -135,7 +135,6 @@ table th {
   line-height: 1.95;
   color: #e4e4e7;
   letter-spacing: 0.012em;
-  /* 日本語の可読幅（1行45文字前後）に抑える。写真ギャラリーは枠外なので影響しない */
   /* 日本語の可読幅（1行50文字前後）に抑える。写真ギャラリーは枠外なので影響しない */
   max-width: 50em;
 }
@@ -161,6 +160,7 @@ table th {
   word-break: auto-phrase;
   line-break: strict;
   text-wrap: pretty;
+  text-align: justify;  
 }
 .post-body h2 {
   margin-top: 2em;

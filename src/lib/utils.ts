@@ -14,7 +14,7 @@ export function renderMarkdown(md: string): string {
    数値を直書きしなくて済むので、トップの数字と記事の数字がずれない。
    ========================================================= */
 
-/** 利用できるショートコードの一覧（管理画面のヘルプにも表示する） */
+/** 利用できるショートコードの一覧（増やしたら public/static/admin.js の SHORTCODES も同じ内容にすること） */
 export const SHORTCODES: { code: string; label: string }[] = [
   { code: 'total_assets', label: '総資産（現金＋NISA＋iDeCo）' },
   { code: 'cash', label: '現金・預金' },
