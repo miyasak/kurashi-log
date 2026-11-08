@@ -368,7 +368,7 @@ function buildSpecs(theme: ThemeDef, summary: Record<string, any>, counts: Recor
     ]
   if (theme.key === 'touring')
     return [
-      { label: '走行距離', value: n(summary.distance) ? `${Number(summary.distance).toLocaleString()} km` : '' },
+      { label: '記録したルート', value: n(summary.distance) ? `${Number(summary.distance).toLocaleString()} km` : '' },
       { label: '都道府県', value: n(summary.prefectures) ? `${summary.prefectures}` : '' },
       { label: '訪問店舗', value: counts.supermarket ? `${counts.supermarket}` : '' },
       { label: '平均会計', value: n(summary.avg_budget) ? yen(summary.avg_budget) : '' }

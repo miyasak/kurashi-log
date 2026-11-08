@@ -36,7 +36,7 @@ export const HomePage: FC<Props> = ({
       value: last?.total_assets ? `¥${Number(last.total_assets).toLocaleString('ja-JP')}` : '',
       sub: diff ? `前月比 ${diff > 0 ? '+' : '−'}¥${Math.abs(diff).toLocaleString('ja-JP')}` : undefined
     },
-    { label: '走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
+    { label: '記録したルート', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
     { label: '立ち寄り店', value: superCount ? `${superCount}` : '' },
     { label: '都道府県', value: prefCount ? `${prefCount}` : '' },
     // 記事数は10件に達するまで出さない（少ないと逆にマイナスに見える）
@@ -69,7 +69,7 @@ export const HomePage: FC<Props> = ({
         ? validSpecs([{ label: '総資産', value: last?.total_assets ? yen(last.total_assets) : '' }])
         : t.key === 'touring'
           ? validSpecs([
-              { label: '走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
+              { label: '記録したルート', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
               { label: '都道府県', value: prefCount ? `${prefCount}` : '' }
             ])
           : []
@@ -262,9 +262,9 @@ export const HomePage: FC<Props> = ({
                 <div class="mt-6">
                   <SpecRow
                     items={[
-                      { label: '総走行距離', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
+                      { label: '記録したルート', value: totalDistance ? `${totalDistance.toLocaleString()} km` : '' },
                       { label: '都道府県', value: prefCount ? `${prefCount}` : '' },
-                      { label: 'ログ数', value: counts.touring ? `${counts.touring}` : '' },
+                      { label: 'ルート記事', value: counts.touring ? `${counts.touring}` : '' },
                       { label: '立ち寄り店', value: superCount ? `${superCount}` : '' }
                     ]}
                   />
