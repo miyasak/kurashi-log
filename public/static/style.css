@@ -623,14 +623,34 @@ footer .border-t,
 footer .border-edge2 {
   border-color: rgba(255, 255, 255, 0.10) !important;
 }
-/* ヒーロー写真：スマホは340pxに切り、PCは原寸比率で最大500px */
+/* ヒーロー：写真と文字を同じマスに重ね、背の高いほうが高さを決める */
+#hero {
+  display: grid;
+  min-height: 300px;
+}
+#hero > #hero-img,
+#hero > #hero-copy {
+  grid-area: 1 / 1;
+}
 #hero-img {
-  height: 300px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   object-position: center;
 }
+#hero-copy {
+  display: flex;
+  align-items: center;
+  padding: 36px 0;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+#hero-copy > div {
+  width: 100%;
+}
 @media (min-width: 640px) {
-  #hero-img {
-    height: auto;
-    object-position: center;
+  #hero-copy {
+    padding: 64px 0;
   }
 }

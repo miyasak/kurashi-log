@@ -78,9 +78,8 @@ export const HomePage: FC<Props> = ({
 
   return (
     <>
-      {/* ==================== ヒーロー ==================== */}
-      <section class="relative isolate overflow-hidden border-b border-edge2 bg-panel2">
-        {/* 写真を普通に置く。sm以上は原寸比率なので切れない */}
+      {/* ==================== ヒーロー ==================== */}      
+      <section id="hero" class="relative isolate overflow-hidden border-b border-edge2 bg-panel2">
         <img
           id="hero-img"
           src="/static/hero.jpg"
@@ -89,13 +88,12 @@ export const HomePage: FC<Props> = ({
           height="349"
           fetchpriority="high"
           decoding="async"
-          class="block w-full object-cover"
         />
-        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/15"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20"></div>
 
         {/* 文字を上に重ねる */}
-        <div class="absolute inset-0">
-          <div class="mx-auto flex h-full max-w-page items-center px-4 sm:px-6">
+        <div id="hero-copy">
+          <div class="mx-auto max-w-page px-4 sm:px-6">
             <div>
               <p class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
                 <i class="fa-solid fa-chart-simple text-[10px]"></i>
@@ -104,7 +102,7 @@ export const HomePage: FC<Props> = ({
               <h1 class="mt-4 text-[26px] font-bold leading-[1.28] tracking-[-0.03em] text-white sm:text-[38px]">
                 お金と道と暮らしを、数字で残しています
               </h1>
-              <p class="mt-4 max-w-[62ch] text-[14.5px] leading-[1.85] text-white/80">
+              <p class="mt-4 max-w-[62ch] text-[15px] leading-[1.85] text-white/80">
                 <span class="font-medium text-white">Money</span>（資産運用・生活費）、
                 <span class="font-medium text-white">Touring</span>（ツーリング・キャンプ場・ご当地スーパー）、
                 <span class="font-medium text-white">Spa</span>（日帰り温泉）、
