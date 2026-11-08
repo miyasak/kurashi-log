@@ -171,7 +171,7 @@ export const ThemePage: FC<Props> = ({
                       .reverse()
                       .map((s: any) => (
                         <tr class="border-b border-edge2 last:border-0">
-                          <td class="px-4 py-3 font-mono text-[13.5px] tabular-nums font-medium">{s.ym}</td>
+                          <td class="px-4 py-3 font-mono text-[13.5px] tabular-nums font-medium">{(() => { const p = String(s.ym).split('-'); const mi = Number(p[1]); return mi === 1 ? p[0].slice(2) + '年1月' : mi + '月' })()}</td>
                           <td class="px-4 py-3 text-right font-mono text-[14.5px] font-bold tabular-nums text-brand">
                             {yen(s.total_assets)}
                           </td>
