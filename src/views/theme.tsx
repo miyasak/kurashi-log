@@ -1,7 +1,7 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
 import type { ThemeDef } from '../lib/config'
-import { CATEGORY_MAP, THEMES } from '../lib/config'
+import { CATEGORY_MAP, THEMES, AREA_TAGS } from '../lib/config'
 import { PostCard, EmptyState, SpecRow, SectionTitle, validSpecs } from './components'
 import { ArrowLink } from './layout'
 import { yen } from '../lib/utils'
@@ -244,29 +244,57 @@ export const ThemePage: FC<Props> = ({
           </div>
 
           {tags.length ? (
-            <div class="mt-4 flex flex-wrap gap-1.5">
-              <a
-                href={`${base}${qsOf({ tag: '' })}`}
-                class={`rounded-full px-3 py-1 text-[11.5px] transition ${
-                  !activeTag ? 'bg-ink text-base' : 'border border-edge2 bg-panel text-sub hover:text-ink'
-                }`}
-              >
-                すべて
-              </a>
-              {tags.filter((t) => t.cnt >= 2 || t.slug === activeTag || t.name === activeTag).slice(0, 8).map((t) => (
-                <a
-                  href={`${base}${qsOf({ tag: t.slug })}`}
-                  class={`rounded-full px-3 py-1 text-[11.5px] transition ${
-                    activeTag === t.slug
-                      ? 'bg-brand font-medium text-white'
-                      : 'border border-edge2 bg-panel text-sub hover:text-ink'
-                  }`}
-                >
-                  {t.name}
-                  <span class="ml-1.5 font-mono tabular-nums opacity-50">{t.cnt}</span>
-                </a>
-              ))}
-            </div>
+            (() => {
+              const shown = tags.filter(
+                (t) => t.cnt >= 2 || t.slug === activeTag || t.name === activeTag
+              )
+              const rank = (n: string) => {
+                const i = AREA_TAGS.indexOf(n)
+                return i < 0 ? 999 : i
+              }
+              const areas = shown
+                .filter((t) => AREA_TAGS.includes(t.name))
+                .sort((a, b) => rank(a.name) - rank(b.name))
+              const kinds = shown.filter((t) => !AREA_TAGS.includes(t.name)).slice(0, 6)
+              const chip = (t: any) =>
+                `rounded-full px-3 py-1 text-[12px] transition ${
+                  activeTag === t.slug
+                    ? 'bg-brand font-medium text-white'
+                    : 'border border-edge2 bg-panel text-sub hover:text-ink'
+                }`
+              return (
+                <div class="mt-4 space-y-2.5">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="mr-1 w-10 shrink-0 text-[11px] font-bold text-mute">種類</span>
+                    <a
+                      href={`${base}${qsOf({ tag: '' })}`}
+                      class={`rounded-full px-3 py-1 text-[12px] transition ${
+                        !activeTag ? 'bg-ink text-base' : 'border border-edge2 bg-panel text-sub hover:text-ink'
+                      }`}
+                    >
+                      すべて
+                    </a>
+                    {kinds.map((t) => (
+                      <a href={`${base}${qsOf({ tag: t.slug })}`} class={chip(t)}>
+                        {t.name}
+                        <span class="ml-1.5 font-mono tabular-nums opacity-50">{t.cnt}</span>
+                      </a>
+                    ))}
+                  </div>
+                  {areas.length ? (
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span class="mr-1 w-10 shrink-0 text-[11px] font-bold text-mute">エリア</span>
+                      {areas.map((t) => (
+                        <a href={`${base}${qsOf({ tag: t.slug })}`} class={chip(t)}>
+                          {t.name}
+                          <span class="ml-1.5 font-mono tabular-nums opacity-50">{t.cnt}</span>
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              )
+            })()
           ) : null}
 
           <div class="mt-6">
