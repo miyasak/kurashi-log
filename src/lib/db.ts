@@ -266,7 +266,7 @@ export async function upsertPost(db: D1Database, data: any, id?: number) {
     for (const raw of data.tags) {
       const name = String(raw).trim()
       if (!name) continue
-      const tslug = slugify(name)
+      const tslug = name
       await db
         .prepare('INSERT OR IGNORE INTO tags (name, slug) VALUES (?, ?)')
         .bind(name, tslug)

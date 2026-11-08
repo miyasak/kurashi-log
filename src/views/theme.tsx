@@ -253,7 +253,7 @@ export const ThemePage: FC<Props> = ({
               >
                 すべて
               </a>
-              {tags.slice(0, 14).map((t) => (
+              {tags.filter((t) => t.cnt >= 2 || t.slug === activeTag || t.name === activeTag).slice(0, 8).map((t) => (
                 <a
                   href={`${base}${qsOf({ tag: t.slug })}`}
                   class={`rounded-full px-3 py-1 text-[11.5px] transition ${
