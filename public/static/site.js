@@ -168,7 +168,7 @@
       ;[homeEl, assetEl, lifeEl, expenseEl].forEach((el) => emptyChart(el, msg))
       return
     }
-    const labels = stats.map((s) => s.ym)
+    const labels = stats.map((s) => { const p = String(s.ym).split('-'); const mi = Number(p[1]); return mi === 1 ? p[0].slice(2) + '年1月' : mi + '月' })
 
     /* データ点が少ないときの描画対策
        - 1点のみ: 折れ線が引けないので、必ず見えるドットにする

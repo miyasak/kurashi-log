@@ -190,7 +190,7 @@ export const HomePage: FC<Props> = ({
               <div class="flex flex-wrap items-end gap-x-9 gap-y-5">
                 <div>
                   <p class="font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-mute">
-                    {last?.ym} 時点の総資産
+                    {last?.ym ? Number(last.ym.split('-')[0]) + '年' + Number(last.ym.split('-')[1]) + '月' : ''} 時点の総資産
                   </p>
                   <p class="mt-1.5 font-mono text-[34px] font-bold leading-none tabular-nums tracking-[-0.02em] text-ink sm:text-[46px]">
                     {yen(last?.total_assets)}
