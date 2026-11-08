@@ -79,36 +79,50 @@ export const HomePage: FC<Props> = ({
   return (
     <>
       {/* ==================== ヒーロー ==================== */}
-      <section class="border-b border-edge2 bg-base">
-        <div class="mx-auto max-w-page px-4 py-10 sm:px-6 sm:py-14">
-          {/* ロゴ・<title> と同じブランド名で統一 */}
-          <p class="inline-flex items-center gap-2 rounded-full bg-brandsoft px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
-            <i class="fa-solid fa-chart-simple text-[10px]"></i>
-            {SITE.title}
-          </p>
-          <h1 class="mt-4 text-[26px] font-bold leading-[1.28] tracking-[-0.03em] text-ink sm:text-[36px]">
-            お金と道と暮らしを、数字で残しています
-          </h1>
-          {/* ナビと同じ 4テーマ構成で統一 */}
-          <p class="mt-4 max-w-[64ch] text-[14.5px] leading-[1.85] text-sub sm:text-[14.5px]">
-            <span class="font-medium text-ink">Money</span>（資産運用・生活費）、
-            <span class="font-medium text-ink">Touring</span>（ツーリング・キャンプ場・ご当地スーパー）、
-            <span class="font-medium text-ink">Spa</span>（日帰り温泉）、
-            <span class="font-medium text-ink">Tech</span>（業務効率化）。
-            感覚ではなく<span class="font-medium text-ink">実額と実測値</span>で、あとから辿れるように残しています。
-          </p>
+      <section class="relative isolate overflow-hidden border-b border-edge2 bg-panel2">
+        {/* 写真を普通に置く。sm以上は原寸比率なので切れない */}
+        <img
+          id="hero-img"
+          src="/static/hero.jpg"
+          alt=""
+          width="1280"
+          height="349"
+          fetchpriority="high"
+          decoding="async"
+          class="block w-full object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/15"></div>
 
-          {/* はじめての方はこちら（1つだけの小さな導線。About固定ページへ） */}
-          <p class="mt-4">
-            <a
-              href="/about"
-              class="group inline-flex items-center gap-2 text-[13.5px] font-medium text-brand transition hover:opacity-80"
-            >
-              <i class="fa-solid fa-circle-info text-[11px]"></i>
-              はじめての方はこちら
-              <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
-            </a>
-          </p>
+        {/* 文字を上に重ねる */}
+        <div class="absolute inset-0">
+          <div class="mx-auto flex h-full max-w-page items-center px-4 sm:px-6">
+            <div>
+              <p class="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
+                <i class="fa-solid fa-chart-simple text-[10px]"></i>
+                {SITE.title}
+              </p>
+              <h1 class="mt-4 text-[26px] font-bold leading-[1.28] tracking-[-0.03em] text-white sm:text-[38px]">
+                お金と道と暮らしを、数字で残しています
+              </h1>
+              <p class="mt-4 max-w-[62ch] text-[14.5px] leading-[1.85] text-white/80">
+                <span class="font-medium text-white">Money</span>（資産運用・生活費）、
+                <span class="font-medium text-white">Touring</span>（ツーリング・キャンプ場・ご当地スーパー）、
+                <span class="font-medium text-white">Spa</span>（日帰り温泉）、
+                <span class="font-medium text-white">Tech</span>（業務効率化）。
+                感覚ではなく<span class="font-medium text-white">実額と実測値</span>で、あとから辿れるように残しています。
+              </p>
+              <p class="mt-5">
+                <a
+                  href="/about"
+                  class="group inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-[13.5px] font-medium text-white backdrop-blur-sm transition hover:bg-white/25"
+                >
+                  <i class="fa-solid fa-circle-info text-[11px]"></i>
+                  はじめての方はこちら
+                  <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

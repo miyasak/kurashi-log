@@ -623,3 +623,14 @@ footer .border-t,
 footer .border-edge2 {
   border-color: rgba(255, 255, 255, 0.10) !important;
 }
+/* ヒーロー写真：スマホは340pxに切り、PCは原寸比率で最大500px */
+#hero-img {
+  height: 300px;
+  object-position: center;
+}
+@media (min-width: 640px) {
+  #hero-img {
+    height: auto;
+    object-position: center;
+  }
+}
