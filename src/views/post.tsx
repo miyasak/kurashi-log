@@ -290,10 +290,10 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
               </div>
 
               {/* ---------------- 右サイドバー ---------------- */}
-              <aside class="lg:sticky lg:top-20 lg:self-start">
+              <aside class="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
                 {/* 目次（PCのみ・サイドバー上部） */}
                 {toc.length >= 3 ? (
-                  <nav class="mb-5 hidden max-h-[60vh] overflow-y-auto rounded-big border border-edge2 bg-panel p-4 lg:block">
+                  <nav class="mb-5 hidden rounded-big border border-edge2 bg-panel p-4 lg:block">
                     <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
                       Contents
                     </p>

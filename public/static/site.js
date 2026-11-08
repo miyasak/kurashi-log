@@ -5,7 +5,7 @@
   const INK = '#f5f5f7'
   const SUB = '#a1a1aa'
   const MUTE = '#71717a'
-  const LINE = 'rgba(255,255,255,0.07)'
+  const LINE = 'rgba(0,0,0,0.16)'
   const BRAND = '#f97316'
 
   /* アクセントはサイト共通の1色（オレンジ）に統一 */
@@ -138,7 +138,7 @@
           color: MUTE,
           font: FONT,
           padding: 8,
-          callback: (v) => (v >= 10000 ? v / 10000 + '万' : v)
+          callback: (v) => (v >= 10000 ? Math.round(v / 10000) + '万' : v)
         }
       }
     }
@@ -186,11 +186,11 @@
       // 点が少ないときは点自体を常時表示（1点でも必ず見える）
       pointRadius: single ? 6 : few ? 4 : 0,
       pointBackgroundColor: color,
-      pointBorderColor: '#0a0a0b',
+      pointBorderColor: '#ffffff',
       pointBorderWidth: single ? 3 : 2,
       pointHoverRadius: 6,
       pointHoverBackgroundColor: color,
-      pointHoverBorderColor: '#0a0a0b',
+      pointHoverBorderColor: '#ffffff',
       pointHoverBorderWidth: 2,
       spanGaps: true,
       fill: !!fill
@@ -206,7 +206,12 @@
       const min = Math.min(...vals)
       const max = Math.max(...vals)
       const pad = max === min ? Math.max(max * 0.12, 1000) : (max - min) * 0.25
-      return { min: Math.max(0, min - pad), max: max + pad }
+      const lo = Math.max(0, min - pad)
+      const hi = max + pad
+      /* 軸の端が「2555.83万」のような半端な値になるのを防ぐ。
+         範囲の桁に合わせた単位で、下は切り捨て・上は切り上げる */
+      const unit = Math.pow(10, Math.floor(Math.log10(hi - lo || hi)))
+      return { min: Math.floor(lo / unit) * unit, max: Math.ceil(hi / unit) * unit }
     }
     const withAxis = (keys) => {
       const a = axisFor(keys)
@@ -235,7 +240,7 @@
           labels,
           datasets: [
             lineDs('総資産', 'total_assets', BRAND, true),
-            lineDs('NISA', 'nisa_value', '#e4e4e7', false),
+            lineDs('NISA', 'nisa_value', '#3f3f46', false),
             lineDs('iDeCo', 'ideco_value', '#71717a', false)
           ]
         },
@@ -263,7 +268,7 @@
               {
                 label: '手取り収入',
                 data: stats.map((s) => s.income),
-                backgroundColor: 'rgba(255,255,255,0.16)',
+                backgroundColor: 'rgba(0,0,0,0.18)',
                 borderRadius: 4,
                 maxBarThickness: few ? 48 : 20
               }
@@ -341,7 +346,7 @@
 
   /* ================= 地図 ================= */
   function pinIcon(cat) {
-    const c = CAT[cat] || { color: INK, icon: 'fa-location-dot' }
+    const c = CAT[cat] || { color: '#1a1a19', icon: 'fa-location-dot' }
     return L.divIcon({
       className: '',
       html: `<div class="map-pin" style="background:${c.color}"><i class="fa-solid ${c.icon}"></i></div>`,
@@ -377,7 +382,7 @@
     return `<div style="min-width:200px">
       ${thumb}
       <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${BRAND}">${c.name || ''}</div>
-      <a href="/posts/${p.slug}" style="display:block;margin-top:4px;font-size:14px;font-weight:700;letter-spacing:-.01em;color:${INK};text-decoration:none">${p.title}</a>
+      <a href="/posts/${p.slug}" style="display:block;margin-top:4px;font-size:14px;font-weight:700;letter-spacing:-.01em;color:#1a1a19;text-decoration:none">${p.title}</a>
       ${p.place_name ? `<div style="color:${MUTE};font-size:11px;margin-top:3px">${p.place_name}</div>` : ''}
       ${extra}
       <a href="/posts/${p.slug}" style="display:inline-block;margin-top:8px;font-size:12px;color:${BRAND};text-decoration:none">記事を読む ›</a>
