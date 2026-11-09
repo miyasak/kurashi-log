@@ -36,6 +36,8 @@ export type Post = {
   recommend_items: string | null
   access_text: string | null
   linked_slug: string | null
+  series: string | null
+  series_day: number | null
   meta: string | null
   views: number
   created_at: string
@@ -51,7 +53,7 @@ const POST_FIELDS = [
   'distance_km','duration_text','weather','bike','route_text',
   'rating','cospa','budget','visit_date','business_hours',
   'highlight_label','highlight_value','highlight_sub',
-  'genre','area','best_season','road_note','recommend_items','access_text','linked_slug',
+  'genre','area','best_season','road_note','recommend_items','access_text','linked_slug','series','series_day',
   'meta'
 ]
 
@@ -167,6 +169,36 @@ export async function getLinkedPost(db: D1Database, post: Post) {
     .first<any>()
   if (!row) return null
   return normalize(row)
+}
+
+/**
+ * 同じシリーズの前後の記事を取得。
+ * series_day の番号順で「隣」を探すので、欠番があっても繋がる。
+ */
+export async function getSeriesNeighbors(db: D1Database, post: Post) {
+  const empty = { prev: null as any, next: null as any, total: 0, index: 0 }
+  if (!post.series || post.series_day == null) return empty
+
+  const { results } = await db
+    .prepare(
+      `SELECT slug, title, series_day, visit_date
+         FROM posts
+        WHERE status = 'published' AND series = ? AND series_day IS NOT NULL
+        ORDER BY series_day`
+    )
+    .bind(post.series)
+    .all<{ slug: string; title: string; series_day: number; visit_date: string | null }>()
+
+  const list = results || []
+  const i = list.findIndex((r) => r.slug === post.slug)
+  if (i < 0) return empty
+
+  return {
+    prev: i > 0 ? list[i - 1] : null,
+    next: i < list.length - 1 ? list[i + 1] : null,
+    total: list.length,
+    index: i + 1,
+  }
 }
 
 export async function getPostBySlug(db: D1Database, slug: string, includeDrafts = false) {

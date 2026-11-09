@@ -18,6 +18,7 @@ import {
   listMonthlyStats,
   getCategoryCounts,
   getLinkedPost,
+  getSeriesNeighbors,
   findFirstPostSlug
 } from './lib/db'
 import { renderMarkdown, stripMd, applyShortcodes } from './lib/utils'
@@ -255,6 +256,7 @@ app.get('/posts/:slug', async (c) => {
     .slice(0, 2)
   const hasGeo = post.lat != null && post.lng != null
   const linked = await getLinkedPost(c.env.DB, post)
+  const series = await getSeriesNeighbors(c.env.DB, post)
   const mapPins = await countMapPins(c.env.DB)
   const canonical = canonicalOf(c)
   const cover = post.cover_image
@@ -278,7 +280,7 @@ app.get('/posts/:slug', async (c) => {
       scripts={[...(hasGeo ? [LEAFLET_JS] : []), '/static/site.js']}
       headExtra={hasGeo ? LEAFLET_CSS : null}
     >
-      <PostPage post={post} html={html} related={related} linked={linked} />
+      <PostPage post={post} html={html} related={related} linked={linked} series={series} />
     </Layout>
   )
 })

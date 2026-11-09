@@ -11,7 +11,7 @@ export const Stars: FC<{ value?: number | null; color?: string }> = ({ value }) 
       {[1, 2, 3, 4, 5].map((i) => (
         <i
           class={`fa-solid ${i - 0.5 === v || (i - v > 0 && i - v < 1) ? 'fa-star-half-stroke' : 'fa-star'} text-[9.5px]`}
-          style={`color:${i - 0.5 <= v ? ACCENT : 'rgba(255,255,255,0.16)'}`}
+          style={`color:${i - 0.5 <= v ? ACCENT : 'rgba(0,0,0,0.14)'}`}
         ></i>
       ))}
       {v % 1 ? <span class="ml-1 font-mono text-[10px] tabular-nums text-mute">{v.toFixed(1)}</span> : null}
@@ -227,5 +227,64 @@ export const SpecRow: FC<{
         </div>
       ))}
     </dl>
+  )
+}
+
+
+/** シリーズの前後ナビ（← Day6 ／ Day8 →） */
+const seriesKey = (title: string) => {
+  const parts = title.split('｜').map((t) => t.trim()).filter(Boolean)
+  let t = parts.length >= 3 ? parts[1] : parts[parts.length - 1]
+  if (t.length > 18) t = t.split(/[、。]/)[0]
+  return t
+}
+
+export const SeriesNav: FC<{
+  series: { prev: any; next: any; total: number; index: number }
+  label?: string
+}> = ({ series, label = 'この旅の記録' }) => {
+  if (!series || (!series.prev && !series.next)) return null
+  const { prev, next } = series
+
+  return (
+    <nav class="mt-10 border-t border-edge2 pt-6">
+      <p class="text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">{label}</p>
+      <div class="mt-3 grid gap-2.5 sm:grid-cols-2">
+        {prev ? (
+          <a
+            href={`/posts/${prev.slug}`}
+            class="group flex items-center gap-3 rounded-big border border-edge2 bg-panel p-4 transition hover:border-brand/40"
+          >
+            <i class="fa-solid fa-chevron-left text-[11px] text-mute transition group-hover:text-brand"></i>
+            <span class="min-w-0">
+              <span class="block text-[10.5px] font-bold tracking-[0.06em] text-mute">
+                Day {prev.series_day}
+              </span>
+              <span class="mt-0.5 block truncate text-[14px] font-medium text-ink transition group-hover:text-brand">
+                {seriesKey(prev.title)}
+              </span>
+            </span>
+          </a>
+        ) : (
+          <span></span>
+        )}
+        {next ? (
+          <a
+            href={`/posts/${next.slug}`}
+            class="group flex items-center justify-end gap-3 rounded-big border border-edge2 bg-panel p-4 text-right transition hover:border-brand/40"
+          >
+            <span class="min-w-0">
+              <span class="block text-[10.5px] font-bold tracking-[0.06em] text-mute">
+                Day {next.series_day}
+              </span>
+              <span class="mt-0.5 block truncate text-[14px] font-medium text-ink transition group-hover:text-brand">
+                {seriesKey(next.title)}
+              </span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-[11px] text-mute transition group-hover:text-brand"></i>
+          </a>
+        ) : null}
+      </div>
+    </nav>
   )
 }

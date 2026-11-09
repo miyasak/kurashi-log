@@ -2,10 +2,10 @@ import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
 import { CATEGORY_MAP, THEME_MAP, ACCENT, disclaimerOf, pickLabel, pickIcon, placeLabel } from '../lib/config'
 import { formatDate, yen, buildToc } from '../lib/utils'
-import { Stars, PostCard, SectionTitle } from './components'
+import { Stars, PostCard, SectionTitle, SeriesNav } from './components'
 import { ArrowLink } from './layout'
 
-type Props = { post: Post; html: string; related: Post[]; linked?: Post | null }
+type Props = { post: Post; html: string; related: Post[]; linked?: Post | null; series?: any }
 
 /* 小見出し：オレンジ系の英字ラベル + 太字の日本語見出し */
 const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
@@ -18,7 +18,7 @@ const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
   </div>
 )
 
-export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
+export const PostPage: FC<Props> = ({ post, html, related, linked, series }) => {
   const { html: bodyHtml, toc } = buildToc(html)  
   const cat = CATEGORY_MAP[post.category]
   const hasGeo = post.lat != null && post.lng != null
@@ -233,6 +233,9 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                     ))}
                   </div>
                 ) : null}
+
+                {/* シリーズの前後ナビ */}
+                <SeriesNav series={series} />
 
                 {/* ---- LOCAL STOP / 相互リンク記事 ---- */}
                 {linked ? <LinkedCard current={post} linked={linked} /> : null}
