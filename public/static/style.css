@@ -654,3 +654,12 @@ footer .border-edge2 {
     padding: 64px 0;
   }
 }
+/* フッターTOPICSのサブカテゴリ。親より一段暗くして階層を出す */
+footer .footer-sub a {
+  color: #908f8a !important;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+footer .footer-sub a:hover {
+  color: var(--brand) !important;
+}

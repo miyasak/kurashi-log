@@ -475,6 +475,11 @@ app.get('/sitemap.xml', async (c) => {
     entries.push({ loc: '/map', lastmod: newest, priority: '0.6', freq: 'weekly' })
   }
 
+  // ご当地スーパー一覧：記事が1件以上あるときだけ載せる
+  if (posts.some((p) => p.category === 'supermarket')) {
+    entries.push({ loc: '/supermarket', lastmod: newest, priority: '0.7', freq: 'weekly' })
+  }
+
   // テーマ：記事が1件以上あるものだけ載せる（空ページをインデックスさせない）
   for (const t of THEMES) {
     const inTheme = posts.filter((p) => t.categories.includes(p.category as any))

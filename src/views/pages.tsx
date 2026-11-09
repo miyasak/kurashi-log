@@ -515,7 +515,7 @@ export const SupermarketListPage: FC<{
           {items.map((it) => (
             <a
               href={`/posts/${it.slug}`}
-              class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-white/5"
+              class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-black/[0.03]"
             >
               <span class="min-w-0 flex-1 text-[14px] font-bold text-ink">
                 {it.place_name || it.title}

@@ -181,7 +181,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
                 <div class="group relative">
                   <a href={it.href} class={link(it.active)}>{it.label}</a>
                   <div class="absolute left-1/2 top-full hidden w-[210px] -translate-x-1/2 pt-2 group-hover:block group-focus-within:block">
-                    <div class="rounded-xl border border-edge2 bg-base p-1.5 shadow-lg">
+                    <div class="rounded-xl border border-white/10 bg-[#1c1c1b] p-1.5 shadow-lg">                      
                       {it.subs.map((c) => (
                         <a
                           href={`${it.href}?cat=${c.key}`}
@@ -291,6 +291,18 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
                   {t.name}
                   <span class="ml-2 text-[11.5px] text-mute">{t.label}</span>
                 </a>
+                {t.categories.length > 1 ? (
+                  <ul class="footer-sub mt-1.5 space-y-1 pl-3">
+                    {t.categories
+                      .map((k) => CATEGORY_MAP[k])
+                      .filter(Boolean)
+                      .map((c) => (
+                        <li>
+                          <a href={`/theme/${t.key}?cat=${c.key}`}>{c.name}</a>
+                        </li>
+                      ))}
+                  </ul>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -304,7 +316,7 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
             {hasMapPins ? (
               <li><a href="/map" class="text-[14px] text-sub transition hover:text-ink">エリア別マップ</a></li>
             ) : null}
-              <li><a href="/supermarket" class="text-[14px] text-sub transition hover:text-ink">ご当地スーパー</a></li>
+              <li><a href="/supermarket" class="text-[14px] text-sub transition hover:text-ink">ご当地スーパー一覧</a></li>
               <li><a href="/search" class="text-[14px] text-sub transition hover:text-ink">記事を探す</a></li>
           </ul>
         </div>
