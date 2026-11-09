@@ -42,7 +42,7 @@ export const AdminApp: FC = () => (
       <link rel="stylesheet" href="/static/style.css" />
       <style
         dangerouslySetInnerHTML={{
-          __html: `.admin-body .bg-white{background-color:#121214 !important}
+          __html: `html:has(.admin-body){background:#0a0a0b}\n.admin-body .bg-white{background-color:#121214 !important}
 .admin-body .bg-white\\/85{background-color:rgba(18,18,20,.85) !important}
 .admin-body .border-black\\/\\[0\\.07\\]{border-color:rgba(255,255,255,.07) !important}`
         }}
@@ -77,7 +77,7 @@ export const AdminApp: FC = () => (
       </div>
 
       {/* ===== 管理アプリ ===== */}
-      <div id="app-view" class="hidden min-h-screen lg:flex">
+      <div id="app-view" class="hidden min-h-screen w-full lg:flex">
         {/* サイドバー */}
         <aside
           id="sidebar"
