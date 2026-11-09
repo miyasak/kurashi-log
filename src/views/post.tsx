@@ -409,7 +409,7 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
     push('アクセス', post.access_text)
     push('住所', post.address)
   } else if (post.category === 'onsen') {
-    heading = 'SPA DATA'
+    heading = 'ONSEN DATA'
     push('訪問日', formatDate(post.visit_date || post.published_at))
     push('エリア', areaLabel)
     push('施設名', post.place_name)

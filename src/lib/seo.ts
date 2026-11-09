@@ -98,7 +98,7 @@ export function personJsonLd(origin: string, stats: any[]) {
       name: SITE.author === 'Owner' ? SITE.title : SITE.author,
       url: `${origin}/about`,
       description:
-        '60歳で資産1億円を目指す会社員。資産運用と生活費、ツーリングとご当地スーパー、業務効率化の記録を公開しています。',
+        '60歳で資産1億円を目指す会社員。資産運用と生活費、ツーリングとご当地スーパー、IT全般の記録を公開しています。',
       jobTitle: '会社員',
       homeLocation: { '@type': 'Place', name: '東京都' },
       knowsAbout: ['NISA', 'iDeCo', 'インデックス投資', '家計管理', 'ツーリング', '業務効率化'],

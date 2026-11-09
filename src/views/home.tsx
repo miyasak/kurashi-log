@@ -105,8 +105,8 @@ export const HomePage: FC<Props> = ({
               <p class="mt-4 max-w-[62ch] text-[15px] leading-[1.85] text-white/80">
                 <span class="font-medium text-white">Money</span>（資産運用・生活費）、
                 <span class="font-medium text-white">Touring</span>（ツーリング・キャンプ場・ご当地スーパー）、
-                <span class="font-medium text-white">Spa</span>（日帰り温泉）、
-                <span class="font-medium text-white">Tech</span>（業務効率化）。
+                <span class="font-medium text-white">Onsen</span>（日帰り温泉）、
+                <span class="font-medium text-white">Tech</span>（IT全般）。
                 感覚ではなく<span class="font-medium text-white">実額と実測値</span>で、あとから辿れるように残しています。
               </p>
               <p class="mt-5">
@@ -193,7 +193,7 @@ export const HomePage: FC<Props> = ({
               icon="fa-coins"
               title="資産の推移"
               desc="総資産・NISA評価額・iDeCo評価額の月次推移です。"
-              action={<ArrowLink href="/theme/money">お金の記録へ</ArrowLink>}
+              action={<ArrowLink href="/theme/money">資産と生活の記録へ</ArrowLink>}
             />
 
             <div class="mt-6 rounded-big border border-edge2 bg-panel p-4 sm:p-6">
@@ -311,7 +311,7 @@ export const HomePage: FC<Props> = ({
               このサイトについて
             </h2>
             <p class="mt-3 max-w-[66ch] text-[14px] leading-[1.85] text-sub">
-              Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Spa（日帰り温泉）、Tech（業務効率化）。
+              Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Onsen（日帰り温泉）、Tech（IT全般）。
               数字と写真で「あとから辿れる」ことを大切にして記録しています。
               運営者のプロフィールと投資方針は About にまとめています。
             </p>

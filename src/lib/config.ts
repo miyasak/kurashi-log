@@ -100,17 +100,17 @@ export const CATEGORIES: CategoryDef[] = [
   cat(
     'it',
     'tech',
-    '業務効率化',
+    'IT',
     'TECH',
     'fa-gears',
     '作業時間を削った記録',
-    'IT関連全般による効率化や最適化の記録。かかったコストや手順を再現できる形でまとめています。'
+    'IT関連の効率化や最適化の記録。かかったコストや手順を再現できる形でまとめています。'
   ),
   cat(
     'onsen',
     'spa',
     '日帰り温泉',
-    'SPA',
+    'ONSEN',
     'fa-mug-hot',
     '立ち寄った湯の記録',
     '泉質・料金・営業時間と、旅の途中での寄りやすさ。実際に入った湯を記録します。'
@@ -147,7 +147,7 @@ export const THEMES: ThemeDef[] = [
     key: 'money',
     label: 'Money',
     en: 'MONEY',
-    name: 'お金の記録',
+    name: '資産と生活',
     icon: 'fa-coins',
     head: '積み上げた数字を、そのまま置く',
     lead: '資産運用と生活費。評価額・積立額・支出を、感覚ではなく実額で記録しています。',
@@ -169,17 +169,17 @@ export const THEMES: ThemeDef[] = [
     key: 'tech',
     label: 'Tech',
     en: 'TECH',
-    name: '業務効率化',
+    name: 'IT',
     icon: 'fa-gears',
-    head: '手作業を、自動化する',
+    head: 'かかったコストと手順を、残す',
     lead: 'IT関連全般の効率化や最適化、かかったコストの記録。',
-    description: 'IT関連全般による効率化や最適化の記録。かかったコストや手順を再現できる形でまとめています。',
+    description: 'IT関連の効率化や最適化の記録。かかったコストや手順を再現できる形でまとめています。',
     categories: ['it']
   },
   {
     key: 'spa',
-    label: 'Spa',
-    en: 'SPA',
+    label: 'Onsen',
+    en: 'ONSEN',
     name: '日帰り温泉',
     icon: 'fa-mug-hot',
     head: '走ったあとに、湯へ寄る',
@@ -211,12 +211,12 @@ export const GROUPS = THEMES.map((t) => ({
 export const SITE = {
   title: 'Tadoreru',
   /** ロゴ下に出る小さな英字キャプション */
-  caption: 'MONEY · TOURING · SPA · TECH',
+  caption: 'MONEY · TOURING · ONSEN · TECH',
   subtitle: '走った道も、積み上げた数字も、あとから辿れるように。',
   author: 'Owner',
   /** ナビと同じ 4テーマ構成で統一した説明文 */
   description:
-    'Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Spa（日帰り温泉）、Tech（業務効率化）。4つのテーマを数字で記録している個人サイト。'
+    'Money（資産運用・生活費）、Touring（ツーリング・キャンプ場・ご当地スーパー）、Onsen（日帰り温泉）、Tech（IT全般）。4つのテーマを数字で記録している個人サイト。'
 }
 
 /**

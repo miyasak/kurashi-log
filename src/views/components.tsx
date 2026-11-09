@@ -89,7 +89,7 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
    * サムネイル枠の扱い
    * - ツーリング / ご当地スーパーは写真が主役なので、画像が無くても枠を必ず置く
    *   （一覧の見た目が揃い、画像の入れ忘れにも気づける）
-   * - それ以外（資産運用・生活費・業務効率化）は画像が無ければ枠を作らず文字主体にする
+   * - それ以外（資産運用・生活費・IT）は画像が無ければ枠を作らず文字主体にする
    */
   const PHOTO_CATS = ['touring', 'supermarket']
   const needsFrame = PHOTO_CATS.includes(post.category)
