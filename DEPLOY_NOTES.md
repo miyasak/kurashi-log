@@ -2,7 +2,7 @@
 
 ## 環境
 
-- Cloudflareアカウント: tgmiyasaka@gmail.com（2FAあり、リカバリコードは別途保管）
+- Cloudflareアカウント: （2FAあり、リカバリコードは別途保管）
 - 公開URL: https://tadoreru.com
 - Pagesプロジェクト: tadoreru（本番ブランチ main、既定URL tadoreru-eh9.pages.dev）
 - D1: tadoreru / 6de3e843-fbac-4574-9d3a-f57fe835637a
@@ -62,11 +62,43 @@ upsertPost / deletePost で自動掃除するようにしたので通常は不�
 ```sql
 DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = tags.id)
 
-## 残りの宿題
+## D1はローカルとリモートが別物
 
-favicon とアプリアイコンがバイクのまま
-カテゴリ管理画面（今は config.ts 直書き）
-記事末の免責文を管理画面から編集できるようにする
-/about の文言を管理画面から編集できるようにする
-関連記事を1〜3件選べるようにする（今は linked_slug で1件のみ）
-本文画像の max-height
+`npm run dev:sandbox` で開いた管理画面は `.wrangler/state/v3/d1` のローカルDBに書き込む。
+本番データを直すときは必ず https://tadoreru.com/admin から操作すること。
+ローカルで編集して「反映されない」と悩んだら、まずこれを疑う。
+
+CLIは同時実行のオプションが無いので2回に分ける。`~/.zshrc` に入れておくと楽。
+
+d1() { npx wrangler d1 execute tadoreru --local --command="$1" && npx wrangler d1 execute tadoreru --remote --command="$1" }
+
+ローカルが失敗したらリモートは実行されない。逆にローカル成功・リモート失敗（認証切れ）だと
+ズレるので、エラーが出たらリモートだけ流し直す。
+
+認証切れのサイン: `code: 7403 The given account is not valid or is not authorized`。
+`npx wrangler whoami` → 必要なら `logout` / `login`。
+
+## posts にカラムを足すときの手順
+
+1. `ALTER TABLE posts ADD COLUMN ...` を local と remote の両方に流す
+2. `src/lib/db.ts` の `COLS`（読み取り用）に追加
+3. `src/lib/db.ts` の `POST_FIELDS`（書き込み用）に追加 ← 忘れると保存時に無視される
+4. 数値カラムなら `['rating','cospa','budget','series_day']` の変換リストにも追加。
+   入れないと空欄のとき空文字が入り、並び順が壊れる
+5. `public/static/admin.js` の `renderEditor` に入力欄を追加
+
+`db.ts` の保存処理は `POST_FIELDS` を回してSQLを組み立てるので、3を入れれば
+API側（`src/routes/api.ts`）は触らなくてよい。
+
+## ダークテーマの名残
+
+元のテンプレートが黒基調だったため、`rgba(255,255,255,...)` や
+`hover:bg-white/[0.07]` が残っていると明るい背景（#f1f1ec）で見えなくなる。
+過去に2回踏んだ（ナビのホバー色、評価星の空色）。色を足すときは `rgba(0,0,0,...)` 側で書く。
+
+## 管理画面の構成
+
+- `src/views/admin.tsx` … 外枠とログイン画面のみ（158行）
+- `public/static/admin.js` … フォームと一覧の実体（約68KB）。
+  ビルド対象外なので編集すればそのまま配信される。デプロイは必要
+- `src/routes/api.ts` … APIの入口。保存処理の中身は `src/lib/db.ts`
