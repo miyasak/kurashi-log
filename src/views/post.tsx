@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { CATEGORY_MAP, THEME_MAP, ACCENT, disclaimerOf } from '../lib/config'
+import { CATEGORY_MAP, THEME_MAP, ACCENT, disclaimerOf, pickLabel, pickIcon, placeLabel } from '../lib/config'
 import { formatDate, yen, buildToc } from '../lib/utils'
 import { Stars, PostCard, SectionTitle } from './components'
 import { ArrowLink } from './layout'
@@ -242,7 +242,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked }) => {
                   <section class="mt-10">
                     <BlockTitle
                       eyebrow="Location"
-                      title={post.category === 'touring' ? 'ルートの位置' : 'この店の場所'}
+                      title={placeLabel(post.category)}
                       accent={accent}
                     />
                     <div class="overflow-hidden rounded-big border border-edge2">
@@ -359,7 +359,8 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
     '走行距離',
     '会計金額',
     '営業時間',
-    '所要時間'
+    '所要時間',
+    '料金'
   ])
 
   type Row = { label: string; value: any }
@@ -401,6 +402,16 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
     push('店舗', post.place_name)
     push('カテゴリ', post.genre)
     push('会計金額', post.budget ? yen(post.budget) : null)
+    push('営業時間', post.business_hours)
+    push('アクセス', post.access_text)
+    push('住所', post.address)
+  } else if (post.category === 'onsen') {
+    heading = 'SPA DATA'
+    push('訪問日', formatDate(post.visit_date || post.published_at))
+    push('エリア', areaLabel)
+    push('施設名', post.place_name)
+    push('泉質', post.genre)
+    push('料金', post.budget === 0 ? '無料' : post.budget ? yen(post.budget) : null)
     push('営業時間', post.business_hours)
     push('アクセス', post.access_text)
     push('住所', post.address)
@@ -465,8 +476,8 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
         <div class="border-t border-edge2 p-3.5">
           <div class="rounded-xl border border-brand/25 bg-brandsoft p-3.5">
             <p class="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.06em] text-brand">
-              <i class="fa-solid fa-cart-shopping text-[9.5px]"></i>
-              推し買い
+              <i class={`fa-solid ${pickIcon(post.category)} text-[9.5px]`}></i>
+              {pickLabel(post.category)}
             </p>
             <ul class="mt-2 space-y-1.5">
               {items.map((it) => (
@@ -556,8 +567,8 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
           {items.length ? (
             <div class="mt-4 rounded-xl border border-brand/25 bg-brandsoft p-3.5">
               <p class="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.06em] text-brand">
-                <i class="fa-solid fa-cart-shopping text-[9px]"></i>
-                推し買い
+                <i class={`fa-solid ${pickIcon(linked.category)} text-[9px]`}></i>
+                {pickLabel(linked.category)}
               </p>
               <p class="mt-1.5 text-[13px] leading-[1.7] text-ink">{items.join(' / ')}</p>
             </div>

@@ -1,6 +1,6 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
-import { CATEGORY_MAP, ACCENT } from '../lib/config'
+import { CATEGORY_MAP, ACCENT, dateLabel } from '../lib/config'
 import { formatDate, stripMd, yen } from '../lib/utils'
 
 /* ---------- 評価表示 ---------- */
@@ -125,7 +125,7 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
           ) : null}
           <time class="font-mono text-[11px] tabular-nums text-mute">
             {post.visit_date
-              ? `${post.category === 'supermarket' ? '訪問' : '走行'} ${formatDate(post.visit_date)}`
+              ? `${dateLabel(post.category)} ${formatDate(post.visit_date)}`
               : formatDate(post.published_at)}
           </time>
         </div>

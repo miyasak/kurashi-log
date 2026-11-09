@@ -301,3 +301,27 @@ export const AREA_TAGS = [
   '徳島', '香川', '愛媛', '高知',
   '福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島'
 ]
+
+/** 日付の前に出すラベル（カテゴリ別） */
+export const dateLabel = (cat?: string) =>
+  cat === 'supermarket' || cat === 'onsen' ? '訪問' : cat === 'camp' ? '宿泊' : '走行'
+
+/** サイドバーの推しブロックの見出し */
+export const pickLabel = (cat?: string) =>
+  cat === 'supermarket' ? '推し買い'
+  : cat === 'onsen' ? 'この湯の推し'
+  : cat === 'camp' ? 'ここの推し'
+  : 'おすすめ'
+/** 推しブロックのアイコン */
+export const pickIcon = (cat?: string) =>
+  cat === 'supermarket' ? 'fa-cart-shopping'
+  : cat === 'onsen' ? 'fa-mug-hot'
+  : cat === 'camp' ? 'fa-campground'
+  : 'fa-star'
+/** 地図セクションの見出し（カテゴリ別） */
+export const placeLabel = (cat?: string) =>
+  cat === 'touring' ? 'ルートの位置'
+  : cat === 'onsen' ? 'この湯の場所'
+  : cat === 'camp' ? 'このキャンプ場の場所'
+  : cat === 'supermarket' ? 'この店の場所'
+  : 'この場所'
