@@ -405,7 +405,7 @@ export const AboutPage: FC<{
             <dl class="mt-4 divide-y divide-edge2 text-[14px]">
               {[
                 ['公開記事', `${Object.values(counts).reduce((a, b) => a + b, 0)} 件`],
-                ['構成', 'Hono / Cloudflare Workers'],
+                ['構成', 'Hono / Cloudflare Pages'],
                 ['データベース', 'Cloudflare D1 (SQLite)'],
                 ['地図', 'Leaflet / OpenStreetMap'],
                 ['対応端末', 'PC / スマートフォン']

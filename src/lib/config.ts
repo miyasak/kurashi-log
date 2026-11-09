@@ -104,7 +104,7 @@ export const CATEGORIES: CategoryDef[] = [
     'TECH',
     'fa-gears',
     '作業時間を削った記録',
-    'Excel・Python・BIツールで手作業を自動化した記録。再現できる形で書いています。'
+    'IT関連全般による効率化や最適化の記録。かかったコストや手順を再現できる形でまとめています。'
   ),
   cat(
     'onsen',
@@ -172,8 +172,8 @@ export const THEMES: ThemeDef[] = [
     name: '業務効率化',
     icon: 'fa-gears',
     head: '手作業を、自動化する',
-    lead: 'Excel・Python・BIツールで作業時間を削った記録。再現できる形で書いています。',
-    description: 'Excel・Python・BIツールによる業務効率化と自動化の記録。手順を再現できる形でまとめています。',
+    lead: 'IT関連全般の効率化や最適化、かかったコストの記録。',
+    description: 'IT関連全般による効率化や最適化の記録。かかったコストや手順を再現できる形でまとめています。',
     categories: ['it']
   },
   {

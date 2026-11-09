@@ -146,7 +146,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
 }) => {
   const link = (isActive: boolean) =>
     `rounded-full px-3.5 py-1.5 text-[14.5px] font-medium tracking-tight transition ${
-      isActive ? 'bg-brand text-white' : 'text-sub hover:bg-white/[0.07] hover:text-ink'
+      isActive ? 'bg-brand text-white' : 'text-sub hover:bg-black/[0.05] hover:text-ink'
     }`
 
   const items = [
@@ -178,7 +178,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
             ))}
             <a
               href="/search"
-              class="ml-1 grid h-8 w-8 place-items-center rounded-full text-sub transition hover:bg-white/[0.07] hover:text-ink"
+              class="ml-1 grid h-8 w-8 place-items-center rounded-full text-sub transition hover:bg-black/[0.05] hover:text-ink"
               aria-label="検索"
             >
               <i class="fa-solid fa-magnifying-glass text-[13.5px]"></i>
@@ -189,14 +189,14 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
           <div class="ml-auto flex items-center gap-0.5 md:hidden">
             <a
               href="/search"
-              class="grid h-9 w-9 place-items-center rounded-full text-sub transition hover:bg-white/[0.07]"
+              class="grid h-9 w-9 place-items-center rounded-full text-sub transition hover:bg-black/[0.05]"
               aria-label="検索"
             >
               <i class="fa-solid fa-magnifying-glass text-[14px]"></i>
             </a>
             <button
               id="menu-toggle"
-              class="grid h-9 w-9 place-items-center rounded-full text-ink transition hover:bg-white/[0.07]"
+              class="grid h-9 w-9 place-items-center rounded-full text-ink transition hover:bg-black/[0.05]"
               aria-label="メニュー"
               aria-expanded="false"
             >
