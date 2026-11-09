@@ -739,6 +739,11 @@
             紐付けると、記事下部に「${c === 'touring' ? 'このツーリングで寄った店' : 'この店に寄ったツーリング'}」カードが表示され、相互リンクになります
           </p>
         </div>
+        <div class="mt-3 grid grid-cols-[1fr_120px] gap-3">
+          ${field('シリーズ名', 'series', p.series, { ph: '例: shikoku-2026', attr: 'list="series-list"', hint: '同じシリーズ名の記事どうしが「この旅の記録」で前後に繋がります' })}
+          ${field('日番号', 'series_day', p.series_day, { type: 'number', attr: 'min="1" step="1"', ph: '7', hint: '番号順に並びます' })}
+        </div>
+        <datalist id="series-list"></datalist>
         <div class="mt-4">
           <label class="admin-label">位置情報（地図をクリックしてピンを設定）</label>
           <div class="flex flex-wrap gap-2">
@@ -783,7 +788,19 @@
     if (c === 'touring' || c === 'camp' || c === 'supermarket' || c === 'onsen') {
       initMapPicker(p)
       fillLinkedOptions(c, p.linked_slug)
+      fillSeriesOptions()
     }
+  }
+
+  /** 既存のシリーズ名を datalist の候補に流し込む */
+  async function fillSeriesOptions() {
+    const dl = document.getElementById('series-list')
+    if (!dl) return
+    try {
+      const { posts } = await api('/admin/posts?limit=200')
+      const names = [...new Set((posts || []).map((x) => x.series).filter(Boolean))].sort()
+      dl.innerHTML = names.map((n) => `<option value="${esc(n)}"></option>`).join('')
+    } catch (e) {}
   }
 
   /** 相互リンク候補（ツーリング ⇄ ご当地スーパー）をセレクトに流し込む */
