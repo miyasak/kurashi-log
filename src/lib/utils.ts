@@ -4,7 +4,8 @@ marked.setOptions({ gfm: true, breaks: true })
 
 export function renderMarkdown(md: string): string {
   if (!md) return ''
-  return marked.parse(md, { async: false }) as string
+  const html = marked.parse(md, { async: false }) as string
+  return html.replace(/<img /g, '<img loading="lazy" decoding="async" ')
 }
 
 /* =========================================================

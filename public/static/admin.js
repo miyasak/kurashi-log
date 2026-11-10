@@ -1020,7 +1020,28 @@
   }
 
   /** 画像を R2 にアップロードして公開パスを返す */
+  /** 送る前に長辺1600px・JPEGへ縮める。失敗したら元のファイルを返す。 */
+  async function shrinkImage(file) {
+    if (!file.type.startsWith('image/') || file.type === 'image/gif') return file
+    try {
+      const bmp = await createImageBitmap(file)
+      const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height))
+      const w = Math.round(bmp.width * scale)
+      const h = Math.round(bmp.height * scale)
+      const cv = document.createElement('canvas')
+      cv.width = w
+      cv.height = h
+      cv.getContext('2d').drawImage(bmp, 0, 0, w, h)
+      const blob = await new Promise((res) => cv.toBlob(res, 'image/jpeg', 0.82))
+      if (!blob || blob.size >= file.size) return file
+      return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' })
+    } catch (e) {
+      return file
+    }
+  }
+
   async function uploadImage(file) {
+    file = await shrinkImage(file)
     if (file.size > 10 * 1024 * 1024) {
       toast('画像は10MB以下にしてください', 'error')
       return null
