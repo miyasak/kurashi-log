@@ -267,7 +267,7 @@ export const SEO = {
    * GA4 管理画面 → データストリーム で確認できます。
    * 例: 'G-XXXXXXXXXX'
    */
-  gaMeasurementId: '',
+  gaMeasurementId: 'G-PGVVRM4181',
 
   /**
    * Google AdSense のパブリッシャーID（ca-pub- から始まる文字列）。
