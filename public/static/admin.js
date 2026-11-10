@@ -116,7 +116,7 @@
   })
 
   /* ---------- ナビゲーション ---------- */
-  const TITLES = { dashboard: 'ダッシュボード', posts: '記事管理', editor: '記事エディタ', stats: '月次データ', media: 'メディア' }
+  const TITLES = { dashboard: 'ダッシュボード', posts: '記事管理', editor: '記事エディタ', stats: '月次データ', media: 'メディア', settings: '免責文' }  
 
   function navigate(view) {
     state.view = view
@@ -129,6 +129,7 @@
     else if (view === 'editor') renderEditor(state.editing)
     else if (view === 'stats') renderStats()
     else if (view === 'media') renderMedia()
+    else if (view === 'settings') renderSettings()
   }
 
   document.querySelectorAll('.nav-btn').forEach((b) =>
@@ -275,6 +276,44 @@
       })
     )
   }
+
+    async function renderSettings() {
+    main().innerHTML = '<p class="text-sm text-ink-mute">読み込み中...</p>'
+    const r = await api('/admin/settings')
+    const s = (r && r.settings) || {}
+    const rows = [
+      ['disclaimer_money', '資産と生活', 'NISA・iDeCo・家計の記事の末尾に出ます'],
+      ['disclaimer_touring', 'ツーリング', 'ツーリング・キャンプ場・ご当地スーパーの記事に出ます'],
+      ['disclaimer_spa', '日帰り温泉', '温泉記事の末尾に出ます'],
+      ['disclaimer_tech', 'IT', '手順を書いた記事の末尾に出ます']
+    ]
+    main().innerHTML = `
+      <div class="max-w-[760px] space-y-5">
+        <p class="text-[12.5px] text-ink-mute leading-relaxed">
+          記事の末尾に自動で入る注意書きです。テーマごとに1つ、空にするとそのテーマでは表示されません。
+        </p>
+        ${rows.map(([k, label, hint]) => `
+          <div>
+            <label class="admin-label">${label}</label>
+            <textarea name="${k}" rows="4" class="admin-input">${esc(s[k] || '')}</textarea>
+            <p class="mt-1 text-[10.5px] text-ink-mute">${hint}</p>
+          </div>
+        `).join('')}
+        <div class="flex items-center gap-3">
+          <button id="set-save" class="rounded-full bg-brand px-5 py-2.5 text-[13px] font-semibold text-white">保存する</button>
+          <span id="set-msg" class="text-[12px] text-ink-mute"></span>
+        </div>
+      </div>`
+    document.getElementById('set-save').addEventListener('click', async () => {
+      const body = {}
+      rows.forEach(([k]) => { body[k] = document.querySelector(`textarea[name="${k}"]`).value.trim() })
+      const msg = document.getElementById('set-msg')
+      msg.textContent = '保存中...'
+      const res = await api('/admin/settings', { method: 'PUT', body: JSON.stringify(body) })
+      msg.textContent = res && res.ok ? '保存しました' : '保存に失敗しました'
+      setTimeout(() => { msg.textContent = '' }, 2000)
+    })
+  }  
 
   /* ================= 記事一覧 ================= */
   async function renderPosts() {

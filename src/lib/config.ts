@@ -241,8 +241,20 @@ export const DISCLAIMERS: Record<string, string> = {
 export const DISCLAIMER = DISCLAIMERS.asset
 
 /** カテゴリに対応する免責文を返す。未設定なら空文字 */
-export const disclaimerOf = (category?: string | null): string =>
-  (category && DISCLAIMERS[category]) || ''
+export const disclaimerOf = (
+  category?: string | null,
+  settings?: Record<string, string>
+): string => {
+  if (!category) return ''
+  // 管理画面で保存された文言（テーマ単位）を優先する
+  if (settings) {
+    const theme = THEMES.find((t) => (t.categories as readonly string[]).includes(category as any))
+    const v = theme ? settings[`disclaimer_${theme.key}`] : ''
+    if (v) return v
+  }
+  // 未保存ならコード側の既定文言
+  return DISCLAIMERS[category] || ''
+}
 
 
 /** トップの「公開記事」カウンタを表示し始める件数 */

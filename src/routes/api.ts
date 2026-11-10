@@ -11,7 +11,9 @@ import {
   listMonthlyStats,
   upsertMonthlyStat,
   deleteMonthlyStat,
-  getCategoryCounts
+  getCategoryCounts,
+  getSettings,
+  saveSettings,
 } from '../lib/db'
 import { isAuthed, getPassword, createToken, setSessionCookie, clearSessionCookie } from '../lib/auth'
 
@@ -224,5 +226,15 @@ api.delete('/admin/media', async (c) => {
   const key = c.req.query('key')
   if (!key || !key.startsWith('uploads/')) return c.json({ ok: false, error: 'キーが不正です' }, 400)
   await c.env.R2.delete(key)
+  return c.json({ ok: true })
+})
+/* ---- 免責文などの可変テキスト（api.use('/admin/*') より後ろなので認証がかかる） ---- */
+api.get('/admin/settings', async (c) => {
+  return c.json({ settings: await getSettings(c.env.DB) })
+})
+
+api.put('/admin/settings', async (c) => {
+  const body = await c.req.json<Record<string, string>>()
+  await saveSettings(c.env.DB, body)
   return c.json({ ok: true })
 })

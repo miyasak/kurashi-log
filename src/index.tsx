@@ -19,7 +19,8 @@ import {
   getCategoryCounts,
   getLinkedPost,
   getSeriesNeighbors,
-  findFirstPostSlug
+  findFirstPostSlug,
+  getSettings
 } from './lib/db'
 import { renderMarkdown, stripMd, applyShortcodes } from './lib/utils'
 import {
@@ -258,6 +259,7 @@ app.get('/posts/:slug', async (c) => {
   const linked = await getLinkedPost(c.env.DB, post)
   const series = await getSeriesNeighbors(c.env.DB, post)
   const mapPins = await countMapPins(c.env.DB)
+  const settings = await getSettings(c.env.DB)
   const canonical = canonicalOf(c)
   const cover = post.cover_image
   ? (post.cover_image.startsWith('http') ? post.cover_image : originOf(c) + post.cover_image)
@@ -280,7 +282,7 @@ app.get('/posts/:slug', async (c) => {
       scripts={[...(hasGeo ? [LEAFLET_JS] : []), '/static/site.js']}
       headExtra={hasGeo ? LEAFLET_CSS : null}
     >
-      <PostPage post={post} html={html} related={related} linked={linked} series={series} />
+      <PostPage post={post} html={html} related={related} linked={linked} series={series} settings={settings} />
     </Layout>
   )
 })

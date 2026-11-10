@@ -453,3 +453,35 @@ export async function getCategoryCounts(db: D1Database) {
   for (const row of r.results as any[]) map[row.category] = row.c
   return map
 }
+
+/* ---------------- settings（免責文などの可変テキスト） ---------------- */
+
+/** settings を丸ごと key→value のオブジェクトで返す */
+export async function getSettings(db: D1Database) {
+  const r = await db.prepare('SELECT key, value FROM settings').all()
+  const out: Record<string, string> = {}
+  for (const row of r.results as any[]) out[row.key] = row.value ?? ''
+  return out
+}
+
+/** 1件だけ取る。未登録なら空文字 */
+export async function getSetting(db: D1Database, key: string) {
+  const r = await db
+    .prepare('SELECT value FROM settings WHERE key = ?')
+    .bind(key)
+    .first<{ value: string }>()
+  return r?.value ?? ''
+}
+
+/** まとめて保存する。既存キーは上書き */
+export async function saveSettings(db: D1Database, data: Record<string, string>) {
+  const entries = Object.entries(data).filter(([k]) => /^[a-z0-9_]{1,40}$/.test(k))
+  if (!entries.length) return
+  await db.batch(
+    entries.map(([k, v]) =>
+      db
+        .prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
+        .bind(k, String(v ?? ''))
+    )
+  )
+}

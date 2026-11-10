@@ -5,7 +5,7 @@ import { formatDate, yen, buildToc } from '../lib/utils'
 import { Stars, PostCard, SectionTitle, SeriesNav } from './components'
 import { ArrowLink } from './layout'
 
-type Props = { post: Post; html: string; related: Post[]; linked?: Post | null; series?: any }
+type Props = { post: Post; html: string; related: Post[]; linked?: Post | null; series?: any; settings?: Record<string, string> }
 
 /* 小見出し：オレンジ系の英字ラベル + 太字の日本語見出し */
 const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
@@ -18,7 +18,7 @@ const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
   </div>
 )
 
-export const PostPage: FC<Props> = ({ post, html, related, linked, series }) => {
+export const PostPage: FC<Props> = ({ post, html, related, linked, series, settings }) => {
   const { html: bodyHtml, toc } = buildToc(html)  
   const cat = CATEGORY_MAP[post.category]
   const hasGeo = post.lat != null && post.lng != null
@@ -267,10 +267,10 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series }) => 
                   </section>
                 ) : null}
                 {/* 免責文（全記事の末尾に自動挿入） */}
-                {disclaimerOf(post.category) ? (
+                {disclaimerOf(post.category, settings) ? (
                   <p class="mt-8 rounded-xl border border-edge2 bg-panel px-4 py-3.5 text-[11.5px] leading-[1.8] text-mute">
                     <i class="fa-solid fa-circle-info mr-1.5 text-[11px]"></i>
-                    {disclaimerOf(post.category)}
+                    {disclaimerOf(post.category, settings)}
                   </p>
                 ) : null}
                 {/* シェア */}
