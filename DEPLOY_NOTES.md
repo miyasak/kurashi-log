@@ -102,3 +102,34 @@ API側（`src/routes/api.ts`）は触らなくてよい。
 - `public/static/admin.js` … フォームと一覧の実体（約68KB）。
   ビルド対象外なので編集すればそのまま配信される。デプロイは必要
 - `src/routes/api.ts` … APIの入口。保存処理の中身は `src/lib/db.ts`
+
+## 管理画面の保護（Cloudflare Access）
+
+2026-11-10 設定。`/admin` と `/api/admin/*` を Cloudflare Zero Trust の Access で保護している。
+アプリ側の ADMIN_PASSWORD と合わせて二重の守り。リポジトリが public でも、
+Access を通らないとログイン画面にすら到達できない。
+
+- チーム名: `orange-dew-8744`（ログインURL: https://orange-dew-8744.cloudflareaccess.com）
+- プラン: Zero Trust Free（50ユーザーまで無料）
+- アプリ: `Tadoreru Admin`（Self-hosted）
+- Destinations: `tadoreru.com` / `admin`、`tadoreru.com` / `api/admin`
+  ※ Path は先頭スラッシュ無しで書く。`/admin` と書くとマッチしない
+- ポリシー: `Me` / Action: Allow / Include: Emails = tgmiyasaka@gmail.com
+- 認証: One-time PIN（IdP連携なし。メールに届くコードを入力する）
+- Session Duration: 24 hours
+
+### 動作確認
+curl -s https://tadoreru.com/admin | grep -i "cloudflare access" curl -s https://tadoreru.com/api/admin/posts | head -3
+
+どちらも `Sign in ・ Cloudflare Access` のHTMLが返れば正常。
+`/api/admin/posts` が JSON を返したら保護が外れている（Destinations の登録漏れを疑う）。
+あわせてシークレットウィンドウでトップ・記事・/map・/privacy が
+ログイン無しで見えることも確認する。
+
+### はまりどころ
+- `api/admin` を登録し忘れると、画面だけ守られてAPIが素通りになる
+- 管理用のパスを新しく増やしたら Destinations にも追加する
+- ログインが2回（Access → 管理画面のパスワード）出るのは仕様。不具合ではない
+- ADMIN_PASSWORD / SESSION_SECRET は Pages Secrets にのみ置く。ファイルには書かない
+  再設定: `npx wrangler pages secret put ADMIN_PASSWORD --project-name=tadoreru`
+- 一時的に外したいときは Zero Trust → Access → Applications → Tadoreru Admin を Disable

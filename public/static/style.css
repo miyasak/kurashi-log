@@ -663,3 +663,33 @@ footer .footer-sub a {
 footer .footer-sub a:hover {
   color: var(--brand) !important;
 }
+
+/* ---- 文字組み（2026-11-10） ---- */
+/* かなを詰めて引き締める。数字は下で打ち消す */
+body {
+  font-feature-settings: "palt" 1;
+}
+/* 数字は幅をそろえる（資産額の桁が揃う） */
+.num,
+.font-mono,
+table,
+time {
+  font-feature-settings: normal;
+  font-variant-numeric: tabular-nums;
+}
+/* 見出しの改行位置をきれいに、本文の最終行の1文字残りを防ぐ */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+p, li {
+  text-wrap: pretty;
+}
+/* ページ遷移をふわっと（非対応ブラウザでは何も起きない） */
+@view-transition {
+  navigation: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
