@@ -409,7 +409,7 @@ export async function findFirstPostSlug(db: D1Database, slugs: string[]) {
 
 export async function listMonthlyStats(db: D1Database, limit = 36) {
   const r = await db
-    .prepare('SELECT * FROM monthly_stats ORDER BY ym ASC LIMIT ?')
+    .prepare('SELECT * FROM (SELECT * FROM monthly_stats ORDER BY ym DESC LIMIT ?) ORDER BY ym ASC')
     .bind(limit)
     .all()
   return r.results as any[]
