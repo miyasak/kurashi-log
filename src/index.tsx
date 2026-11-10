@@ -36,7 +36,7 @@ import { Layout } from './views/layout'
 import { HomePage } from './views/home'
 import { ThemePage } from './views/theme'
 import { PostPage } from './views/post'
-import { SearchPage, MapPage, SupermarketListPage, AboutPage, NotFoundPage, TagPage } from './views/pages'
+import { SearchPage, MapPage, SupermarketListPage, AboutPage, PrivacyPage, NotFoundPage, TagPage } from './views/pages'
 import { AdminApp } from './views/admin'
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -398,6 +398,23 @@ app.get('/supermarket', async (c) => {
 /* ================= ABOUT =================
    固定ページ（プロフィール要約）。
    自己紹介記事へは「詳しい経緯はこちら」でリンクする（転送しない）。 */
+app.get('/privacy', async (c) => {
+  const mapPins = await countMapPins(c.env.DB)
+  return doc(
+    c,
+    <Layout
+      title="プライバシーポリシー"
+      description="アクセス解析・Cookie・免責事項・お問い合わせ先について。"
+      canonical={canonicalOf(c)}
+      hasMapPins={mapPins > 0}
+      jsonLd={simplePageJsonLd(originOf(c), 'プライバシーポリシー', '/privacy')}
+      scripts={['/static/site.js']}
+    >
+      <PrivacyPage />
+    </Layout>
+  )
+})
+
 app.get('/about', async (c) => {
   const [counts, stats, storySlug, mapPins] = await Promise.all([
     getCategoryCounts(c.env.DB),
@@ -468,6 +485,7 @@ app.get('/sitemap.xml', async (c) => {
     { loc: '', lastmod: newest, priority: '1.0', freq: 'daily' },
     // About は固定ページとして独立させたので必ず載せる
     { loc: '/about', lastmod: newest, priority: '0.8', freq: 'monthly' },
+    { loc: '/privacy', lastmod: newest, priority: '0.3', freq: 'yearly' },
     // /search は robots.txt で Disallow しているため sitemap には載せない
   ]
 

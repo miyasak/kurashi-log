@@ -538,3 +538,99 @@ export const SupermarketListPage: FC<{
     </main>
   )
 }
+
+/* =========================================================
+   プライバシーポリシー（固定ページ）
+   アクセス解析・Cookie・免責・連絡先。内容を変えたらここを直す。
+   ========================================================= */
+export const PrivacyPage: FC = () => {
+  const sections: [string, string[]][] = [
+    [
+      'アクセス解析について',
+      [
+        '当サイトでは、サイトの利用状況を把握するために Google LLC が提供する Google アナリティクス 4 を利用しています。このツールは Cookie を使用して、ページの閲覧状況や訪問者のおおよその地域などの情報を収集します。氏名や住所など、個人を特定できる情報は収集していません。',
+        '収集されたデータは Google 社のプライバシーポリシーに基づいて管理されます。Cookie による計測を望まない場合は、ブラウザの設定で Cookie を無効にするか、Google が提供するオプトアウトアドオンを利用することで拒否できます。'
+      ]
+    ],
+    [
+      'アクセスログについて',
+      [
+        '当サイトは Cloudflare, Inc. のサービス上で運用しています。サーバーへのアクセスに伴い、IPアドレス・ブラウザの種類・アクセス日時などが記録されます。これらは障害対応と不正アクセスの防止のために利用し、それ以外の目的では使用しません。'
+      ]
+    ],
+    [
+      '記載内容について',
+      [
+        '当サイトに掲載している資産額・生活費・税制に関する記述は、運営者個人の記録です。特定の金融商品の購入を勧めるものではなく、投資や税務上の助言でもありません。制度の適用可否は個々の状況によって異なります。実際の判断は、ご自身の責任において、必要に応じて専門家に相談のうえ行ってください。',
+        '施設の料金・営業時間・道路状況などは、いずれも訪問した時点の情報です。その後変更されている場合があります。最新の情報は各施設の公式サイトでご確認ください。',
+        '掲載内容には正確を期していますが、情報の利用によって生じたいかなる損害についても責任を負いかねます。'
+      ]
+    ],
+    [
+      '広告・アフィリエイトについて',
+      [
+        '現在、当サイトに広告は掲載していません。将来的に第三者配信の広告サービスやアフィリエイトプログラムを利用する場合は、その旨をこのページに追記します。その際、広告配信事業者が Cookie を使用して訪問者の興味に応じた広告を表示することがあります。'
+      ]
+    ],
+    [
+      '著作権について',
+      [
+        '当サイトに掲載している文章および写真の著作権は運営者に帰属します。引用の範囲を超えた転載はご遠慮ください。引用される場合は、出典として当サイトへのリンクを添えていただければ問題ありません。'
+      ]
+    ],
+    [
+      'お問い合わせ',
+      [
+        '当サイトに関するご連絡は contact@tadoreru.com までお願いします。記載内容の誤りのご指摘も歓迎します。内容によっては返信までお時間をいただく場合があります。'
+      ]
+    ]
+  ]
+
+  return (
+    <>
+      <section class="border-b border-edge2 bg-base">
+        <div class="mx-auto max-w-page px-4 py-8 sm:px-6 sm:py-10">
+          <nav class="flex items-center gap-1.5 text-[11.5px] text-mute">
+            <a href="/" class="transition hover:text-ink">ホーム</a>
+            <i class="fa-solid fa-chevron-right text-[8px]"></i>
+            <span class="text-sub">プライバシーポリシー</span>
+          </nav>
+
+          <p class="mt-4 flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.16em] text-brand">
+            <i class="fa-solid fa-shield-halved text-[10px]"></i>Privacy
+          </p>
+          <h1 class="mt-1.5 text-[24px] font-bold leading-[1.22] tracking-[-0.03em] text-ink sm:text-[32px]">
+            プライバシーポリシー
+          </h1>
+          <p class="mt-3 max-w-[64ch] text-[14.5px] leading-[1.8] text-sub">
+            個人が運営しているサイトです。何を集めていて、何を集めていないかをここに書いておきます。
+          </p>
+        </div>
+      </section>
+
+      <section class="bg-base">
+        <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">
+          <div class="max-w-[72ch] space-y-9">
+            {sections.map(([head, paras]) => (
+              <div>
+                <h2 class="text-[17px] font-bold tracking-tight text-ink sm:text-[19px]">{head}</h2>
+                <div class="mt-3 space-y-3.5">
+                  {paras.map((t) => (
+                    <p class="text-[14.5px] leading-[1.9] text-sub">{t}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div class="border-t border-edge2 pt-6">
+              <p class="font-mono text-[12px] tabular-nums text-mute">制定日 2026.11.10</p>
+              <div class="mt-4">
+                <ArrowLink href="/about">運営者について読む</ArrowLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}

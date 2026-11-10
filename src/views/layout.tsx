@@ -312,6 +312,7 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
           <ul class="mt-3 space-y-2.5">
             <li><a href="/" class="text-[14px] text-sub transition hover:text-ink">ホーム</a></li>
             <li><a href="/about" class="text-[14px] text-sub transition hover:text-ink">このサイトについて</a></li>
+            <li><a href="/privacy" class="text-[14px] text-sub transition hover:text-ink">プライバシーポリシー</a></li>
             {/* マップはピンが1件以上になるまで出さない */}
             {hasMapPins ? (
               <li><a href="/map" class="text-[14px] text-sub transition hover:text-ink">エリア別マップ</a></li>
