@@ -91,7 +91,7 @@ app.get('/', async (c) => {
     byCategory[cat.key] = counts[cat.key] ? await listPosts(db, { category: cat.key, limit: 3 }) : []
   }
   const dist = await db
-    .prepare("SELECT COALESCE(SUM(distance_km),0) AS d FROM posts WHERE status='published' AND category='touring'")
+    .prepare(`SELECT COALESCE(SUM(distance_km),0) AS d FROM posts WHERE status='published' AND category IN (${MAP_CAT_SQL})`)
     .first<{ d: number }>()
   const sup = await db
     .prepare("SELECT COUNT(*) AS c FROM posts WHERE status='published' AND category='supermarket'")

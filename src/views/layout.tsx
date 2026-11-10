@@ -71,7 +71,7 @@ export const Layout: FC<LayoutProps> = (props) => {
         {props.jsonLd ? (
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(props.jsonLd) }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(props.jsonLd).replace(/</g, '\\u003c') }}
           ></script>
         ) : null}
 

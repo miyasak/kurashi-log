@@ -16,6 +16,13 @@ import {
 import { isAuthed, getPassword, createToken, setSessionCookie, clearSessionCookie } from '../lib/auth'
 
 export const api = new Hono<{ Bindings: Bindings }>()
+
+/** クエリの数値を安全に読む（数字でなければ既定値、範囲外は丸める） */
+function num(v: string | undefined, def: number, max: number): number {
+  const n = Number(v)
+  if (!v || !Number.isFinite(n)) return def
+  return Math.min(Math.max(Math.trunc(n), 0), max)
+}
 /* ログイン試行の制限（1つのWorkerインスタンス内でのみ有効な簡易版） */
 const loginTries = new Map<string, { n: number; until: number }>()
 function tooManyTries(ip: string): boolean {
@@ -36,8 +43,8 @@ api.get('/posts', async (c) => {
     category,
     tag,
     q,
-    limit: limit ? Number(limit) : 20,
-    offset: offset ? Number(offset) : 0
+    limit: num(limit, 20, 100),
+    offset: num(offset, 0, 100000)
   })
   return c.json({ posts })
 })
@@ -99,8 +106,8 @@ api.get('/admin/posts', async (c) => {
     category,
     q,
     includeDrafts: true,
-    limit: limit ? Number(limit) : 100,
-    offset: offset ? Number(offset) : 0
+    limit: num(limit, 100, 100),
+    offset: num(offset, 0, 100000)
   })
   if (status) posts = posts.filter((p) => p.status === status)
   const total = await countPosts(c.env.DB, { includeDrafts: true })
