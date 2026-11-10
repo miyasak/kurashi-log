@@ -422,9 +422,11 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
     heading = post.category === 'it' ? 'ARTICLE DATA' : 'SUMMARY'
     push('公開日', formatDate(post.published_at))
     push('カテゴリ', post.genre || cat?.name)
-    push(post.highlight_label || 'ハイライト', post.highlight_value)
-    push('補足', post.highlight_sub)
   }
+
+  // ハイライトはカテゴリを問わずデータ表の最後に出す
+  push(post.highlight_label || 'ハイライト', post.highlight_value)
+  push('補足', post.highlight_sub)
 
   const hasRatings = post.rating != null || post.cospa != null
   const hasRecommend = !!post.recommend_items

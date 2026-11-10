@@ -807,22 +807,29 @@
           </div>`
     } else if (c === 'asset' || c === 'life') {
       inner = `
-        <p class="mb-3 text-[11.5px] text-ink-soft">記事上部に大きく表示される数値ハイライトです（任意）。</p>
-        <div class="grid gap-3 sm:grid-cols-3">
-          ${field('ラベル', 'highlight_label', p.highlight_label, { ph: c === 'asset' ? '例: 総資産' : '例: 今月の生活費' })}
-          ${field('数値', 'highlight_value', p.highlight_value, { ph: c === 'asset' ? '例: 12,340,000円' : '例: 168,000円' })}
-          ${field('補足', 'highlight_sub', p.highlight_sub, { ph: '例: 前月比 +120,000円' })}
-        </div>
-        <p class="mt-3 rounded-xl bg-slate-50 p-3 text-[11.5px] text-ink-soft">
+        <p class="rounded-xl bg-slate-50 p-3 text-[11.5px] text-ink-soft">
           <i class="fa-solid fa-circle-info mr-1"></i>グラフの元データは「月次データ」画面から登録してください。
         </p>`
     } else {
       inner = `<p class="text-[11.5px] text-ink-soft">IT / 生成AI カテゴリは追加項目なし。タグを活用して整理しましょう。</p>`
     }
+    // ハイライトはカテゴリを問わず記事データ表の最後に出るので、フォームも共通にする
+    const hl = `<div class="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+      <p class="mb-3 text-[11px] font-black tracking-widest text-ink-soft">
+        <i class="fa-solid fa-star mr-1.5"></i>数値ハイライト（任意）
+      </p>
+      <p class="mb-3 text-[11.5px] text-ink-soft">その記事を代表する数字をひとつだけ。空欄なら表示されません。</p>
+      <div class="grid gap-3 sm:grid-cols-3">
+        ${field('ラベル', 'highlight_label', p.highlight_label, { ph: '例: 登った石段 / 宿泊費 / 総資産' })}
+        ${field('数値', 'highlight_value', p.highlight_value, { ph: '例: 785段 / 0円 / 12,340,000円' })}
+        ${field('補足', 'highlight_sub', p.highlight_sub, { ph: '例: 金刀比羅宮の御本宮まで' })}
+      </div>
+    </div>`
+
     $('#cat-fields').innerHTML = `<div class="rounded-2xl border border-slate-200 bg-white p-5">
       <p class="mb-3 text-[11px] font-black tracking-widest" style="color:${catOf(c).color}">
         <i class="fa-solid ${catOf(c).icon} mr-1.5"></i>${catOf(c).name} の項目
-      </p>${inner}</div>`
+      </p>${inner}</div>${hl}`
 
     if (c === 'touring' || c === 'camp' || c === 'supermarket' || c === 'onsen') {
       initMapPicker(p)
