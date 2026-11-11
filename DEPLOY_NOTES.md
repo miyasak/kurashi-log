@@ -133,3 +133,27 @@ curl -s https://tadoreru.com/admin | grep -i "cloudflare access" curl -s https:/
 - ADMIN_PASSWORD / SESSION_SECRET は Pages Secrets にのみ置く。ファイルには書かない
   再設定: `npx wrangler pages secret put ADMIN_PASSWORD --project-name=tadoreru`
 - 一時的に外したいときは Zero Trust → Access → Applications → Tadoreru Admin を Disable
+
+## 管理画面に機能を足すときの手順とハマりどころ（2026-11-11 タグ管理を追加して分かったこと）
+
+管理画面の機能は4ファイルに分かれていて、どれか1つ忘れると「サイドバーは切り替わるのに画面が変わらない」「ずっと読み込み中」のような中途半端な壊れ方をします。サイドバーの項目は `src/views/admin.tsx`（サーバー側で描画するHTMLなので、ここを直さないとボタン自体が出ません）、画面の中身は `public/static/admin.js` の `renderXxx` 関数、画面の振り分けは同ファイル上部の `TITLES` と `view === 'xxx'` の分岐、APIは `src/routes/api.ts`、DB処理は `src/lib/db.ts` です。
+
+### import漏れは500になる
+
+`src/routes/api.ts` のハンドラだけ書いて `../lib/db` からのimportを足し忘れると、ビルドは通るのに実行時にReferenceErrorとなり、APIが500を返します。画面側は「読み込み中...」のまま止まるので原因が分かりにくいです。まず `grep -n "関数名" src/routes/api.ts` で、使用箇所だけでなくimport行にも出ているかを確認してください。逆に同じ名前を二重にimportすると `Identifier has already been declared` でビルドが落ちます。スクリプトで追記する前に、すでに入っていないか必ず確認します。
+
+### 切り分けの順番
+
+APIが怪しいときは、ルートがそもそも本番に出ているかを `grep -c "admin/tags" dist/_worker.js` で確認します。HTTPステータスでも切り分けられます。404はルート未登録、401は認証ミドルウェアでの弾き、302はCloudflare Accessのログイン画面へのリダイレクト（curlでは正常な挙動なので無視してよい）、500はハンドラ内部のエラーです。500のときは別ターミナルで `npx wrangler pages deployment tail --project-name=tadoreru` を流したまま画面を開くと、実際の例外メッセージが読めます。
+
+### admin.js は強くキャッシュされる
+
+`public/static/admin.js` はブラウザに強くキャッシュされるため、デプロイ後は Shift+Command+R のスーパーリロードが必須です。普通のリロードでは古いJSのまま動き、直したはずの不具合が再現し続けます。ローカルと本番の両方を `grep -c "追加した文字列" public/static/admin.js` と `curl -s https://tadoreru.com/static/admin.js | grep -c "追加した文字列"` で比べると、デプロイ漏れかキャッシュかを切り分けられます。
+
+### 関数を差し込む位置に注意
+
+Pythonスクリプトで関数を挿入すると、インデントの違いでアンカー文字列が一致せず、別の関数の内側に入ってしまうことがあります（`renderSettings` が `renderMedia` の中に入っていた例があります）。挿入後は `grep -n "^  async function render\|^  function render" public/static/admin.js` でインデント2のトップレベルに並んでいるかを確認し、`node --check public/static/admin.js` で構文チェックをしてからビルドしてください。
+
+### タグ操作とDBの関係
+
+タグのリネームと削除は `post_tags` を直接書き換えます。`tags` の `slug` は `name` と同じ値で運用しているため、リネーム時は両方を更新します。記事保存時（`src/lib/db.ts` の「タグ更新」ブロック）はフォームのタグ名から `INSERT OR IGNORE` でタグを作り直すので、リネーム・削除の前から開いていた記事編集画面を保存すると、古い名前のタグが復活します。
