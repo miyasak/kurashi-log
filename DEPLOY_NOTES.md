@@ -157,3 +157,41 @@ Pythonスクリプトで関数を挿入すると、インデントの違いで�
 ### タグ操作とDBの関係
 
 タグのリネームと削除は `post_tags` を直接書き換えます。`tags` の `slug` は `name` と同じ値で運用しているため、リネーム時は両方を更新します。記事保存時（`src/lib/db.ts` の「タグ更新」ブロック）はフォームのタグ名から `INSERT OR IGNORE` でタグを作り直すので、リネーム・削除の前から開いていた記事編集画面を保存すると、古い名前のタグが復活します。
+## tw.css は作り置きなので新しいクラスは効かない
+
+`static/tw.css` は `npm run build:css` で生成した静的ファイルで、ソースを走査して
+使っているクラスだけを含んでいる。そのため JSX に新しいユーティリティクラスを書いても、
+生成し直さないかぎり何も起きない。`grid-cols-[2.4rem_minmax(0,1fr)]` を書いて
+レイアウトが崩れたことがある（About のランク表）。
+
+見た目が「クラスを書いたのに無反応」なら、まず `grep "クラス名" public/static/tw.css` で
+含まれているか確認する。含まれていなければ、`public/static/style.css` に自前のクラスを
+書くほうが早い。style.css は後から読み込まれるので、既存定義の上書きもできる。
+
+ただし同じセレクタを二重に定義すると後から読みにくくなるので、追記の前に
+`grep -n "セレクタ" public/static/style.css` で既存の定義を探すこと。
+
+## 直したのに反映されないときの順番
+
+1. ブラウザのキャッシュ（管理画面なら admin.js、公開側なら style.css）→ Shift+Command+R
+2. Cloudflare のエッジキャッシュ → curl で確かめるときは
+   `curl -s "https://tadoreru.com/posts/xxx?v=$(date +%s)"` のようにクエリを足す
+3. デプロイ漏れ → `grep -c "文字列" dist/_worker.js` と
+   `curl -s https://tadoreru.com/static/admin.js | grep -c "文字列"` を比べる
+4. ローカルDBだけ更新していた → D1 の local / remote を両方確認
+
+DBの値だけを変えた場合はビルドもデプロイも要らない。コードを変えたときだけデプロイする。
+
+## デプロイが一度失敗することがある
+
+`Failed to publish your Function. binding DB of type d1 failed to generate` が出ることがある。
+D1バインディングの生成が一時的に失敗しているだけで、設定の問題ではない。
+同じコマンドをもう一度流すと通る。
+
+## 記事データ表の項目を減らすとき
+
+表示を消すだけなら `src/views/post.tsx` の `push(...)` を削る。
+管理画面のフォーム（`public/static/admin.js`）からも消す場合は注意が必要で、
+`src/lib/db.ts` の保存処理が `POST_FIELDS` を全件回して
+`payload[f] = data[f] ?? null` を入れるため、フォームに無い項目は保存時に null で
+上書きされる。値を残したまま表示だけ消したいなら、フォームは残して post.tsx だけ直す。

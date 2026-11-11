@@ -50,6 +50,7 @@ npm run build npx wrangler pages deploy dist --project-name=tadoreru
 `DEPLOY_NOTES.md` を参照。D1のローカル／リモートの扱い、
 カラム追加の手順、シークレットの変更方法など。
 
+
 ## タグ管理（管理画面）
 
 管理画面サイドバーの「タグ」から、登録済みタグの一覧と整理ができます。
@@ -68,10 +69,18 @@ npm run build npx wrangler pages deploy dist --project-name=tadoreru
 
 リネームや削除をしたあと、そのタグが付いていた記事の編集画面を**変更前から開きっぱなし**にしていると、保存時にフォームのタグ欄の古い名前で再作成されます。記事を開き直してから保存してください。
 
+## 評価ランク
+
+ツーリング・キャンプ場・日帰り温泉の記事に S / A / B / C / D のランクを付けている。
+DBは `posts.rating`（5=S 〜 1=D）、表示は `src/views/components.tsx` の `RankBadge`、
+配色は `public/static/style.css` の `.rank-*`。基準の本文は `/about#rank`
+（`src/views/pages.tsx` の `#rank` セクション）にあり、記事側のバッジはそこへリンクする。
+ご当地スーパーは別の軸で見るためランクを付けない。
+
 ## 残っている宿題
 
 - コメント機能（テーブル新設・Turnstile・承認フロー）
-- 免責文とカテゴリを管理画面から編集（いまは `config.ts` 直書き）
+- カテゴリを管理画面から編集（いまは `config.ts` 直書き。免責文は2026-11-10に対応済み）
 - `/about` の文言を管理画面から編集
 - 関連記事を1〜3件選べるように（いまは `linked_slug` で1件のみ）
 - favicon とアプリアイコンがバイクのまま
