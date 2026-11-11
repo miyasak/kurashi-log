@@ -385,7 +385,6 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
     push('ルート', post.route_text)
     push('ベストシーズン', post.best_season)
     push('天気', post.weather)
-    push('使用車両', post.bike)
   } else if (post.category === 'camp') {
       heading = 'CAMP DATA'
       push('訪問日', formatDate(post.visit_date || post.published_at))
@@ -428,7 +427,7 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
   push(post.highlight_label || 'ハイライト', post.highlight_value)
   push('補足', post.highlight_sub)
 
-  const hasRatings = post.rating != null || post.cospa != null
+  const hasRatings = post.rating != null
   const hasRecommend = !!post.recommend_items
   if (!rows.length && !hasRatings && !hasRecommend) return null
 
@@ -463,14 +462,6 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
             <dt class="text-[11px] text-mute">総合評価</dt>
             <dd>
               <Stars value={post.rating} />
-            </dd>
-          </div>
-        ) : null}
-        {post.cospa != null ? (
-          <div class="grid grid-cols-[86px_minmax(0,1fr)] items-center gap-3 px-5 py-3">
-            <dt class="text-[11px] text-mute">コスパ</dt>
-            <dd>
-              <Stars value={post.cospa} />
             </dd>
           </div>
         ) : null}

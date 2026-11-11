@@ -174,16 +174,9 @@ app.get('/theme/:key', async (c) => {
          FROM posts WHERE status='published' AND category IN (${MAP_CAT_SQL})`
       )
       .first<any>()
-    const s = await db
-      .prepare(
-        `SELECT AVG(budget) AS b FROM posts
-         WHERE status='published' AND category='supermarket' AND budget IS NOT NULL`
-      )
-      .first<any>()
     Object.assign(summary, {
       distance: Math.round(r?.d || 0),
-      prefectures: r?.p || 0,
-      avg_budget: s?.b ? Math.round(s.b) : null
+      prefectures: r?.p || 0
     })
   }
 
