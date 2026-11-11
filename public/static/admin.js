@@ -289,7 +289,11 @@
 
     const row = (t) => `<div class="flex items-center justify-between border-b border-slate-100 px-4 py-2.5 last:border-b-0">
       <span class="text-[13px] text-ink">${esc(t.name)}</span>
-      <span class="font-mono text-[12px] tabular-nums text-ink-mute">${t.published}</span>
+      <span class="flex items-center gap-3">
+        <span class="font-mono text-[12px] tabular-nums text-ink-mute">${t.published}</span>
+        <button class="tag-ren text-[11px] text-ink-mute hover:text-brand" data-id="${t.id}" data-name="${esc(t.name)}">名前変更</button>
+        <button class="tag-del text-[11px] text-ink-mute hover:text-red-500" data-id="${t.id}" data-name="${esc(t.name)}">削除</button>
+      </span>
     </div>`
 
     const block = (title, note, list) => !list.length ? '' : `<div class="rounded-2xl border border-slate-200 bg-white p-5">
@@ -304,6 +308,29 @@
       ${block('1件だけのタグ', '行き止まりになりやすい。記事が増えるまでは様子見でよい。', single)}
       ${block('公開記事で未使用のタグ', '下書きだけで使われているか、どの記事にも付いていない。', unused)}
     </div>`
+
+    document.querySelectorAll('.tag-del').forEach((b) =>
+      b.addEventListener('click', async () => {
+        if (!confirm(`タグ「${b.dataset.name}」を削除しますか？記事からも外れます。`)) return
+        const res = await api('/admin/tags/' + b.dataset.id, { method: 'DELETE' })
+        if (res && res.ok) renderTags()
+        else alert('削除できませんでした')
+      })
+    )
+    document.querySelectorAll('.tag-ren').forEach((b) =>
+      b.addEventListener('click', async () => {
+        const name = prompt('新しいタグ名', b.dataset.name)
+        if (!name || name.trim() === b.dataset.name) return
+        const res = await api('/admin/tags/' + b.dataset.id, {
+          method: 'PUT',
+          body: JSON.stringify({ name: name.trim() })
+        })
+        if (res && res.ok) {
+          if (res.merged) alert('同じ名前のタグがあったので統合したにゃ')
+          renderTags()
+        } else alert('変更できませんでした')
+      })
+    )
   }
 
   async function renderSettings() {

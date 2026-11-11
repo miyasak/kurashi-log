@@ -368,6 +368,24 @@ export async function deletePost(db: D1Database, id: number) {
 }
 
 /** 管理画面用。未使用タグと下書きのみのタグも含めて全件返す */
+export async function renameTag(db: D1Database, id: number, name: string) {
+  const dup = await db
+    .prepare('SELECT id FROM tags WHERE name = ? AND id <> ?')
+    .bind(name, id)
+    .first<{ id: number }>()
+  if (dup) {
+    // 同名タグがある＝統合。重複する組み合わせは OR IGNORE で捨て、残りを消す
+    await db.batch([
+      db.prepare('UPDATE OR IGNORE post_tags SET tag_id = ? WHERE tag_id = ?').bind(dup.id, id),
+      db.prepare('DELETE FROM post_tags WHERE tag_id = ?').bind(id),
+      db.prepare('DELETE FROM tags WHERE id = ?').bind(id)
+    ])
+    return { merged: true }
+  }
+  await db.prepare('UPDATE tags SET name = ?, slug = ? WHERE id = ?').bind(name, name, id).run()
+  return { merged: false }
+}
+
 export async function listTagsAdmin(db: D1Database) {
   const r = await db
     .prepare(
@@ -382,6 +400,13 @@ export async function listTagsAdmin(db: D1Database) {
     )
     .all()
   return r.results as { id: number; name: string; slug: string; total: number; published: number }[]
+}
+
+export async function deleteTag(db: D1Database, id: number) {
+  await db.batch([
+    db.prepare('DELETE FROM post_tags WHERE tag_id = ?').bind(id),
+    db.prepare('DELETE FROM tags WHERE id = ?').bind(id)
+  ])
 }
 
 export async function listTags(db: D1Database, category?: string, categories?: string[]) {

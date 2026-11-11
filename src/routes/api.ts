@@ -14,6 +14,8 @@ import {
   getCategoryCounts,
   getSettings,
   listTagsAdmin,
+  renameTag,
+  deleteTag,
   saveSettings,
 } from '../lib/db'
 import { isAuthed, getPassword, createToken, setSessionCookie, clearSessionCookie } from '../lib/auth'
@@ -243,4 +245,20 @@ api.put('/admin/settings', async (c) => {
 api.get('/admin/tags', async (c) => {
   const tags = await listTagsAdmin(c.env.DB)
   return c.json({ tags })
+})
+
+api.delete('/admin/tags/:id', async (c) => {
+  const id = Number(c.req.param('id'))
+  if (!id) return c.json({ ok: false, error: 'bad id' }, 400)
+  await deleteTag(c.env.DB, id)
+  return c.json({ ok: true })
+})
+
+api.put('/admin/tags/:id', async (c) => {
+  const id = Number(c.req.param('id'))
+  const body = await c.req.json<{ name?: string }>()
+  const name = (body.name || '').trim()
+  if (!id || !name) return c.json({ ok: false, error: 'bad request' }, 400)
+  const r = await renameTag(c.env.DB, id, name)
+  return c.json({ ok: true, merged: r.merged })
 })
