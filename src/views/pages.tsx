@@ -378,6 +378,104 @@ export const AboutPage: FC<{
         </div>
       </section>
 
+      {/* 評価ランク */}
+      <section id="rank" class="border-b border-edge2 bg-base scroll-mt-20">
+        <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">
+          <SectionTitle eyebrow="Rank" icon="fa-award" title="評価ランクについて" />
+          <p class="mt-4 max-w-[66ch] text-[14px] leading-[1.85] text-sub">
+            記事に付いている S / A / B / C / D は、走っている途中に寄る価値があるか、という一点で判定しています。
+            料金や設備の絶対評価ではなく、同じ条件なら次も選ぶかどうかの記録です。
+            基準はカテゴリごとに少しずつ違います。
+          </p>
+          <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div class="rounded-big border border-edge2 bg-panel p-5">
+                <h3 class="flex items-center gap-2 text-[14.5px] font-bold tracking-tight">
+                  <i class="fa-solid fa-route text-[13px] text-brand"></i>ツーリングルート
+                </h3>
+                <div class="mt-4 rounded-xl border border-edge2 bg-base">
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-s">S</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">この道のために遠征する価値がある。何度でも走りたい</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-a">A</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">近くを通るなら必ず組み込む</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-b">B</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">移動として悪くない。景色か道のどちらかは良い</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-c">C</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">次は別のルートを選ぶ</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-d">D</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">勧めない</p>
+                  </div>
+                </div>
+              </div>
+              <div class="rounded-big border border-edge2 bg-panel p-5">
+                <h3 class="flex items-center gap-2 text-[14.5px] font-bold tracking-tight">
+                  <i class="fa-solid fa-campground text-[13px] text-brand"></i>キャンプ場
+                </h3>
+                <div class="mt-4 rounded-xl border border-edge2 bg-base">
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-s">S</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">料金に対して設備と景色が揃う。連泊したくなる</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-a">A</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">また使う。不満がない</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-b">B</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">一泊なら十分。設備は最低限</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-c">C</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">他に選択肢があるなら選ばない</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-d">D</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">勧めない</p>
+                  </div>
+                </div>
+              </div>
+              <div class="rounded-big border border-edge2 bg-panel p-5">
+                <h3 class="flex items-center gap-2 text-[14.5px] font-bold tracking-tight">
+                  <i class="fa-solid fa-droplet text-[13px] text-brand"></i>日帰り温泉
+                </h3>
+                <div class="mt-4 rounded-xl border border-edge2 bg-base">
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-s">S</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">700円以下。かけ流しまたはとろとろ・ぬるぬるの湯で、サウナ・露天・休憩所が揃う。寄り道してでも行く</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-a">A</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">湯は良いが設備が限られる。通り道なら必ず寄る</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-b">B</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">汗を流せれば十分なとき。価格相応</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-c">C</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">次はないかな</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-d">D</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">勧めない</p>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <p class="mt-5 text-[12.5px] leading-[1.8] text-mute">
+            ご当地スーパーにはランクを付けていません。価格と品揃え、値引きが始まる時間帯という別の軸で見ているためです。
+          </p>
+        </div>
+      </section>
+
       {/* 詳しい経緯はこちら */}
       <section class="bg-base">
         <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">

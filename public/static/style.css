@@ -693,3 +693,38 @@ p, li {
     navigation: none;
   }
 }
+
+/* 評価ランク（S/A/B/C）のバッジ。数字より記号として読ませる */
+.rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.55em;
+  padding: 0.12em 0.42em;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  vertical-align: middle;
+}
+.rank-s { background: #f97316; border-color: #f97316; color: #fff; }
+.rank-a { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.14); color: #18181b; }
+.rank-b { background: transparent; border-color: rgba(0, 0, 0, 0.12); color: #6b6b66; }
+.rank-c { background: transparent; border-color: rgba(0, 0, 0, 0.08); color: #9a9a94; }
+a.rank:hover { opacity: 0.82; }
+.rank-d { background: transparent; border-color: rgba(0, 0, 0, 0.08); color: #b0b0aa; }
+
+/* 評価ランク表：左にバッジ、右に基準文 */
+#rank .rank-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+#rank .rank-row > .rank {
+  flex: 0 0 2.2rem;
+}
+#rank { scroll-margin-top: 5rem; }

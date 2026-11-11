@@ -777,37 +777,32 @@
         </div>
         ${
           c === 'touring'
-            ? `<div class="mt-3 grid gap-3 sm:grid-cols-4">
+            ? `<div class="mt-3 grid gap-3 sm:grid-cols-2">
                 ${field('走行距離(km)', 'distance_km', p.distance_km, { type: 'number', attr: 'step="0.1"' })}
                 ${field('所要時間', 'duration_text', p.duration_text, { ph: '例: 8時間' })}
-                ${field('天気', 'weather', p.weather, { ph: '例: 晴れ' })}
-                ${field('車両', 'bike', p.bike, { ph: '例: CB400SF' })}
               </div>
               <div class="mt-3">
                 <label class="admin-label">ルート</label>
                 <input name="route_text" value="${esc(p.route_text)}" placeholder="例: 福島市 → 高湯温泉 → 浄土平 → 土湯峠" class="admin-input" />
               </div>
-              <div class="mt-3 grid gap-3 sm:grid-cols-3">
-                ${field('ベストシーズン', 'best_season', p.best_season, { ph: '例: 5月〜10月（紅葉は10月上旬）' })}
+              <div class="mt-3 grid gap-3 sm:grid-cols-2">
                 ${field('訪問日', 'visit_date', p.visit_date, { type: 'date' })}
-              <div>
-                <label class="admin-label">総合評価</label>
-                <select name="rating" class="admin-input">${starOpts(p.rating)}</select>
-              </div>
+                <div>
+                  <label class="admin-label">ランク</label>
+                  <select name="rating" class="admin-input">${rankOpts(p.rating)}</select>
+                  <p class="mt-1 text-[10.5px] text-ink-mute">S〜D。基準は /about#rank</p>
+                </div>
               </div>
               <div class="mt-3">
                 <label class="admin-label">路面・注意事項</label>
                 <textarea name="road_note" rows="2" class="admin-input !font-sans" placeholder="例: 冬季通行止め（11月中旬〜4月上旬）。夜間通行止めの時間帯あり。">${esc(p.road_note)}</textarea>
                 <p class="mt-1 text-[10.5px] text-ink-mute">本文下に注意ボックスとして表示されます</p>
               </div>`
-            : `<div class="mt-3 grid gap-3 sm:grid-cols-4">
+            : `<div class="mt-3 grid gap-3 sm:grid-cols-3">
                 <div>
-                  <label class="admin-label">総合評価</label>
-                  <select name="rating" class="admin-input">${starOpts(p.rating)}</select>
-                </div>
-                <div>
-                  <label class="admin-label">コスパ</label>
-                  <select name="cospa" class="admin-input">${starOpts(p.cospa)}</select>
+                  <label class="admin-label">ランク</label>
+                  <select name="rating" class="admin-input">${rankOpts(p.rating)}</select>
+                  <p class="mt-1 text-[10.5px] text-ink-mute">S〜D。基準は /about#rank</p>
                 </div>
                 ${field(c === 'camp' ? '料金' : c === 'onsen' ? '入浴料' : '会計金額（円）', 'budget', p.budget, { type: 'number' })}
                 ${field('訪問日', 'visit_date', p.visit_date, { type: 'date' })}
@@ -925,6 +920,13 @@
     } catch (e) {
       /* 失敗時は「紐付けなし」のみ */
     }
+  }
+
+  const rankOpts = (v) => {
+    const n = v == null || v === '' ? '' : String(Math.min(5, Math.max(1, Math.round(Number(v)))))
+    return [['', '未評価'], ['5', 'S'], ['4', 'A'], ['3', 'B'], ['2', 'C'], ['1', 'D']]
+      .map(([val, label]) => `<option value="${val}"${val === n ? ' selected' : ''}>${label}</option>`)
+      .join('')
   }
 
   const starOpts = (v) =>

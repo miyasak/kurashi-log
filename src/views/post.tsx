@@ -2,7 +2,7 @@ import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
 import { CATEGORY_MAP, THEME_MAP, ACCENT, disclaimerOf, pickLabel, pickIcon, placeLabel } from '../lib/config'
 import { formatDate, yen, buildToc } from '../lib/utils'
-import { Stars, PostCard, SectionTitle, SeriesNav } from './components'
+import { Stars, RankBadge, PostCard, SectionTitle, SeriesNav } from './components'
 import { ArrowLink } from './layout'
 
 type Props = { post: Post; html: string; related: Post[]; linked?: Post | null; series?: any; settings?: Record<string, string> }
@@ -134,7 +134,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
                   {post.genre}
                 </span>
               ) : null}
-              {post.rating ? <Stars value={post.rating} color={accent} /> : null}
+              {post.rating ? <RankBadge value={post.rating} /> : null}
               {post.status === 'draft' ? (
                 <span class="rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-semibold text-white">
                   下書きプレビュー
@@ -379,12 +379,9 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
     heading = 'RIDE DATA'
     push('訪問日', formatDate(post.visit_date || post.published_at))
     push('エリア', areaLabel)
-    push('カテゴリ', post.genre)
     push('走行距離', post.distance_km ? `${post.distance_km} km` : null)
     push('所要時間', post.duration_text)
     push('ルート', post.route_text)
-    push('ベストシーズン', post.best_season)
-    push('天気', post.weather)
   } else if (post.category === 'camp') {
       heading = 'CAMP DATA'
       push('訪問日', formatDate(post.visit_date || post.published_at))
@@ -459,9 +456,9 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
         {/* 評価（スーパー） */}
         {post.rating != null ? (
           <div class="grid grid-cols-[86px_minmax(0,1fr)] items-center gap-3 px-5 py-3">
-            <dt class="text-[11px] text-mute">総合評価</dt>
+            <dt class="text-[11px] text-mute">ランク</dt>
             <dd>
-              <Stars value={post.rating} />
+              <RankBadge value={post.rating} />
             </dd>
           </div>
         ) : null}
@@ -551,7 +548,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
 
           {linked.rating ? (
             <p class="mt-2.5">
-              <Stars value={linked.rating} />
+              <RankBadge value={linked.rating} link={false} />
             </p>
           ) : null}
 

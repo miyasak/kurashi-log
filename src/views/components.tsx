@@ -19,6 +19,20 @@ export const Stars: FC<{ value?: number | null; color?: string }> = ({ value }) 
   )
 }
 
+/* 評価ランク。rating は数値のまま持ち、表示だけ S/A/B/C に変換する
+   5=S / 4=A / 3=B / 2=C / 1=D。基準は /about#rank に置く */
+export const RankBadge: FC<{ value?: number | null; link?: boolean }> = ({ value, link = true }) => {
+  if (value === null || value === undefined) return null
+  const n = Math.min(5, Math.max(1, Math.round(value)))
+  const letter = ['D', 'C', 'B', 'A', 'S'][n - 1]
+  const cls = `rank rank-${letter.toLowerCase()}`
+  return link ? (
+    <a href="/about#rank" class={cls} title="評価基準を見る">{letter}</a>
+  ) : (
+    <span class={cls}>{letter}</span>
+  )
+}
+
 /* =========================================================
    セクション見出し（左揃え・小さめ）
    ========================================================= */
