@@ -111,15 +111,17 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
   const showFrame = hasImage || needsFrame
 
   /** カテゴリごとの「数字」行 */
-  const metrics: { label: string; value: string; stars?: number | null }[] = []
+  const metrics: { label: string; value: string; rank?: number | null }[] = []
+  /** ランクを出すのはツーリング・キャンプ・温泉のみ（ご当地スーパーは対象外） */
+  const RANK_CATS = ['touring', 'camp', 'onsen']
   if (post.category === 'touring') {
     if (post.distance_km) metrics.push({ label: '走行距離', value: `${post.distance_km.toLocaleString()} km` })
     if (post.prefecture) metrics.push({ label: 'エリア', value: post.prefecture })
-  } else if (post.category === 'supermarket') {
-    if (post.budget) metrics.push({ label: '会計', value: yen(post.budget) })
-    if (post.rating) metrics.push({ label: '総合', value: '', stars: post.rating })
   } else if (post.highlight_value) {
     metrics.push({ label: post.highlight_label || '数値', value: post.highlight_value })
+  }
+  if (RANK_CATS.includes(post.category) && post.rating != null) {
+    metrics.push({ label: 'ランク', value: '', rank: post.rating })
   }
 
   return (
@@ -171,7 +173,7 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
               <div>
                 <dt class="text-[9.5px] font-bold uppercase tracking-[0.1em] text-mute">{m.label}</dt>
                 <dd class="mt-0.5 font-mono text-[15px] font-bold tabular-nums tracking-tight text-brand">
-                  {m.stars != null ? <Stars value={m.stars} /> : m.value}
+                  {m.rank != null ? <RankBadge value={m.rank} link={false} /> : m.value}
                 </dd>
               </div>
             ))}

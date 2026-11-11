@@ -711,12 +711,12 @@ p, li {
   text-decoration: none;
   vertical-align: middle;
 }
-.rank-s { background: #f97316; border-color: #f97316; color: #fff; }
-.rank-a { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.14); color: #18181b; }
-.rank-b { background: transparent; border-color: rgba(0, 0, 0, 0.12); color: #6b6b66; }
-.rank-c { background: transparent; border-color: rgba(0, 0, 0, 0.08); color: #9a9a94; }
+.rank-s { background: var(--brand); border-color: var(--brand); color: #fff; }
+.rank-a { background: rgba(234, 88, 12, 0.12); border-color: rgba(234, 88, 12, 0.55); color: var(--brand); }
+.rank-b { background: rgba(0, 0, 0, 0.05); border-color: rgba(0, 0, 0, 0.26); color: #4a4a46; }
+.rank-c { background: rgba(0, 0, 0, 0.03); border-color: rgba(0, 0, 0, 0.2); color: #76766f; }
 a.rank:hover { opacity: 0.82; }
-.rank-d { background: transparent; border-color: rgba(0, 0, 0, 0.08); color: #b0b0aa; }
+.rank-d { background: transparent; border-color: rgba(0, 0, 0, 0.16); color: #9b9b94; }
 
 /* 評価ランク表：左にバッジ、右に基準文 */
 #rank .rank-row {
