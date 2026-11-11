@@ -116,7 +116,7 @@
   })
 
   /* ---------- ナビゲーション ---------- */
-  const TITLES = { dashboard: 'ダッシュボード', posts: '記事管理', editor: '記事エディタ', stats: '月次データ', media: 'メディア', settings: '免責文' }  
+  const TITLES = { dashboard: 'ダッシュボード', posts: '記事管理', editor: '記事エディタ', stats: '月次データ', media: 'メディア', settings: '免責文', tags: 'タグ' }  
 
   function navigate(view) {
     state.view = view
@@ -130,6 +130,7 @@
     else if (view === 'stats') renderStats()
     else if (view === 'media') renderMedia()
     else if (view === 'settings') renderSettings()
+    else if (view === 'tags') renderTags()
   }
 
   document.querySelectorAll('.nav-btn').forEach((b) =>
@@ -277,7 +278,35 @@
     )
   }
 
-    async function renderSettings() {
+  /* ================= タグ一覧 ================= */
+  async function renderTags() {
+    main().innerHTML = '<p class="text-sm text-ink-mute">読み込み中...</p>'
+    const r = await api('/admin/tags')
+    const tags = (r && r.tags) || []
+    const multi = tags.filter((t) => t.published >= 2)
+    const single = tags.filter((t) => t.published === 1)
+    const unused = tags.filter((t) => !t.published)
+
+    const row = (t) => `<div class="flex items-center justify-between border-b border-slate-100 px-4 py-2.5 last:border-b-0">
+      <span class="text-[13px] text-ink">${esc(t.name)}</span>
+      <span class="font-mono text-[12px] tabular-nums text-ink-mute">${t.published}</span>
+    </div>`
+
+    const block = (title, note, list) => !list.length ? '' : `<div class="rounded-2xl border border-slate-200 bg-white p-5">
+      <p class="text-[11px] font-black tracking-widest text-ink-soft">${title}（${list.length}）</p>
+      <p class="mb-3 mt-1 text-[11.5px] text-ink-mute">${note}</p>
+      <div class="rounded-xl border border-slate-200">${list.map(row).join('')}</div>
+    </div>`
+
+    main().innerHTML = `<div class="grid gap-4">
+      <p class="text-[12px] text-ink-soft">全${tags.length}件。数字は公開記事での使用数です。</p>
+      ${block('2件以上で使われているタグ', '回遊の導線として機能しているタグ。', multi)}
+      ${block('1件だけのタグ', '行き止まりになりやすい。記事が増えるまでは様子見でよい。', single)}
+      ${block('公開記事で未使用のタグ', '下書きだけで使われているか、どの記事にも付いていない。', unused)}
+    </div>`
+  }
+
+  async function renderSettings() {
     main().innerHTML = '<p class="text-sm text-ink-mute">読み込み中...</p>'
     const r = await api('/admin/settings')
     const s = (r && r.settings) || {}

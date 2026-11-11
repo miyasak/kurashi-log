@@ -367,6 +367,23 @@ export async function deletePost(db: D1Database, id: number) {
     .run()  
 }
 
+/** 管理画面用。未使用タグと下書きのみのタグも含めて全件返す */
+export async function listTagsAdmin(db: D1Database) {
+  const r = await db
+    .prepare(
+      `SELECT t.id, t.name, t.slug,
+              COUNT(pt.post_id) AS total,
+              SUM(CASE WHEN p.status = 'published' THEN 1 ELSE 0 END) AS published
+       FROM tags t
+       LEFT JOIN post_tags pt ON pt.tag_id = t.id
+       LEFT JOIN posts p ON p.id = pt.post_id
+       GROUP BY t.id
+       ORDER BY published DESC, total DESC, t.name`
+    )
+    .all()
+  return r.results as { id: number; name: string; slug: string; total: number; published: number }[]
+}
+
 export async function listTags(db: D1Database, category?: string, categories?: string[]) {
   const binds: any[] = []
   let filter = ''

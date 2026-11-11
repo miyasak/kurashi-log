@@ -13,6 +13,7 @@ import {
   deleteMonthlyStat,
   getCategoryCounts,
   getSettings,
+  listTagsAdmin,
   saveSettings,
 } from '../lib/db'
 import { isAuthed, getPassword, createToken, setSessionCookie, clearSessionCookie } from '../lib/auth'
@@ -237,4 +238,9 @@ api.put('/admin/settings', async (c) => {
   const body = await c.req.json<Record<string, string>>()
   await saveSettings(c.env.DB, body)
   return c.json({ ok: true })
+})
+
+api.get('/admin/tags', async (c) => {
+  const tags = await listTagsAdmin(c.env.DB)
+  return c.json({ tags })
 })
