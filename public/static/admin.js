@@ -801,12 +801,25 @@
                 <p class="mt-1 text-[10.5px] text-ink-mute">本文下に注意ボックスとして表示されます</p>
               </div>`
             : `<div class="mt-3 grid gap-3 sm:grid-cols-3">
+                ${
+                  c === 'supermarket'
+                    ? `<div>
+                  <label class="admin-label">コスパ</label>
+                  <select name="cospa" class="admin-input">${rankOpts(p.cospa)}</select>
+                  <p class="mt-1 text-[10.5px] text-ink-mute">定価の安さ。値引きの強さは含めない</p>
+                </div>
                 <div>
+                  <label class="admin-label">品質</label>
+                  <select name="rating" class="admin-input">${rankOpts(p.rating)}</select>
+                  <p class="mt-1 text-[10.5px] text-ink-mute">地場品・鮮魚・惣菜の強さ</p>
+                </div>`
+                    : `<div>
                   <label class="admin-label">ランク</label>
                   <select name="rating" class="admin-input">${rankOpts(p.rating)}</select>
                   <p class="mt-1 text-[10.5px] text-ink-mute">S〜D。基準は /about#rank</p>
                 </div>
-                ${field(c === 'camp' ? '料金' : c === 'onsen' ? '入浴料' : '会計金額（円）', 'budget', p.budget, { type: 'number' })}
+                ${field(c === 'camp' ? '料金' : '入浴料', 'budget', p.budget, { type: 'number' })}`
+                }
                 ${field('訪問日', 'visit_date', p.visit_date, { type: 'date' })}
               </div>
               <div class="mt-3 grid gap-3 sm:grid-cols-2">
