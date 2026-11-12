@@ -9,7 +9,7 @@ type LayoutProps = PropsWithChildren<{
   /** 大テーマ（money / touring / tech）を直接指定 */
   activeTheme?: string
   /** ホーム/マップなど、ナビでハイライトする固定ページ */
-  activePage?: 'home' | 'map' | 'about' | 'search' | 'supermarket'
+  activePage?: 'home' | 'map' | 'about' | 'search' | 'supermarket' | 'camp'
   ogImage?: string | null
   scripts?: string[]
   headExtra?: any
@@ -185,7 +185,11 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
                       {it.subs.map((c) => (
                         <a
                           href={`${it.href}?cat=${c.key}`}
-                          class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13.5px] text-sub transition hover:bg-black/[0.05] hover:text-ink"
+                          class={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13.5px] transition ${
+                            activePage === c.key
+                              ? 'bg-brand/15 font-semibold text-ink'
+                              : 'text-sub hover:bg-black/[0.05] hover:text-ink'
+                          }`}
                         >
                           <i class={`fa-solid ${c.icon} w-4 text-[12px] text-brand`}></i>
                           {c.name}
@@ -317,6 +321,7 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
             {hasMapPins ? (
               <li><a href="/map" class="text-[14px] text-sub transition hover:text-ink">エリア別マップ</a></li>
             ) : null}
+              <li><a href="/camp" class="text-[14px] text-sub transition hover:text-ink">キャンプ場一覧</a></li>
               <li><a href="/supermarket" class="text-[14px] text-sub transition hover:text-ink">ご当地スーパー一覧</a></li>
               <li><a href="/search" class="text-[14px] text-sub transition hover:text-ink">記事を探す</a></li>
           </ul>

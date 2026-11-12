@@ -37,7 +37,7 @@ import { Layout } from './views/layout'
 import { HomePage } from './views/home'
 import { ThemePage } from './views/theme'
 import { PostPage } from './views/post'
-import { SearchPage, MapPage, SupermarketListPage, AboutPage, PrivacyPage, NotFoundPage, TagPage } from './views/pages'
+import { SearchPage, MapPage, SupermarketListPage, CampListPage, AboutPage, PrivacyPage, NotFoundPage, TagPage } from './views/pages'
 import { AdminApp } from './views/admin'
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -360,6 +360,38 @@ app.get('/map', async (c) => {
   )
 })
 
+/* ================== キャンプ場一覧 ================== */
+app.get('/camp', async (c) => {
+  const rows = await c.env.DB.prepare(
+    `SELECT slug, title, place_name, prefecture, budget, business_hours, rating
+       FROM posts
+      WHERE status='published' AND category='camp'
+      ORDER BY budget ASC, rating DESC, published_at DESC`
+  ).all<{
+    slug: string
+    title: string
+    place_name: string | null
+    prefecture: string | null
+    budget: number | null
+    business_hours: string | null
+    rating: number | null
+  }>()
+  return doc(
+    c,
+    <Layout
+      title="キャンプ場一覧"
+      activePage="camp"
+      activeTheme="touring"
+      description="ツーリングで実際に泊まったキャンプ場の一覧です。料金・エリア・ランク・開設期間から記事を探せます。"
+      canonical={canonicalOf(c)}
+      jsonLd={simplePageJsonLd(originOf(c), 'キャンプ場一覧', '/camp')}
+      scripts={['/static/site.js']}
+    >
+      <CampListPage items={rows.results || []} />
+    </Layout>
+  )
+})
+
 /* ================== ご当地スーパー一覧 ================== */
 app.get('/supermarket', async (c) => {
   const rows = await c.env.DB.prepare(
@@ -382,6 +414,7 @@ app.get('/supermarket', async (c) => {
     <Layout
       title="ご当地スーパー一覧"
       activePage="supermarket"
+      activeTheme="touring"
       description="ツーリング中に立ち寄ったご当地スーパーの一覧です。県・訪問日・値引きを確認できた時刻・コスパと品質のランクから記事を探せます。"
       canonical={canonicalOf(c)}
       jsonLd={simplePageJsonLd(originOf(c), 'ご当地スーパー一覧', '/supermarket')}
@@ -493,6 +526,9 @@ app.get('/sitemap.xml', async (c) => {
   // ご当地スーパー一覧：記事が1件以上あるときだけ載せる
   if (posts.some((p) => p.category === 'supermarket')) {
     entries.push({ loc: '/supermarket', lastmod: newest, priority: '0.7', freq: 'weekly' })
+  }
+  if (posts.some((p) => p.category === 'camp')) {
+    entries.push({ loc: '/camp', lastmod: newest, priority: '0.7', freq: 'weekly' })
   }
 
   // テーマ：記事が1件以上あるものだけ載せる（空ページをインデックスさせない）

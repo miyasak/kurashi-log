@@ -728,3 +728,19 @@ a.rank:hover { opacity: 0.82; }
   flex: 0 0 2.2rem;
 }
 #rank { scroll-margin-top: 5rem; }
+
+/* キャンプ場一覧の行（スマホは折り返し、sm以上は列を固定して揃える） */
+.camp-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 14px;
+}
+@media (min-width: 640px) {
+  .camp-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 11rem 4.5rem 3.5rem 14rem;
+    gap: 0 1rem;
+    align-items: center;
+  }
+}

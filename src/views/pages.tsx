@@ -656,6 +656,72 @@ export const TagPage: FC<{ tag: string; posts: Post[] }> = ({ tag, posts }) => (
     </section>
   </>
 )
+export const CampListPage: FC<{
+  items: {
+    slug: string
+    title: string
+    place_name: string | null
+    prefecture: string | null
+    budget: number | null
+    business_hours: string | null
+    rating: number | null
+  }[]
+}> = ({ items }) => {
+  return (
+    <main class="mx-auto max-w-page px-6 py-10">
+      <h1 class="text-[22px] font-bold tracking-[-0.02em] text-ink sm:text-[26px]">
+        キャンプ場一覧
+      </h1>
+      <p class="mt-2 text-[14px] leading-[1.8] text-sub">
+        ツーリングで実際に泊まったキャンプ場の記録です。料金の安い順に並んでいます。「開設期間」は訪問時に確認した情報で、冬季は閉鎖する場所もあります。ランクは料金・ロケーション・トイレ・炊事場・荷運び・買い出し・温泉・アクセスの8つで見た個人の評価で、詳しい基準は{' '}
+        <a href="/about#rank" class="text-brand underline underline-offset-2">
+          評価ランクについて
+        </a>
+        にまとめています。
+      </p>
+      {items.length ? (
+        <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
+          <div class="camp-row border-b border-edge2 bg-base px-4 py-2 text-[11px] font-bold text-mute">
+            <span class="min-w-0 flex-1">キャンプ場</span>
+            <span class="w-24">エリア</span>
+            <span class="w-20">料金</span>
+            <span class="w-14">ランク</span>
+            <span class="w-40">開設期間</span>
+          </div>
+          {items.map((it) => (
+            <a
+              href={`/posts/${it.slug}`}
+              class="camp-row border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-black/[0.03]"
+            >
+              <span class="min-w-0 flex-1 text-[14px] font-bold text-ink">
+                {it.place_name || it.title}
+              </span>
+              <span class="w-24 text-[13px] text-mute">{it.prefecture || '—'}</span>
+              <span class="w-20 font-mono text-[13px] font-bold tabular-nums text-brand">
+                {it.budget != null ? (it.budget === 0 ? '無料' : `${it.budget.toLocaleString()}円`) : '—'}
+              </span>
+              <span class="w-14">
+                {it.rating != null ? (
+                  <RankBadge value={it.rating} link={false} />
+                ) : (
+                  <span class="text-[13px] text-mute">—</span>
+                )}
+              </span>
+              <span class="w-40 text-[12.5px] leading-[1.6] text-mute">
+                {it.business_hours || '—'}
+              </span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="mt-6 rounded-big border border-edge2 bg-panel px-4 py-8 text-center text-[14px] text-mute">
+          まだ記事がありません。
+        </p>
+      )}
+    </main>
+  )
+}
+
 export const SupermarketListPage: FC<{
   items: {
     slug: string
