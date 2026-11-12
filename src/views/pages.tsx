@@ -1,7 +1,7 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
 import { THEMES, SITE, MAP_CATEGORIES, CATEGORY_MAP } from '../lib/config'
-import { PostCard, EmptyState, SectionTitle } from './components'
+import { PostCard, EmptyState, SectionTitle, RankBadge } from './components'
 import { ArrowLink, PillButton } from './layout'
 import { yen } from '../lib/utils'
 
@@ -473,9 +473,73 @@ export const AboutPage: FC<{
                 </div>
               </div>
           </div>
-          <p class="mt-5 text-[12.5px] leading-[1.8] text-mute">
-            ご当地スーパーにはランクを付けていません。価格と品揃え、値引きが始まる時間帯という別の軸で見ているためです。
-          </p>
+          <div class="mt-4 rounded-big border border-edge2 bg-panel p-5">
+            <h3 class="flex items-center gap-2 text-[14.5px] font-bold tracking-tight text-brand">
+              <i class="fa-solid fa-cart-shopping text-[13px] text-brand"></i>ご当地スーパー
+            </h3>
+            <p class="mt-2 text-[13px] leading-[1.7] text-sub">
+              ここだけは総合ランクではなく、2つの軸で別々に見ています。
+            </p>
+            <p class="mt-2.5">
+              <span style="display:inline-block;border:1px solid rgba(0,0,0,0.12);border-radius:9999px;padding:2px 9px;margin:0 6px 6px 0;font-size:11.5px;color:#6b6b66">コスパ＝定価の安さ</span>
+              <span style="display:inline-block;border:1px solid rgba(0,0,0,0.12);border-radius:9999px;padding:2px 9px;margin:0 6px 6px 0;font-size:11.5px;color:#6b6b66">品質＝地場品・鮮魚・惣菜</span>
+            </p>
+            <div class="mt-3 grid gap-4 sm:grid-cols-2">
+              <div>
+                <p class="text-[12px] font-bold text-ink">コスパ</p>
+                <div class="mt-2 overflow-hidden rounded-xl border border-edge2">
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-s">S</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">定価がディスカウント店水準。値引きを待たなくても安い</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-a">A</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">全国チェーンより明確に安い。常時この価格なら寄る</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-b">B</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">全国チェーンより少し安い。地場チェーンとして健闘</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-c">C</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">全国チェーン並み。イオン・ヨーカドーと同じ位置</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-d">D</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">明らかに高い。補給以外で寄る理由がない</p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p class="text-[12px] font-bold text-ink">品質</p>
+                <div class="mt-2 overflow-hidden rounded-xl border border-edge2">
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-s">S</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">県産品が棚の主役。店内調理の刺身や惣菜が目的になる</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-a">A</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">地場品の棚がはっきりある。鮮魚か惣菜が明確に強い</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-b">B</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">必要なものは揃い、地場品も一部ある</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-c">C</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">全国チェーンと同じ品揃え。土地の色はない</p>
+                  </div>
+                  <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
+                    <span class="rank rank-d">D</span>
+                    <p class="text-[13px] leading-[1.7] text-sub">品揃えが限られ、買い出し先として機能しない</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="mt-3 text-[11.5px] leading-[1.7] text-mute">
+              値引きの強さはランクに含めず、「値引きを見た時刻」として別に記録しています。同じチェーンでも店舗によって価格も品揃えも違うため、訪問した1店舗を、ツーリング中の買い出し先という目的で見た個人の主観です。
+            </p>
+          </div>
         </div>
       </section>
 
@@ -600,6 +664,8 @@ export const SupermarketListPage: FC<{
     prefecture: string | null
     visit_date: string | null
     highlight_value: string | null
+    cospa: number | null
+    rating: number | null
   }[]
 }> = ({ items }) => {
   return (
@@ -608,10 +674,21 @@ export const SupermarketListPage: FC<{
         ご当地スーパー一覧
       </h1>
       <p class="mt-2 text-[14px] leading-[1.8] text-sub">
-        ツーリングの途中で立ち寄ったご当地スーパーの記録です。訪問日の新しい順に並んでいます。右端は値引きや半額を確認できた時刻で、「—」は観測できていない店です。
+        ツーリングの途中で立ち寄ったご当地スーパーの記録です。訪問日の新しい順に並んでいます。「値引きを見た時刻」は実際に値引きシールを確認できた時刻で、「—」は観測できていない店です。コスパは定価の安さ、品質は地場品と鮮魚・惣菜の強さを見ています。全国チェーン（イオン・ヨーカドー）をC相当とした、訪問した1店舗についての個人の主観です。詳しい基準は{' '}
+        <a href="/about#rank" class="text-brand underline underline-offset-2">
+          評価ランクについて
+        </a>
+        にまとめています。
       </p>
       {items.length ? (
         <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-edge2 bg-base px-4 py-2 text-[11px] font-bold text-mute">
+            <span class="min-w-0 flex-1">店舗</span>
+            <span class="w-24">エリア</span>
+            <span class="w-24">訪問日</span>
+            <span class="w-28">値引きを見た時刻</span>
+            <span class="w-24">コスパ / 品質</span>
+          </div>
           {items.map((it) => (
             <a
               href={`/posts/${it.slug}`}
@@ -626,6 +703,19 @@ export const SupermarketListPage: FC<{
               </span>
               <span class="w-28 text-[13px] text-brand">
                 {it.highlight_value || '—'}
+              </span>
+              <span class="flex w-24 items-center gap-1.5">
+                {it.cospa ? (
+                  <RankBadge value={it.cospa} link={false} />
+                ) : (
+                  <span class="text-[13px] text-mute">—</span>
+                )}
+                <span class="text-[11px] text-mute">/</span>
+                {it.rating ? (
+                  <RankBadge value={it.rating} link={false} />
+                ) : (
+                  <span class="text-[13px] text-mute">—</span>
+                )}
               </span>
             </a>
           ))}

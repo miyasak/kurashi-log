@@ -123,6 +123,11 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
   if (RANK_CATS.includes(post.category) && post.rating != null) {
     metrics.push({ label: 'ランク', value: '', rank: post.rating })
   }
+  /** ご当地スーパーは総合ランクではなくコスパ・品質の2軸を出す */
+  if (post.category === 'supermarket') {
+    if (post.cospa != null) metrics.push({ label: 'コスパ', value: '', rank: post.cospa })
+    if (post.rating != null) metrics.push({ label: '品質', value: '', rank: post.rating })
+  }
 
   return (
     <a

@@ -134,7 +134,9 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
                   {post.genre}
                 </span>
               ) : null}
-              {post.rating ? <RankBadge value={post.rating} /> : null}
+              {post.rating && post.category !== 'supermarket' ? (
+                <RankBadge value={post.rating} />
+              ) : null}
               {post.status === 'draft' ? (
                 <span class="rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-semibold text-white">
                   下書きプレビュー
@@ -452,8 +454,27 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
           </div>
         ))}
 
-        {/* 評価（スーパー） */}
-        {post.rating != null ? (
+        {/* 評価（スーパーはコスパ/品質の2軸、それ以外は総合ランク） */}
+        {post.category === 'supermarket' ? (
+          post.cospa != null || post.rating != null ? (
+            <div class="grid grid-cols-[86px_minmax(0,1fr)] items-center gap-3 px-5 py-3">
+              <dt class="text-[11px] text-mute">コスパ / 品質</dt>
+              <dd class="flex items-center gap-1.5">
+                {post.cospa != null ? (
+                  <RankBadge value={post.cospa} />
+                ) : (
+                  <span class="text-[13px] text-mute">—</span>
+                )}
+                <span class="text-[11px] text-mute">/</span>
+                {post.rating != null ? (
+                  <RankBadge value={post.rating} />
+                ) : (
+                  <span class="text-[13px] text-mute">—</span>
+                )}
+              </dd>
+            </div>
+          ) : null
+        ) : post.rating != null ? (
           <div class="grid grid-cols-[86px_minmax(0,1fr)] items-center gap-3 px-5 py-3">
             <dt class="text-[11px] text-mute">ランク</dt>
             <dd>
@@ -545,7 +566,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
             ) : null}
           </div>
 
-          {linked.rating ? (
+          {linked.rating && !isSuper ? (
             <p class="mt-2.5">
               <RankBadge value={linked.rating} link={false} />
             </p>
