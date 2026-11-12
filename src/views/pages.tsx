@@ -419,29 +419,32 @@ export const AboutPage: FC<{
                 <h3 class="flex items-center gap-2 text-[14.5px] font-bold tracking-tight">
                   <i class="fa-solid fa-campground text-[13px] text-brand"></i>キャンプ場
                 </h3>
+                <p class="mt-3 text-[12.5px] leading-[1.75] text-mute">次の8つを満たした数で決めています。</p>
+                <div class="mt-2 text-[11.5px] text-mute" style="display:flex;flex-wrap:wrap;gap:6px"><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">料金</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">ロケーション</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">トイレ</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">炊事場</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">荷運び</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">買い出し</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">温泉</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">アクセス</span></div>
                 <div class="mt-4 rounded-xl border border-edge2 bg-base">
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-s">S</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">料金に対して設備と景色が揃う。連泊したくなる</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">8つすべて。連泊したくなる</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-a">A</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">また使う。不満がない</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">7つ。ひとつだけ惜しい</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-b">B</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">一泊なら十分。設備は最低限</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">5〜6つ。一泊なら十分</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-c">C</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">他に選択肢があるなら選ばない</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">3〜4つ。我慢する前提で使う</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-d">D</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">勧めない</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">2つ以下。勧めない</p>
                   </div>
                 </div>
-              </div>
+              <p class="mt-2 text-[11.5px] leading-[1.7] text-mute">無料でもトイレか炊事場に難があるときはCにしています。</p>
+                </div>
               <div class="rounded-big border border-edge2 bg-panel p-5">
                 <h3 class="flex items-center gap-2 text-[14.5px] font-bold tracking-tight">
                   <i class="fa-solid fa-droplet text-[13px] text-brand"></i>日帰り温泉
