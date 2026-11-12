@@ -722,6 +722,72 @@ export const CampListPage: FC<{
   )
 }
 
+export const OnsenListPage: FC<{
+  items: {
+    slug: string
+    title: string
+    place_name: string | null
+    prefecture: string | null
+    budget: number | null
+    business_hours: string | null
+    rating: number | null
+  }[]
+}> = ({ items }) => {
+  return (
+    <main class="mx-auto max-w-page px-6 py-10">
+      <h1 class="text-[22px] font-bold tracking-[-0.02em] text-ink sm:text-[26px]">
+        日帰り温泉一覧
+      </h1>
+      <p class="mt-2 text-[14px] leading-[1.8] text-sub">
+        ツーリングやキャンプの途中で寄った日帰り温泉の記録です。入浴料の安い順に並んでいます。料金も営業時間も訪問時に確認したもので、変わることがあります。ランクは湯の良さと設備、価格を合わせて見た個人の評価で、詳しい基準は{' '}
+        <a href="/about#rank" class="text-brand underline underline-offset-2">
+          評価ランクについて
+        </a>
+        にまとめています。
+      </p>
+      {items.length ? (
+        <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
+          <div class="camp-row border-b border-edge2 bg-base px-4 py-2 text-[11px] font-bold text-mute">
+            <span>施設名</span>
+            <span>エリア</span>
+            <span>入浴料</span>
+            <span>ランク</span>
+            <span>営業時間</span>
+          </div>
+          {items.map((it) => (
+            <a
+              href={`/posts/${it.slug}`}
+              class="camp-row border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-black/[0.03]"
+            >
+              <span class="min-w-0 text-[14px] font-bold text-ink">
+                {it.place_name || it.title}
+              </span>
+              <span class="text-[13px] text-mute">{it.prefecture || '—'}</span>
+              <span class="font-mono text-[13px] font-bold tabular-nums text-brand">
+                {it.budget != null ? `${it.budget.toLocaleString()}円` : '—'}
+              </span>
+              <span>
+                {it.rating != null ? (
+                  <RankBadge value={it.rating} link={false} />
+                ) : (
+                  <span class="text-[13px] text-mute">—</span>
+                )}
+              </span>
+              <span class="text-[12.5px] leading-[1.6] text-mute">
+                {it.business_hours || '—'}
+              </span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="mt-6 rounded-big border border-edge2 bg-panel px-4 py-8 text-center text-[14px] text-mute">
+          まだ記事がありません。
+        </p>
+      )}
+    </main>
+  )
+}
+
 export const SupermarketListPage: FC<{
   items: {
     slug: string

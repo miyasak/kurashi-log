@@ -37,7 +37,7 @@ import { Layout } from './views/layout'
 import { HomePage } from './views/home'
 import { ThemePage } from './views/theme'
 import { PostPage } from './views/post'
-import { SearchPage, MapPage, SupermarketListPage, CampListPage, AboutPage, PrivacyPage, NotFoundPage, TagPage } from './views/pages'
+import { SearchPage, MapPage, SupermarketListPage, CampListPage, OnsenListPage, AboutPage, PrivacyPage, NotFoundPage, TagPage } from './views/pages'
 import { AdminApp } from './views/admin'
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -360,6 +360,38 @@ app.get('/map', async (c) => {
   )
 })
 
+/* ================== 日帰り温泉一覧 ================== */
+app.get('/onsen', async (c) => {
+  const rows = await c.env.DB.prepare(
+    `SELECT slug, title, place_name, prefecture, budget, business_hours, rating
+       FROM posts
+      WHERE status='published' AND category='onsen'
+      ORDER BY budget ASC, rating DESC, published_at DESC`
+  ).all<{
+    slug: string
+    title: string
+    place_name: string | null
+    prefecture: string | null
+    budget: number | null
+    business_hours: string | null
+    rating: number | null
+  }>()
+  return doc(
+    c,
+    <Layout
+      title="日帰り温泉一覧"
+      activePage="onsen"
+      activeTheme="spa"
+      description="ツーリングやキャンプの途中で寄った日帰り温泉の一覧です。入浴料・エリア・ランク・営業時間から記事を探せます。"
+      canonical={canonicalOf(c)}
+      jsonLd={simplePageJsonLd(originOf(c), '日帰り温泉一覧', '/onsen')}
+      scripts={['/static/site.js']}
+    >
+      <OnsenListPage items={rows.results || []} />
+    </Layout>
+  )
+})
+
 /* ================== キャンプ場一覧 ================== */
 app.get('/camp', async (c) => {
   const rows = await c.env.DB.prepare(
@@ -529,6 +561,9 @@ app.get('/sitemap.xml', async (c) => {
   }
   if (posts.some((p) => p.category === 'camp')) {
     entries.push({ loc: '/camp', lastmod: newest, priority: '0.7', freq: 'weekly' })
+  }
+  if (posts.some((p) => p.category === 'onsen')) {
+    entries.push({ loc: '/onsen', lastmod: newest, priority: '0.7', freq: 'weekly' })
   }
 
   // テーマ：記事が1件以上あるものだけ載せる（空ページをインデックスさせない）

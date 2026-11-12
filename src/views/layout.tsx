@@ -9,7 +9,7 @@ type LayoutProps = PropsWithChildren<{
   /** 大テーマ（money / touring / tech）を直接指定 */
   activeTheme?: string
   /** ホーム/マップなど、ナビでハイライトする固定ページ */
-  activePage?: 'home' | 'map' | 'about' | 'search' | 'supermarket' | 'camp'
+  activePage?: 'home' | 'map' | 'about' | 'search' | 'supermarket' | 'camp' | 'onsen'
   ogImage?: string | null
   scripts?: string[]
   headExtra?: any
@@ -322,6 +322,7 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
               <li><a href="/map" class="text-[14px] text-sub transition hover:text-ink">エリア別マップ</a></li>
             ) : null}
               <li><a href="/camp" class="text-[14px] text-sub transition hover:text-ink">キャンプ場一覧</a></li>
+              <li><a href="/onsen" class="text-[14px] text-sub transition hover:text-ink">日帰り温泉一覧</a></li>
               <li><a href="/supermarket" class="text-[14px] text-sub transition hover:text-ink">ご当地スーパー一覧</a></li>
               <li><a href="/search" class="text-[14px] text-sub transition hover:text-ink">記事を探す</a></li>
           </ul>
