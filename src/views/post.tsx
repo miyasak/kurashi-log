@@ -400,7 +400,6 @@ const SpecCard: FC<{ post: Post }> = ({ post }) => {
     push('エリア', areaLabel)
     push('店舗', post.place_name)
     push('カテゴリ', post.genre)
-    push('会計金額', post.budget ? yen(post.budget) : null)
     push('営業時間', post.business_hours)
     push('アクセス', post.access_text)
     push('住所', post.address)

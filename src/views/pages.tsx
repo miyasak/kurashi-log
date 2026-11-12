@@ -599,17 +599,16 @@ export const SupermarketListPage: FC<{
     place_name: string | null
     prefecture: string | null
     visit_date: string | null
-    rating: number | null
+    highlight_value: string | null
   }[]
 }> = ({ items }) => {
-  const stars = (n: number) => '★'.repeat(Math.floor(n)) + (n % 1 ? '☆' : '')
   return (
     <main class="mx-auto max-w-page px-6 py-10">
       <h1 class="text-[22px] font-bold tracking-[-0.02em] text-ink sm:text-[26px]">
         ご当地スーパー一覧
       </h1>
       <p class="mt-2 text-[14px] leading-[1.8] text-sub">
-        ツーリングの途中で立ち寄ったご当地スーパーの記録です。訪問日の新しい順に並んでいます。
+        ツーリングの途中で立ち寄ったご当地スーパーの記録です。訪問日の新しい順に並んでいます。右端は値引きや半額を確認できた時刻で、「—」は観測できていない店です。
       </p>
       {items.length ? (
         <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
@@ -625,8 +624,8 @@ export const SupermarketListPage: FC<{
               <span class="w-24 font-mono text-[13px] tabular-nums text-mute">
                 {it.visit_date || '—'}
               </span>
-              <span class="w-20 text-[13px] text-brand">
-                {it.rating ? stars(Number(it.rating)) : '—'}
+              <span class="w-28 text-[13px] text-brand">
+                {it.highlight_value || '—'}
               </span>
             </a>
           ))}
