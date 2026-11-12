@@ -195,3 +195,29 @@ D1バインディングの生成が一時的に失敗しているだけで、設
 `src/lib/db.ts` の保存処理が `POST_FIELDS` を全件回して
 `payload[f] = data[f] ?? null` を入れるため、フォームに無い項目は保存時に null で
 上書きされる。値を残したまま表示だけ消したいなら、フォームは残して post.tsx だけ直す。
+
+## 一覧ページの追加手順（2026-11-12）
+
+`/supermarket` と `/camp` は、テーマページとは別の「表で比較する」ページ。
+増やすときは5か所を触る。
+
+1. `src/views/pages.tsx` … `XxxListPage` を追加（SupermarketListPage が雛形）
+2. `src/index.tsx` … import に追加、`app.get('/xxx')` でルート追加
+3. `src/index.tsx` … sitemap の entries に push（記事が1本以上あるときだけ）
+4. `src/views/layout.tsx` … フッターの SITE 欄にリンク追加、`activePage` の型に追加
+5. ルートの `<Layout>` に `activePage="xxx"` と `activeTheme="touring"` を渡す
+   （`activeTheme` を渡さないとヘッダーのタブが光らない）
+
+行のレイアウトは `public/static/style.css` の `.camp-row` を使う。
+`flex` + `w-24` のような固定幅だと、長い地名（例: 北海道枝幸郡浜頓別町）で
+崩れるため、sm以上は grid で列を固定している。
+
+### ハマりどころ（今日2回踏んだ）
+
+`public/static/admin.js` と `public/static/style.css` を変えたときは、
+デプロイ後に必ず Shift+Command+R（ハードリロード）で確認する。
+普通のリロードだと古いファイルが使われ、「反映されていない」「レイアウトが
+崩れた」ように見える。`curl` で確認すると正しく配信されていることが多い。
+
+`?v=$(date +%s)` はHTMLには効くが、HTMLから読み込まれる .js / .css には
+効かない（URLが変わらないため）。
