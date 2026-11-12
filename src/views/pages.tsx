@@ -679,6 +679,15 @@ export const CampListPage: FC<{
         </a>
         にまとめています。
       </p>
+      <p class="mt-3">
+        <a
+          href="/theme/touring?cat=camp"
+          class="inline-flex items-center gap-1.5 text-[13.5px] text-sub underline underline-offset-2 transition hover:text-ink"
+        >
+          <i class="fa-solid fa-chevron-left text-[9px]"></i>
+          キャンプ場の記事を読む
+        </a>
+      </p>
       {items.length ? (
         <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
           <div class="camp-row border-b border-edge2 bg-base px-4 py-2 text-[11px] font-bold text-mute">
@@ -744,6 +753,15 @@ export const OnsenListPage: FC<{
           評価ランクについて
         </a>
         にまとめています。
+      </p>
+      <p class="mt-3">
+        <a
+          href="/theme/spa"
+          class="inline-flex items-center gap-1.5 text-[13.5px] text-sub underline underline-offset-2 transition hover:text-ink"
+        >
+          <i class="fa-solid fa-chevron-left text-[9px]"></i>
+          日帰り温泉の記事を読む
+        </a>
       </p>
       {items.length ? (
         <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
@@ -811,6 +829,15 @@ export const SupermarketListPage: FC<{
           評価ランクについて
         </a>
         にまとめています。
+      </p>
+      <p class="mt-3">
+        <a
+          href="/theme/touring?cat=supermarket"
+          class="inline-flex items-center gap-1.5 text-[13.5px] text-sub underline underline-offset-2 transition hover:text-ink"
+        >
+          <i class="fa-solid fa-chevron-left text-[9px]"></i>
+          ご当地スーパーの記事を読む
+        </a>
       </p>
       {items.length ? (
         <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">

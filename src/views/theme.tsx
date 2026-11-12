@@ -222,6 +222,28 @@ export const ThemePage: FC<Props> = ({
             desc={total ? `${total} 件の記録があります。` : undefined}
           />
 
+          {(() => {
+            const cmp =
+              activeCat === 'camp'
+                ? { href: '/camp', label: 'キャンプ場を表で比較' }
+                : activeCat === 'supermarket'
+                  ? { href: '/supermarket', label: 'ご当地スーパーを表で比較' }
+                  : theme.key === 'spa'
+                    ? { href: '/onsen', label: '日帰り温泉を表で比較' }
+                    : null
+            return cmp ? (
+              <div class="mt-4">
+                <a
+                  href={cmp.href}
+                  class="inline-flex items-center gap-2 rounded-full border border-brand/25 bg-brandsoft px-4 py-2 text-[13.5px] font-medium text-brand transition hover:brightness-105"
+                >
+                  <i class="fa-solid fa-table-list text-[11.5px]"></i>
+                  {cmp.label}
+                </a>
+              </div>
+            ) : null
+          })()}
+
           {/* 検索 & タグ（左揃え） */}
           <div class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-3">
             <form action={base} method="get" class="flex w-full max-w-[420px] items-center gap-2">
