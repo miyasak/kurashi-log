@@ -668,7 +668,7 @@ export const CampListPage: FC<{
   }[]
 }> = ({ items }) => {
   return (
-    <main class="mx-auto max-w-page px-6 py-10">
+    <div class="mx-auto max-w-page px-6 py-10">
       <h1 class="text-[22px] font-bold tracking-[-0.02em] text-ink sm:text-[26px]">
         キャンプ場一覧
       </h1>
@@ -727,7 +727,7 @@ export const CampListPage: FC<{
           まだ記事がありません。
         </p>
       )}
-    </main>
+    </div>
   )
 }
 
@@ -743,7 +743,7 @@ export const OnsenListPage: FC<{
   }[]
 }> = ({ items }) => {
   return (
-    <main class="mx-auto max-w-page px-6 py-10">
+    <div class="mx-auto max-w-page px-6 py-10">
       <h1 class="text-[22px] font-bold tracking-[-0.02em] text-ink sm:text-[26px]">
         日帰り温泉一覧
       </h1>
@@ -802,7 +802,7 @@ export const OnsenListPage: FC<{
           まだ記事がありません。
         </p>
       )}
-    </main>
+    </div>
   )
 }
 
@@ -819,7 +819,7 @@ export const SupermarketListPage: FC<{
   }[]
 }> = ({ items }) => {
   return (
-    <main class="mx-auto max-w-page px-6 py-10">
+    <div class="mx-auto max-w-page px-6 py-10">
       <h1 class="text-[22px] font-bold tracking-[-0.02em] text-ink sm:text-[26px]">
         ご当地スーパー一覧
       </h1>
@@ -884,7 +884,7 @@ export const SupermarketListPage: FC<{
           まだ記事がありません。
         </p>
       )}
-    </main>
+    </div>
   )
 }
 

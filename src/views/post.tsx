@@ -512,7 +512,16 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
   const accent = ACCENT
   const isSuper = linked.category === 'supermarket'
   const eyebrow = isSuper ? 'Local Stop' : 'Related Ride'
-  const heading = isSuper ? 'このツーリングで寄った店' : 'この店に寄ったツーリング'
+  const heading =
+    linked.category === 'supermarket'
+      ? 'このツーリングで寄った店'
+      : linked.category === 'camp'
+        ? 'この日泊まったキャンプ場'
+        : linked.category === 'onsen'
+          ? 'この日入った温泉'
+          : current.category === 'supermarket'
+            ? 'この店に寄ったツーリング'
+            : 'この日のツーリング'
 
   const items = (linked.recommend_items || '')
     .split(/[\n/／・]+/)
