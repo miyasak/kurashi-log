@@ -44,7 +44,7 @@ export const Layout: FC<LayoutProps> = (props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
         <title>{title}</title>
         <meta name="description" content={desc} />
-        <meta name="theme-color" content="#f1f1ec" />
+        <meta name="theme-color" content="#ffffff" />
         <meta name="color-scheme" content="light" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={desc} />

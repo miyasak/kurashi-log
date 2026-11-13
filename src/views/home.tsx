@@ -148,36 +148,39 @@ export const HomePage: FC<Props> = ({
       {themeCards.length ? (
         <section class="border-b border-edge2 bg-base">
           <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-12">
-            <div class={`grid grid-cols-1 gap-4 ${themeCards.length === 3 ? 'sm:grid-cols-2 lg:grid-cols-3' : 'sm:grid-cols-2'}`}>
-              {themeCards.map((c) => (
+            <div class="overflow-hidden rounded-big border border-edge2 bg-panel">
+              {themeCards.map((c, i) => (
                 <a
                   href={`/theme/${c.theme.key}`}
-                  class="group flex flex-col rounded-big border border-edge2 bg-panel p-5 transition duration-300 hover:border-brand/40 sm:p-6"
+                  class={`group flex flex-wrap items-center gap-x-5 gap-y-3 px-5 py-4 transition hover:bg-black/[0.03] sm:px-6 sm:py-5 ${i ? 'border-t border-edge2' : ''}`}
                 >
-                  <span class="grid h-10 w-10 place-items-center rounded-lg bg-brandsoft text-brand">
+                  <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brandsoft text-brand">
                     <i class={`fa-solid ${c.theme.icon} text-[15px]`}></i>
                   </span>
-                  <h2 class="mt-4 text-[17px] font-bold tracking-[-0.02em] text-ink">
-                    {c.theme.label}
-                    <span class="ml-2 text-[13.5px] font-medium text-mute">{c.theme.name}</span>
-                  </h2>
-                  <p class="mt-2 text-[13.5px] leading-[1.7] text-sub">{c.theme.description}</p>
+                  <div class="min-w-0 flex-1 sm:max-w-[42%]">
+                    <h2 class="text-[16px] font-bold tracking-[-0.02em] text-ink">
+                      {c.theme.label}
+                      <span class="ml-2 text-[13px] font-medium text-mute">{c.theme.name}</span>
+                    </h2>
+                    <p class="mt-1 text-[13px] leading-[1.6] text-sub">{c.theme.description}</p>
+                  </div>
                   {c.stats.length ? (
-                    <dl class="mt-5 flex flex-wrap gap-x-7 gap-y-3">
+                    <dl class="ml-auto flex shrink-0 items-center justify-start gap-6 sm:ml-0 sm:w-64">
                       {c.stats.map((s) => (
-                        <div>
+                        <div class="text-right">
                           <dt class="text-[10px] font-bold uppercase tracking-[0.12em] text-mute">{s.label}</dt>
-                          <dd class="mt-1 font-mono text-[19px] font-bold leading-none tabular-nums tracking-tight text-ink">
+                          <dd class="mt-1 font-mono text-[18px] font-bold leading-none tabular-nums tracking-tight text-ink">
                             {s.value}
                           </dd>
                         </div>
                       ))}
                     </dl>
                   ) : null}
-                  <p class="mt-auto pt-5 flex items-center gap-1.5 text-[13.5px] font-medium text-brand">
-                    <span class="font-mono tabular-nums">{c.count}</span> 件の記録を見る
+                  <div class="ml-auto flex shrink-0 items-center gap-1.5 text-[13px] font-medium text-brand">
+                    <span class="font-mono tabular-nums">{c.count}</span>
+                    <span>件の記録</span>
                     <i class="fa-solid fa-chevron-right text-[9px] transition group-hover:translate-x-0.5"></i>
-                  </p>
+                  </div>
                 </a>
               ))}
             </div>
