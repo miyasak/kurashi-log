@@ -80,16 +80,36 @@ export const HomePage: FC<Props> = ({
     <>
       {/* ==================== ヒーロー ==================== */}      
       <section id="hero" class="relative isolate overflow-hidden border-b border-edge2 bg-panel2">
-        <img
-          id="hero-img"
-          src="/static/hero.jpg"
-          alt=""
-          width="1280"
-          height="349"
-          fetchpriority="high"
-          decoding="async"
-        />
-        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20"></div>
+        <div id="hero-img">
+          <img
+            class="hero-slide"
+            src="/static/hero.jpg"
+            alt=""
+            width="1280"
+            height="349"
+            fetchpriority="high"
+            decoding="async"
+          />
+          <img
+            class="hero-slide"
+            src="/static/hero2.jpg"
+            alt=""
+            width="1280"
+            height="349"
+            loading="lazy"
+            decoding="async"
+          />
+          <img
+            class="hero-slide"
+            src="/static/hero3.jpg"
+            alt=""
+            width="1280"
+            height="349"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 from-20% via-black/70 to-black/35"></div>
 
         {/* 文字を上に重ねる */}
         <div id="hero-copy">
