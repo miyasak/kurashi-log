@@ -1,7 +1,7 @@
 import type { FC } from 'hono/jsx'
 import type { Post } from '../lib/db'
 import type { ThemeDef } from '../lib/config'
-import { CATEGORY_MAP, THEMES, AREA_TAGS } from '../lib/config'
+import { CATEGORY_MAP, THEMES, AREA_TAGS, REGION_TAGS, PREF_TAGS } from '../lib/config'
 import { PostCard, EmptyState, SpecRow, SectionTitle, validSpecs } from './components'
 import { ArrowLink } from './layout'
 import { yen } from '../lib/utils'
@@ -270,13 +270,12 @@ export const ThemePage: FC<Props> = ({
               const shown = tags.filter(
                 (t) => t.cnt >= 2 || t.slug === activeTag || t.name === activeTag
               )
-              const rank = (n: string) => {
-                const i = AREA_TAGS.indexOf(n)
-                return i < 0 ? 999 : i
-              }
-              const areas = shown
-                .filter((t) => AREA_TAGS.includes(t.name))
-                .sort((a, b) => rank(a.name) - rank(b.name))
+              const regions = shown
+                .filter((t) => REGION_TAGS.includes(t.name))
+                .sort((a, b) => REGION_TAGS.indexOf(a.name) - REGION_TAGS.indexOf(b.name))
+              const prefs = shown
+                .filter((t) => PREF_TAGS.includes(t.name))
+                .sort((a, b) => PREF_TAGS.indexOf(a.name) - PREF_TAGS.indexOf(b.name))
               const kinds = shown.filter((t) => !AREA_TAGS.includes(t.name)).slice(0, 6)
               const chip = (t: any) =>
                 `rounded-full px-3 py-1 text-[12px] transition ${
@@ -287,7 +286,7 @@ export const ThemePage: FC<Props> = ({
               return (
                 <div class="mt-4 space-y-2.5">
                   <div class="flex flex-wrap items-center gap-1.5">
-                    <span class="mr-1 w-10 shrink-0 text-[11px] font-bold text-mute">種類</span>
+                    <span class="mr-1 w-14 shrink-0 text-[11px] font-bold text-mute">種類</span>
                     <a
                       href={`${base}${qsOf({ tag: '' })}`}
                       class={`rounded-full px-3 py-1 text-[12px] transition ${
@@ -303,10 +302,21 @@ export const ThemePage: FC<Props> = ({
                       </a>
                     ))}
                   </div>
-                  {areas.length ? (
+                  {regions.length ? (
                     <div class="flex flex-wrap items-center gap-1.5">
-                      <span class="mr-1 w-10 shrink-0 text-[11px] font-bold text-mute">エリア</span>
-                      {areas.map((t) => (
+                      <span class="mr-1 w-14 shrink-0 text-[11px] font-bold text-mute">地方</span>
+                      {regions.map((t) => (
+                        <a href={`${base}${qsOf({ tag: t.slug })}`} class={chip(t)}>
+                          {t.name}
+                          <span class="ml-1.5 font-mono tabular-nums opacity-50">{t.cnt}</span>
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                  {prefs.length ? (
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span class="mr-1 w-14 shrink-0 text-[11px] font-bold text-mute">都道府県</span>
+                      {prefs.map((t) => (
                         <a href={`${base}${qsOf({ tag: t.slug })}`} class={chip(t)}>
                           {t.name}
                           <span class="ml-1.5 font-mono tabular-nums opacity-50">{t.cnt}</span>

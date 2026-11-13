@@ -157,7 +157,7 @@ export const HomePage: FC<Props> = ({
                   <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brandsoft text-brand">
                     <i class={`fa-solid ${c.theme.icon} text-[15px]`}></i>
                   </span>
-                  <div class="min-w-0 flex-1 sm:max-w-[42%]">
+                  <div class="min-w-0 basis-[calc(100%-3.75rem)] sm:basis-auto sm:flex-1 sm:max-w-[42%]">
                     <h2 class="text-[16px] font-bold tracking-[-0.02em] text-ink">
                       {c.theme.label}
                       <span class="ml-2 text-[13px] font-medium text-mute">{c.theme.name}</span>
@@ -165,7 +165,7 @@ export const HomePage: FC<Props> = ({
                     <p class="mt-1 text-[13px] leading-[1.6] text-sub">{c.theme.description}</p>
                   </div>
                   {c.stats.length ? (
-                    <dl class="ml-auto flex shrink-0 items-center justify-start gap-6 sm:ml-0 sm:w-64">
+                    <dl class="ml-[3.75rem] flex shrink-0 items-center justify-start gap-6 sm:ml-0 sm:w-64">
                       {c.stats.map((s) => (
                         <div class="text-right">
                           <dt class="text-[10px] font-bold uppercase tracking-[0.12em] text-mute">{s.label}</dt>
