@@ -885,3 +885,8 @@ a.rank:hover { opacity: 0.82; }
 .super-row.bg-base {
   background: #f1f1f1 !important;
 }
+
+/* セクションの帯。描画された順に数えて交互に塗る */
+main > section:nth-of-type(even) {
+  background: #f6f6f5;
+}

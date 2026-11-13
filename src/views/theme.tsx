@@ -196,7 +196,7 @@ export const ThemePage: FC<Props> = ({
 
       {/* ============ ツーリング：地図（記事がある時のみ） ============ */}
       {showMap && total > 0 ? (
-        <section class="border-b border-edge2 bg-panel">
+        <section class="border-b border-edge2 bg-base">
           <div class="mx-auto max-w-page px-4 py-9 sm:px-6 sm:py-11">
             <SectionTitle
               eyebrow="Map"
