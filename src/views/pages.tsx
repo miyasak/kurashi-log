@@ -414,13 +414,12 @@ export const AboutPage: FC<{
                     <p class="text-[13px] leading-[1.7] text-sub">勧めない</p>
                   </div>
                 </div>
+                <p class="mt-4 text-[12.5px] leading-[1.75] text-mute">道そのもの（景色・路面・交通量）と、そこへ行くまでの手間を比べて決めています。</p>
               </div>
               <div class="rounded-big border border-edge2 bg-panel p-5">
                 <h3 class="flex items-center gap-2 text-[14.5px] font-bold tracking-tight">
                   <i class="fa-solid fa-campground text-[13px] text-brand"></i>キャンプ場
                 </h3>
-                <p class="mt-3 text-[12.5px] leading-[1.75] text-mute">次の8つを満たした数で決めています。</p>
-                <div class="mt-2 text-[11.5px] text-mute" style="display:flex;flex-wrap:wrap;gap:6px"><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">料金</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">ロケーション</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">トイレ</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">炊事場</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">荷運び</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">買い出し</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">温泉</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">アクセス</span></div>
                 <div class="mt-4 rounded-xl border border-edge2 bg-base">
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-s">S</span>
@@ -443,6 +442,8 @@ export const AboutPage: FC<{
                     <p class="text-[13px] leading-[1.7] text-sub">2つ以下。勧めない</p>
                   </div>
                 </div>
+                <p class="mt-4 text-[12.5px] leading-[1.75] text-mute">次の8つを満たした数で決めています。</p>
+                <div class="mt-2 text-[11.5px] text-mute" style="display:flex;flex-wrap:wrap;gap:6px"><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">料金</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">ロケーション</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">トイレ</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">炊事場</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">荷運び</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">買い出し</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">温泉</span><span style="display:inline-block;border:1px solid var(--edge2,rgba(0,0,0,.12));border-radius:999px;padding:2px 9px">アクセス</span></div>
               <p class="mt-2 text-[11.5px] leading-[1.7] text-mute">無料でもトイレか炊事場に難があるときはCにしています。</p>
                 </div>
               <div class="rounded-big border border-edge2 bg-panel p-5">
@@ -452,11 +453,11 @@ export const AboutPage: FC<{
                 <div class="mt-4 rounded-xl border border-edge2 bg-base">
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-s">S</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">700円以下。かけ流しまたはとろとろ・ぬるぬるの湯で、サウナ・露天・休憩所が揃う。寄り道してでも行く</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">料金に対して明らかに得。かけ流しか個性のある湯で、露天・サウナ・休憩所が揃う。価格帯は問わない</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-a">A</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">湯は良いが設備が限られる。通り道なら必ず寄る</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">料金相応だが、湯か設備のどちらかが抜けている。通り道なら必ず寄る</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-b">B</span>
@@ -464,13 +465,14 @@ export const AboutPage: FC<{
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-c">C</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">次はないかな</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">内容に対して高い。次はないかな</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-d">D</span>
                     <p class="text-[13px] leading-[1.7] text-sub">勧めない</p>
                   </div>
                 </div>
+                <p class="mt-4 text-[12.5px] leading-[1.75] text-mute">日帰り入浴の相場を700〜900円（スーパー銭湯でサウナ・露天が付く価格帯）とし、払った額に対して何が得られたかで見ています。</p>
               </div>
           </div>
           <div class="mt-4 rounded-big border border-edge2 bg-panel p-5">
