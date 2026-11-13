@@ -132,7 +132,7 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
   return (
     <a
       href={href}
-      class="group flex h-full flex-col overflow-hidden rounded-big border border-edge2 card-dark transition duration-300 hover:border-brand/40"
+      class="group flex h-full flex-col overflow-hidden rounded-big border border-edge2 bg-panel transition duration-300 hover:border-brand/40"
     >
       {showFrame ? <Cover post={post} ratio="aspect-[16/9]" /> : null}
       <div class="flex flex-1 flex-col p-4 sm:p-5">
