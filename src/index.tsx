@@ -363,7 +363,7 @@ app.get('/map', async (c) => {
 /* ================== 日帰り温泉一覧 ================== */
 app.get('/onsen', async (c) => {
   const rows = await c.env.DB.prepare(
-    `SELECT slug, title, place_name, prefecture, budget, business_hours, rating
+    `SELECT slug, title, place_name, prefecture, budget, business_hours, rating, visit_date
        FROM posts
       WHERE status='published' AND category='onsen'
       ORDER BY budget ASC, rating DESC, published_at DESC`
@@ -375,6 +375,7 @@ app.get('/onsen', async (c) => {
     budget: number | null
     business_hours: string | null
     rating: number | null
+    visit_date: string | null
   }>()
   return doc(
     c,
@@ -395,7 +396,7 @@ app.get('/onsen', async (c) => {
 /* ================== キャンプ場一覧 ================== */
 app.get('/camp', async (c) => {
   const rows = await c.env.DB.prepare(
-    `SELECT slug, title, place_name, prefecture, budget, business_hours, rating
+    `SELECT slug, title, place_name, prefecture, budget, business_hours, rating, visit_date
        FROM posts
       WHERE status='published' AND category='camp'
       ORDER BY budget ASC, rating DESC, published_at DESC`
@@ -407,6 +408,7 @@ app.get('/camp', async (c) => {
     budget: number | null
     business_hours: string | null
     rating: number | null
+    visit_date: string | null
   }>()
   return doc(
     c,

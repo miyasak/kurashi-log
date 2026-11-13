@@ -583,3 +583,81 @@
     if (e.key === 'Escape') close()
   })
 })()
+
+/* 一覧ページの並べ替え（URLは増やさず、行を入れ替えるだけ） */
+;(function () {
+  function n(el, k) {
+    var v = parseFloat(el.getAttribute('data-' + k))
+    return isNaN(v) ? -1 : v
+  }
+  function d(el) {
+    return el.getAttribute('data-date') || ''
+  }
+  function newer(a, b) {
+    return d(b) < d(a) ? -1 : d(b) > d(a) ? 1 : 0
+  }
+  function run() {
+    var first = document.querySelector('a[data-rank], a[data-cospa]')
+    if (!first) return
+    var box = first.parentElement
+    var rows = [].slice.call(box.querySelectorAll('a[data-rank], a[data-cospa]'))
+    if (rows.length < 3) return
+    var sup = first.hasAttribute('data-cospa')
+    var base = rows.slice()
+    var modes = sup
+      ? [
+          { k: 'default', l: '訪問日順' },
+          { k: 'cospa', l: 'コスパ順' },
+          { k: 'quality', l: '品質順' }
+        ]
+      : [
+          { k: 'default', l: '料金順' },
+          { k: 'rank', l: 'ランク順' },
+          { k: 'date', l: '新着順' }
+        ]
+    var bar = document.createElement('div')
+    bar.className = 'sort-bar'
+    var lab = document.createElement('span')
+    lab.className = 'sort-label'
+    lab.textContent = '並べ替え'
+    bar.appendChild(lab)
+    modes.forEach(function (m, i) {
+      var b = document.createElement('button')
+      b.type = 'button'
+      b.className = 'sort-btn' + (i === 0 ? ' is-on' : '')
+      b.textContent = m.l
+      b.addEventListener('click', function () {
+        [].forEach.call(bar.querySelectorAll('.sort-btn'), function (x) {
+          x.classList.remove('is-on')
+        })
+        b.classList.add('is-on')
+        var list = base.slice()
+        if (m.k === 'rank') {
+          list.sort(function (a, c) {
+            return n(c, 'rank') - n(a, 'rank') || n(a, 'price') - n(c, 'price') || newer(a, c)
+          })
+        } else if (m.k === 'date') {
+          list.sort(newer)
+        } else if (m.k === 'cospa') {
+          list.sort(function (a, c) {
+            return n(c, 'cospa') - n(a, 'cospa') || n(c, 'quality') - n(a, 'quality') || newer(a, c)
+          })
+        } else if (m.k === 'quality') {
+          list.sort(function (a, c) {
+            return n(c, 'quality') - n(a, 'quality') || n(c, 'cospa') - n(a, 'cospa') || newer(a, c)
+          })
+        }
+        list.forEach(function (r) {
+          box.appendChild(r)
+        })
+      })
+      bar.appendChild(b)
+    })
+    box.parentNode.insertBefore(bar, box)
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run)
+  } else {
+    run()
+  }
+})()

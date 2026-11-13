@@ -667,6 +667,7 @@ export const CampListPage: FC<{
     budget: number | null
     business_hours: string | null
     rating: number | null
+    visit_date: string | null
   }[]
 }> = ({ items }) => {
   return (
@@ -703,6 +704,9 @@ export const CampListPage: FC<{
             <a
               href={`/posts/${it.slug}`}
               class="camp-row border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-black/[0.03]"
+              data-price={String(it.budget ?? 999999)}
+              data-rank={String(it.rating ?? 0)}
+              data-date={it.visit_date || ''}
             >
               <span class="min-w-0 flex-1 text-[14px] font-bold text-ink">
                 {it.place_name || it.title}
@@ -742,6 +746,7 @@ export const OnsenListPage: FC<{
     budget: number | null
     business_hours: string | null
     rating: number | null
+    visit_date: string | null
   }[]
 }> = ({ items }) => {
   return (
@@ -778,6 +783,9 @@ export const OnsenListPage: FC<{
             <a
               href={`/posts/${it.slug}`}
               class="camp-row border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-black/[0.03]"
+              data-price={String(it.budget ?? 999999)}
+              data-rank={String(it.rating ?? 0)}
+              data-date={it.visit_date || ''}
             >
               <span class="min-w-0 flex-1 text-[14px] font-bold text-ink">
                 {it.place_name || it.title}
@@ -843,7 +851,7 @@ export const SupermarketListPage: FC<{
       </p>
       {items.length ? (
         <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-edge2 bg-base px-4 py-2 text-[11px] font-bold text-mute">
+          <div class="super-row border-b border-edge2 bg-base px-4 py-2 text-[11px] font-bold text-mute">
             <span class="min-w-0 flex-1">店舗</span>
             <span class="w-24">エリア</span>
             <span class="w-24">訪問日</span>
@@ -853,7 +861,10 @@ export const SupermarketListPage: FC<{
           {items.map((it) => (
             <a
               href={`/posts/${it.slug}`}
-              class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-black/[0.03]"
+              class="super-row border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-black/[0.03]"
+              data-cospa={String(it.cospa ?? 0)}
+              data-quality={String(it.rating ?? 0)}
+              data-date={it.visit_date || ''}
             >
               <span class="min-w-0 flex-1 text-[14px] font-bold text-ink">
                 {it.place_name || it.title}
