@@ -75,7 +75,8 @@ npm run build npx wrangler pages deploy dist --project-name=tadoreru
 DBは `posts.rating`（5=S 〜 1=D）、表示は `src/views/components.tsx` の `RankBadge`、
 配色は `public/static/style.css` の `.rank-*`。基準の本文は `/about#rank`
 （`src/views/pages.tsx` の `#rank` セクション）にあり、記事側のバッジはそこへリンクする。
-ご当地スーパーは別の軸で見るためランクを付けない。
+ご当地スーパーは総合ランクを持たず、コスパ（`posts.cospa`）と品質（`posts.rating`）の
+2軸で付ける。カラムを流用しているため、他カテゴリの `rating` とは意味が違う。
 
 ## 残っている宿題
 
