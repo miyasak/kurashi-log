@@ -453,11 +453,11 @@ export const AboutPage: FC<{
                 <div class="mt-4 rounded-xl border border-edge2 bg-base">
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-s">S</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">料金に対して明らかに得。かけ流しか個性のある湯で、露天・サウナ・休憩所が揃う。価格帯は問わない</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">料金に対して明らかに得。湯そのものが目的になるか、設備まで含めて価格以上。価格帯は問わない</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-a">A</span>
-                    <p class="text-[13px] leading-[1.7] text-sub">料金相応だが、湯か設備のどちらかが抜けている。通り道なら必ず寄る</p>
+                    <p class="text-[13px] leading-[1.7] text-sub">料金相応。湯か設備のどちらかは良いが、わざわざ行くほどではない。通り道なら必ず寄る</p>
                   </div>
                   <div class="rank-row border-b border-edge2 px-4 py-3 last:border-b-0">
                     <span class="rank rank-b">B</span>
