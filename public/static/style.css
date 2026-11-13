@@ -836,3 +836,30 @@ a.rank:hover { opacity: 0.82; }
   color: #fff;
   font-weight: 700;
 }
+
+/* ---------------- dark card (入口用) ---------------- */
+.card-dark {
+  background: #1e2430;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.card-dark .text-ink { color: #ffffff; }
+.card-dark .text-sub { color: rgba(255, 255, 255, 0.74); }
+.card-dark .text-mute { color: rgba(255, 255, 255, 0.5); }
+.card-dark .border-edge2 { border-color: rgba(255, 255, 255, 0.14); }
+.card-dark .bg-base,
+.card-dark .bg-panel2 { background: rgba(255, 255, 255, 0.08); }
+.card-dark .rank-b {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.88);
+}
+.card-dark .rank-c {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: rgba(255, 255, 255, 0.68);
+}
+.card-dark .rank-d {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.52);
+}
