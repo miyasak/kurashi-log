@@ -3,11 +3,11 @@
    ========================================================= */
 
 :root {
-  --base: #f1f1ec;
+  --base: #ffffff;
   --panel: #ffffff;
-  --panel2: #e8e8e2;
+  --panel2: #ededed;
   --edge: rgba(0, 0, 0, 0.16);
-  --edge2: rgba(0, 0, 0, 0.11);
+  --edge2: rgba(0, 0, 0, 0.15);
   --ink: #1a1a19;
   --sub: #5c5c58;
   --mute: #8c8c87;
@@ -17,11 +17,11 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  background: var(--base);
+  background: #ffffff;
 }
 
 body {
-  background: var(--base);
+  background: #ffffff;
   color: var(--ink);
   letter-spacing: 0.01em;
   font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans',
@@ -873,4 +873,15 @@ a.rank:hover { opacity: 0.82; }
 #global-nav.nav-ghost button,
 #global-nav.nav-ghost span {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* 地が白になったぶん、カードは影で浮かせて面を分ける */
+.rounded-big.bg-panel {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* 地が白になったので、表の見出し行だけ明示的に灰色で残す */
+.camp-row.bg-base,
+.super-row.bg-base {
+  background: #f1f1f1 !important;
 }
