@@ -766,32 +766,32 @@ export const OnsenListPage: FC<{
       {items.length ? (
         <div class="mt-6 overflow-hidden rounded-big border border-edge2 bg-panel">
           <div class="camp-row border-b border-edge2 bg-base px-4 py-2 text-[11px] font-bold text-mute">
-            <span>施設名</span>
-            <span>エリア</span>
-            <span>入浴料</span>
-            <span>ランク</span>
-            <span>営業時間</span>
+            <span class="min-w-0 flex-1">施設名</span>
+            <span class="w-24">エリア</span>
+            <span class="w-20">入浴料</span>
+            <span class="w-14">ランク</span>
+            <span class="w-40">営業時間</span>
           </div>
           {items.map((it) => (
             <a
               href={`/posts/${it.slug}`}
               class="camp-row border-b border-edge2 px-4 py-3.5 last:border-b-0 hover:bg-black/[0.03]"
             >
-              <span class="min-w-0 text-[14px] font-bold text-ink">
+              <span class="min-w-0 flex-1 text-[14px] font-bold text-ink">
                 {it.place_name || it.title}
               </span>
-              <span class="text-[13px] text-mute">{it.prefecture || '—'}</span>
-              <span class="font-mono text-[13px] font-bold tabular-nums text-brand">
+              <span class="w-24 text-[13px] text-mute">{it.prefecture || '—'}</span>
+              <span class="w-20 font-mono text-[13px] font-bold tabular-nums text-brand">
                 {it.budget != null ? `${it.budget.toLocaleString()}円` : '—'}
               </span>
-              <span>
+              <span class="w-14">
                 {it.rating != null ? (
                   <RankBadge value={it.rating} link={false} />
                 ) : (
                   <span class="text-[13px] text-mute">—</span>
                 )}
               </span>
-              <span class="text-[12.5px] leading-[1.6] text-mute">
+              <span class="w-40 text-[12.5px] leading-[1.6] text-mute">
                 {it.business_hours || '—'}
               </span>
             </a>
