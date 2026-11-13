@@ -661,3 +661,17 @@
     run()
   }
 })()
+
+/* ヘッダー：暗いヒーローの上では透明、スクロールしたら色を付ける */
+;(function () {
+  var nav = document.getElementById('global-nav')
+  if (!nav) return
+  nav.classList.add('nav-glass')
+  if (!document.querySelector('article > header img')) return
+  var apply = function () {
+    if (window.scrollY > 60) nav.classList.remove('nav-ghost')
+    else nav.classList.add('nav-ghost')
+  }
+  apply()
+  window.addEventListener('scroll', apply, { passive: true })
+})()
