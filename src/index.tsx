@@ -17,7 +17,7 @@ import {
   listTags,
   listMonthlyStats,
   getCategoryCounts,
-  getLinkedPost,
+  getLinkedPosts,
   getSeriesNeighbors,
   findFirstPostSlug,
   getSettings
@@ -249,7 +249,7 @@ app.get('/posts/:slug', async (c) => {
     .filter((p) => p.id !== post.id)
     .slice(0, 2)
   const hasGeo = post.lat != null && post.lng != null
-  const linked = await getLinkedPost(c.env.DB, post)
+  const linked = await getLinkedPosts(c.env.DB, post)
   const series = await getSeriesNeighbors(c.env.DB, post)
   const mapPins = await countMapPins(c.env.DB)
   const settings = await getSettings(c.env.DB)

@@ -5,7 +5,7 @@ import { formatDate, yen, buildToc } from '../lib/utils'
 import { Stars, RankBadge, PostCard, SectionTitle, SeriesNav } from './components'
 import { ArrowLink } from './layout'
 
-type Props = { post: Post; html: string; related: Post[]; linked?: Post | null; series?: any; settings?: Record<string, string> }
+type Props = { post: Post; html: string; related: Post[]; linked?: Post[]; series?: any; settings?: Record<string, string> }
 
 /* 小見出し：オレンジ系の英字ラベル + 太字の日本語見出し */
 const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
@@ -240,7 +240,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
                 <SeriesNav series={series} />
 
                 {/* ---- LOCAL STOP / 相互リンク記事 ---- */}
-                {linked ? <LinkedCard current={post} linked={linked} /> : null}
+                {(linked || []).map((lp) => <LinkedCard current={post} linked={lp} />)}
 
                 {/* 地図 */}
                 {hasGeo ? (
@@ -529,7 +529,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
     .filter(Boolean)
 
   return (
-    <section class="mt-10">
+    <section class="mt-10 linked-block">
       <BlockTitle eyebrow={eyebrow} title={heading} accent={accent} />
 
       <div class="max-w-[400px] overflow-hidden rounded-big border border-edge2 bg-panel">

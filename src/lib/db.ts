@@ -154,8 +154,8 @@ export async function countPosts(db: D1Database, opts: ListOptions = {}) {
  * A（この記事）が linked_slug で指している記事、または
  * 逆方向（相手の linked_slug がこの記事を指している）も拾う。
  */
-export async function getLinkedPost(db: D1Database, post: Post) {
-  const row = await db
+export async function getLinkedPosts(db: D1Database, post: Post) {
+  const rows = await db
     .prepare(
       `SELECT p.*, (
          SELECT group_concat(t.name, ',') FROM post_tags pt JOIN tags t ON t.id = pt.tag_id WHERE pt.post_id = p.id
@@ -163,12 +163,17 @@ export async function getLinkedPost(db: D1Database, post: Post) {
        FROM posts p
        WHERE p.status = 'published' AND p.id <> ?
          AND (p.slug = ? OR (p.linked_slug IS NOT NULL AND p.linked_slug = ?))
-       LIMIT 1`
+       ORDER BY CASE p.category
+         WHEN 'touring' THEN 1
+         WHEN 'onsen' THEN 2
+         WHEN 'supermarket' THEN 3
+         WHEN 'camp' THEN 4
+         ELSE 5 END
+       LIMIT 3`
     )
     .bind(post.id, post.linked_slug || '', post.slug)
-    .first<any>()
-  if (!row) return null
-  return normalize(row)
+    .all<any>()
+  return (rows.results || []).map(normalize)
 }
 
 /**
