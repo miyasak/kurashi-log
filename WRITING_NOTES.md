@@ -74,7 +74,7 @@ Googleの検索結果はPCで全角32文字前後、スマホで40文字前後�
 3. タイトル・スラッグを入れる
    - スラッグを空にすると `post-xxxxxxxx` の自動生成になる。
      読めるスラッグ（`post-nagata-no-yu` など）を手で入れたほうがよい
-   - **公開後にスラッグを変えるとURLが変わる**ので、後から直さない
+   - 公開後でもスラッグは変えられるが、必ず `SLUG_REDIRECTS` を先に入れる（後述）
 4. リード文（summary）を1〜2文で手書き
 5. 本文は「ひな形」ボタンでテンプレを入れてから書く
 6. カテゴリ固有の欄を埋める（下の表）
@@ -231,3 +231,106 @@ S を付けすぎると評価として機能しなくなる。迷ったら既に
 
 価格の裏取りが弱い。今後は定点商品（2Lの水・食パン1斤・刺身の小パック）の
 価格をメモして、コスパランクを数字で説明できるようにする。
+
+
+## スラッグの決め方（2026-11-14 確定）
+
+全記事を読めるスラッグに統一した。自動生成の `post-mvyz3spd` 形式は使わない。
+
+- 接頭辞は `post-` で統一。記事だとひと目で分かるので、SQLや管理画面で扱いやすい
+- 温泉：`post-nibukawa-spa`（施設名 + spa）
+- キャンプ：`post-myokin-camp`（施設名 + camp）
+- スーパー：`post-itoku-namioka`（店名 + 地名）
+- ツーリング：`post-tsugaru-round` `post-matsuyama-saijo`（地名・区間名）。
+  `day7` のような連番は使わない。同じ旅でもキャンプやスーパーが混ざって番号がずれるため
+- 資産・IT：`post-ideco-nenmatsu` のように内容を短く表す。
+  金額や達成率は記事が育つとズレるので入れない
+
+### 公開後にスラッグを変えるとき
+
+URLが変わるので、順番を守らないと一瞬404になる。必ずこの順でやる。
+
+1. `src/lib/config.ts` の `SLUG_REDIRECTS` に `'旧slug': '新slug',` を追記
+2. `npm run build && npx wrangler pages deploy dist --project-name=tadoreru --commit-dirty=true`
+3. D1を更新（本文リンク → linked_slug → slug本体の順）
+4. 旧URLが301、新URLが200を返すか確認
+
+逆順にすると、既にインデックスされているURLと外部に貼ったリンクが404になる。
+本文リンクを先に直す理由は、slugを先に変えると参照元を辿れなくなるため。
+
+置換は3パターン必要。マークダウンの `(/posts/xxx)`、絶対URL
+`(https://tadoreru.com/posts/xxx)`、HTMLカードの `href="/posts/xxx"`。
+資産系の記事に HTML のカードリンクがあるので忘れやすい。
+
+### 検証
+
+curl -s "https://tadoreru.com/sitemap.xml" | grep -o 'https://tadoreru.com/posts/[^<]*' | while read u; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" "$u"); [ "$code" != "200" ] && echo "NG $code $u"
+done
+
+npx wrangler d1 execute tadoreru --remote --command="SELECT COUNT(*) FROM posts WHERE linked_slug IS NOT NULL AND linked_slug NOT IN (SELECT slug FROM posts)"
+
+2つ目が0でないとき、空文字 `''` が混ざっていることがある。
+`UPDATE posts SET linked_slug = NULL WHERE linked_slug = ''` で揃える。
+
+## 内部リンクは相対パスで書く
+
+記事本文のリンクは `(/posts/post-xxx)` と書く。
+`https://tadoreru.com/posts/...` と絶対URLで書くと、slug変更のたびに書き換えが増える。
+テーマページも `(/theme/touring?cat=touring)` と書く。
+
+コード側で絶対URLに変換している箇所はないので、これは書き方だけの問題。
+
+## 関連記事カード
+
+`linked_slug` で繋いだ記事は、記事下部にカードで出る。
+双方向に拾うので、どちらか一方に入れれば両方から辿れる。
+
+カテゴリごとに見出しが変わる（このツーリングで寄った店 / この日入った温泉 /
+この日泊まったキャンプ場 / この日のツーリング）。
+最大3件まで表示し、並びはツーリング → 温泉 → スーパー → キャンプの順。
+
+## 日帰り温泉記事の型（2026-11-14 時点・5本で確定）
+
+本文の順番は、施設の状況（表）→ 湯のこと → 設備と使い勝手 → 混雑と時間帯 →
+周辺のこと → 関連リンク。
+
+- 「施設の状況」は内湯 / 露天 / サウナ / 休憩所 / 食堂 / シャンプー・石鹸 /
+  ドライヤー / 駐車場 の表。「あり」だけでなく中身を書く（「あり（主浴槽・ジャグジー）」）
+- サイドバーの「この湯の推し」は泉質と湯の特徴を4つまで。
+  設備の有無は本文の表に任せる。両方に書くと「なし」が並んで読みにくい
+- 効能は施設の表示を引用するにとどめ、断定しない
+
+ツーリング記事と内容が重なるときは、温泉側に詳細を寄せてツーリング側を3〜4行に圧縮し、
+本文から温泉記事へリンクする。両方に同じ分量を書かない。
+鈍川温泉（2026-11-14）でこの形にした。
+
+## 四国シリーズ（shikoku-2026）
+
+| day | slug |
+|---|---|
+| 1 | post-minodanofuchi-camp |
+| 2 | post-miyanomae-camp |
+| 3 | post-shikoku-karst |
+| 4 | post-ashizuri-sunny-road |
+| 5 | post-kanyojima-camp |
+| 6 | post-yuyake-koyake-line |
+| 7 | post-matsuyama-saijo |
+| 8 | post-saijo-matsushige |
+
+温泉記事（鈍川）と横断記事（出費まとめ）はシリーズに入れない。
+温泉は /onsen で横並びに比較する作りなので、ツーリングの連番に混ぜない。
+
+## 立ち寄り地（post_spots）と地図ピン
+
+別物なので混同しない。
+
+- 地図ピン（/map）は `posts.lat` / `lng` を見る。1記事1点。全記事に入っている
+- 「ルートの位置」の番号つき立ち寄り地は `post_spots` テーブル。
+  ツーリング記事だけに必要で、キャンプ・温泉・スーパーの単独施設には要らない
+- 入力は管理画面の地図検索から。緯度経度を手で調べるより速くて正確
+
+### 宿題
+
+ツーリング6本（宗谷・男鹿・津軽・四国カルスト・足摺・夕やけこやけ）は
+`post_spots` が未入力。本文のタイムライン表を見ながら管理画面で足す。
