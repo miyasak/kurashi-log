@@ -181,14 +181,14 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
                 <div class="group relative">
                   <a href={it.href} class={link(it.active)}>{it.label}</a>
                   <div class="absolute left-1/2 top-full hidden w-[210px] -translate-x-1/2 pt-2 group-hover:block group-focus-within:block">
-                    <div class="rounded-xl border border-white/10 bg-[#1c1c1b] p-1.5 shadow-lg">                      
+                    <div class="rounded-xl border border-white/15 bg-[#1b2b3a]/95 p-1.5 shadow-lg backdrop-blur-xl">                      
                       {it.subs.map((c) => (
                         <a
                           href={`${it.href}?cat=${c.key}`}
                           class={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13.5px] transition ${
                             activePage === c.key
-                              ? 'bg-brand/15 font-semibold text-ink'
-                              : 'text-sub hover:bg-black/[0.05] hover:text-ink'
+                              ? 'bg-brand/20 font-semibold text-white'
+                              : 'text-white/75 hover:bg-white/10 hover:text-white'
                           }`}
                         >
                           <i class={`fa-solid ${c.icon} w-4 text-[12px] text-brand`}></i>
@@ -226,7 +226,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
       </header>
 
       {/* モバイル：ハンバーガーメニュー */}
-      <div id="mobile-menu" class="fixed inset-0 z-40 hidden bg-base/97 pt-14 backdrop-blur-xl md:hidden">
+      <div class="fixed inset-0 z-40 hidden pt-14 md:hidden" id="mobile-menu">
         <div class="mx-auto max-w-page overflow-y-auto px-4 py-4" style="max-height:calc(100vh - 3.5rem)">
           {THEMES.map((t) => (
             <a

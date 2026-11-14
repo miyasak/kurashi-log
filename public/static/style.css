@@ -903,3 +903,21 @@ main > section:nth-of-type(even) {
     aspect-ratio: 16 / 7;
   }
 }
+
+/* スマホのメニュー。ヒーロー写真が透けて文字が沈むため不透明の紺にする */
+#mobile-menu {
+  background: #1b2b3a;
+}
+#mobile-menu a,
+#mobile-menu span {
+  color: #ffffff;
+}
+#mobile-menu .text-mute {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+#mobile-menu .border-edge2 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+#mobile-menu .text-brand {
+  color: var(--brand) !important;
+}
