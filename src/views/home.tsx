@@ -96,7 +96,6 @@ export const HomePage: FC<Props> = ({
             alt=""
             width="1280"
             height="349"
-            loading="lazy"
             decoding="async"
           />
           <img
@@ -105,7 +104,6 @@ export const HomePage: FC<Props> = ({
             alt=""
             width="1280"
             height="349"
-            loading="lazy"
             decoding="async"
           />
         </div>
