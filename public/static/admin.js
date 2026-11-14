@@ -1084,6 +1084,20 @@
     }))
   }
 
+  async function geocodeOne(q) {
+    const res = await fetch(
+      'https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=ja&q=' + encodeURIComponent(q)
+    )
+    const list = await res.json()
+    if (!list.length) return null
+    return { lat: parseFloat(list[0].lat), lng: parseFloat(list[0].lon) }
+  }
+
+  function prefHint() {
+    const el = document.querySelector('[name="prefecture"], #f-prefecture, [data-f="prefecture"]')
+    return el && el.value ? el.value.trim() : ''
+  }
+
   function renderSpots(spots) {
     const el = $('#spot-list')
     el.innerHTML = spots.length
@@ -1094,6 +1108,7 @@
         <div class="flex flex-wrap items-center gap-2">
           <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-orange-500 text-[11px] font-bold text-white">${i + 1}</span>
           <input class="s-name admin-input flex-1 min-w-[160px]" value="${esc(s.name)}" placeholder="スポット名" />
+          <button type="button" data-sgeo="${i}" class="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-slate-200 text-ink-soft hover:border-slate-300" title="スポット名で座標を検索"><i class="fa-solid fa-magnifying-glass text-xs"></i></button>
           <input class="s-lat admin-input w-[110px]" value="${esc(s.lat)}" placeholder="緯度" />
           <input class="s-lng admin-input w-[110px]" value="${esc(s.lng)}" placeholder="経度" />
           <button type="button" data-up="${i}" class="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 text-ink-soft" title="上へ"><i class="fa-solid fa-arrow-up text-xs"></i></button>
@@ -1113,6 +1128,36 @@
       cur.splice(to, 0, x)
       renderSpots(cur)
     }
+    const spotGeo = async (b) => {
+      const row = b.closest('[data-spot]')
+      const name = row.querySelector('.s-name').value.trim()
+      if (!name) return toast('スポット名を入れてください', 'error')
+      const pref = prefHint()
+      b.disabled = true
+      b.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i>'
+      try {
+        let hit = await geocodeOne(pref ? pref + ' ' + name : name)
+        if (!hit && pref) hit = await geocodeOne(name)
+        if (!hit) return toast('見つかりませんでした', 'error')
+        row.querySelector('.s-lat').value = hit.lat.toFixed(6)
+        row.querySelector('.s-lng').value = hit.lng.toFixed(6)
+        toast(name + ' の座標を入れました')
+      } catch (e) {
+        toast('検索に失敗しました', 'error')
+      } finally {
+        b.disabled = false
+        b.innerHTML = '<i class="fa-solid fa-magnifying-glass text-xs"></i>'
+      }
+    }
+    el.querySelectorAll('[data-sgeo]').forEach((b) => b.addEventListener('click', () => spotGeo(b)))
+    el.querySelectorAll('.s-name').forEach((inp) =>
+      inp.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return
+        e.preventDefault()
+        const b = inp.closest('[data-spot]').querySelector('[data-sgeo]')
+        if (b) spotGeo(b)
+      })
+    )
     el.querySelectorAll('[data-up]').forEach((b) =>
       b.addEventListener('click', () => move(Number(b.dataset.up), Number(b.dataset.up) - 1))
     )
