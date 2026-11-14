@@ -875,7 +875,7 @@
                 <i class="fa-solid fa-plus mr-1.5"></i>スポットを追加
               </button>
               <p class="mt-1 text-[10.5px] text-ink-mute">
-                2件以上でピンが番号付きになり、点線でつながります。上の地図をクリックすると空いている緯度・経度に入ります
+                2件以上でピンが番号付きになり、点線でつながります。スポット名の右の虫めがねで座標を検索できます（上の地図のクリックでも入ります）
               </p>
             </div>              
           </div>`
@@ -1245,6 +1245,11 @@
       .filter(Boolean)
     data.photos = currentPhotos().filter((p) => p.url)
     data.spots = currentSpots().filter((s) => s.name && s.lat && s.lng)
+    // 代表地点が空ならスポット1の座標で埋める（手入力があれば触らない）
+    if (!String(data.lat || '').trim() && !String(data.lng || '').trim() && data.spots.length) {
+      data.lat = data.spots[0].lat
+      data.lng = data.spots[0].lng
+    }
     return data
   }
 
