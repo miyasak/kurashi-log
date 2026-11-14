@@ -345,3 +345,42 @@ export const placeLabel = (cat?: string) =>
   : cat === 'camp' ? 'このキャンプ場の場所'
   : cat === 'supermarket' ? 'この店の場所'
   : 'この場所'
+
+/* 旧slug → 新slug。URL整理時の301リダイレクト用。
+   slugを変えたらここに1行足す。 */
+export const SLUG_REDIRECTS: Record<string, string> = {
+  'post-mvyz3spd': 'post-matsuyama-saijo',
+  'post-mtzu8ga8': 'post-asset-1oku-plan',
+  'nav-down': 'post-orukan-nav-down',
+  'post-mvnhccx3': 'post-sbi-shinsei-teiki',
+  'post-mvnvaqow': 'post-bank-hikkoshi',
+  'post-mvvoxcm5': 'post-jugyoin-mochikabu',
+  'furusato-tax-2026': 'post-furusato-tax-2026',
+  'ideco-year-end-adjustment': 'post-ideco-nenmatsu',
+  'tax-benefit-priority': 'post-tax-benefit',
+  'post-mvpb5ob7': 'post-seikatsuhi-nenkan',
+  'post-mvvnqszt': 'post-touring-9days-cost',
+  'domain-cloudflare-registrar': 'post-cloudflare-domain',
+  'post-mvs1isix': 'post-kutcharo-camp',
+  'post-mvqq733y': 'post-tawadaira-camp',
+  'post-mvpd1b6k': 'post-shonai-yuhi-camp',
+  'post-mvtmw6m3': 'post-akita-chuo-camp',
+  'post-mvl30i62': 'post-hanaoka-camp',
+  'post-mvxng9x3': 'post-minodanofuchi-camp',
+  'post-mvxtvmom': 'post-miyanomae-camp',
+  'post-mvtll4bp': 'post-kanyojima-camp',
+  'post-mvnrc3hv': 'post-myokin-camp',
+  'post-mvf75sr3': 'post-osen-honten',
+  'post-mvi4pfo2': 'post-itoku-namioka',
+  'post-mvjl1ug3': 'post-yamayo-towada',
+  'post-mvgnqxcr': 'post-maiya-ofunato',
+  'post-mvgkw6oa': 'post-ujie-ishinomaki',
+  'post-mvl1ltys': 'post-halows-sumiyoshi',
+  'post-mvs5i25v': 'post-soya-round',
+  'post-mvv14llq': 'post-oga-round',
+  'post-mvm54zod': 'post-tsugaru-round',
+  'post-mvyax5yp': 'post-shikoku-karst',
+  'post-mvyjba9b': 'post-ashizuri-sunny-road',
+  'post-mvyz24x8': 'post-yuyake-koyake-line',
+  'post-mvz078vb': 'post-saijo-matsushige',
+}

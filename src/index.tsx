@@ -8,7 +8,8 @@ import {
   ABOUT_POST_SLUGS,
   MAP_CAT_SQL,
   SITE,
-  type Bindings
+  type Bindings,
+  SLUG_REDIRECTS
 } from './lib/config'
 import {
   listPosts,
@@ -234,7 +235,11 @@ app.get('/posts/:slug', async (c) => {
   const slug = c.req.param('slug')
   const authed = await isAuthed(c)
   const post = await getPostBySlug(c.env.DB, slug, authed)
-  if (!post) return notFound(c)
+  if (!post) {
+    const moved = SLUG_REDIRECTS[c.req.param('slug')]
+    if (moved) return c.redirect(`/posts/${moved}`, 301)
+    return notFound(c)
+  }
   // 本文の {{total_assets}} などを月次データの最新値に置き換えてから描画する
   const stats = await listMonthlyStats(c.env.DB)
   const html = renderMarkdown(applyShortcodes(post.body, stats))
