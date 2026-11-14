@@ -669,16 +669,27 @@ footer .border-edge2 {
   100% { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
+  /* 動きを減らす設定でも切り替えは残す。周期を倍近くにしてゆっくり溶かす */
   .hero-slide {
-    animation: none;
+    animation: heroFadeSlow 45s infinite;
   }
   .hero-slide:nth-child(1) {
     opacity: 1;
+    animation-delay: 0s;
   }
-  .hero-slide:nth-child(2),
+  .hero-slide:nth-child(2) {
+    animation-delay: 15s;
+  }
   .hero-slide:nth-child(3) {
-    opacity: 0;
+    animation-delay: 30s;
   }
+}
+@keyframes heroFadeSlow {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  31% { opacity: 1; }
+  39% { opacity: 0; }
+  100% { opacity: 0; }
 }
 #hero-copy {
   display: flex;
