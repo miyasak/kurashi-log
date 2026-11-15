@@ -857,7 +857,7 @@
                 ${field('アクセス', 'access_text', p.access_text, { ph: '例: 常磐道いわき湯本ICから10分' })}
               </div>
               <div class="mt-3">
-                <label class="admin-label">${c === 'camp' ? '設備メモ' : c === 'onsen' ? '泉質・設備メモ' : '推し買い'}</label>
+                <label class="admin-label">${c === 'onsen' ? '泉質・特徴' : c === 'supermarket' ? '推し買い' : '特徴メモ（任意）'}</label>
                 <textarea name="recommend_items" rows="3" class="admin-input !font-sans" placeholder="${c === 'onsen' ? '単純温泉&#10;露天あり&#10;サウナなし&#10;シャンプー備付' : '手むすびおにぎり&#10;常磐ものの刺身&#10;メヒカリの唐揚げ'}">${esc(p.recommend_items)}</textarea>
                 <p class="mt-1 text-[10.5px] text-ink-mute">改行 または「/」区切り。DATAカード内にオレンジのボックスで表示されます</p>
               </div>`
