@@ -234,14 +234,14 @@ export const SpecRow: FC<{
   if (!list.length) return null
   return (
     <dl
-      class={`flex flex-wrap gap-x-8 gap-y-5 ${
+      class={`flex flex-wrap gap-x-5 gap-y-4 sm:gap-x-8 sm:gap-y-5 ${
         panel ? 'rounded-big border border-edge2 bg-panel px-5 py-5' : ''
       }`}
     >
       {list.map((it) => (
-        <div class="min-w-[104px]">
+        <div class="min-w-[88px] sm:min-w-[104px]">
           <dt class="text-[10px] font-bold uppercase tracking-[0.12em] text-mute">{it.label}</dt>
-          <dd class="mt-1.5 font-mono text-[22px] font-bold leading-none tabular-nums tracking-tight text-ink sm:text-[26px]">
+          <dd class="mt-1.5 font-mono text-[19px] font-bold leading-none tabular-nums tracking-tight text-ink sm:text-[26px]">
             {it.value}
           </dd>
           {it.sub ? <p class="mt-1.5 text-[11px] text-mute">{it.sub}</p> : null}

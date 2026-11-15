@@ -7,6 +7,7 @@ import {
   THEME_MAP,
   ABOUT_POST_SLUGS,
   MAP_CAT_SQL,
+  PREF_TAGS,
   SITE,
   type Bindings,
   SLUG_REDIRECTS
@@ -168,12 +169,20 @@ app.get('/theme/:key', async (c) => {
       living_cost: withCost.length ? withCost[withCost.length - 1].living_cost : null
     })
   } else if (theme.key === 'touring') {
+    const prefPh = PREF_TAGS.map(() => '?').join(',')
     const r = await db
       .prepare(
-        `SELECT COALESCE(SUM(distance_km),0) AS d,
-                COUNT(DISTINCT CASE WHEN prefecture <> '' THEN prefecture END) AS p
-         FROM posts WHERE status='published' AND category IN (${MAP_CAT_SQL})`
+        `SELECT
+           (SELECT COALESCE(SUM(distance_km),0) FROM posts
+             WHERE status='published' AND category IN (${MAP_CAT_SQL})) AS d,
+           (SELECT COUNT(DISTINCT t.name)
+              FROM posts p
+              JOIN post_tags pt ON pt.post_id = p.id
+              JOIN tags t ON t.id = pt.tag_id
+             WHERE p.status='published' AND p.category IN (${MAP_CAT_SQL})
+               AND t.name IN (${prefPh})) AS p`
       )
+      .bind(...PREF_TAGS)
       .first<any>()
     Object.assign(summary, {
       distance: Math.round(r?.d || 0),
