@@ -953,7 +953,13 @@ main > section:nth-of-type(even) {
 
 /* ---------------- テーマページのヒーロー ---------------- */
 .theme-hero {
-  min-height: 300px;
+  min-height: 396px;
+  height: calc(100vw / 1280 * 420);
+  max-height: 560px;
+  margin-top: -3.5rem;
+  display: flex;
+  align-items: center;
+  padding-top: 3.5rem;
 }
 /* 白背景のカード・チップ・ボタンの中は元の文字色に戻す */
 .theme-hero .bg-panel,
