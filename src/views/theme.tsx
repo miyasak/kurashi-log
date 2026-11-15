@@ -54,13 +54,23 @@ export const ThemePage: FC<Props> = ({
     return s ? `?${s}` : ''
   }
 
+  const heroImg = posts.find((x) => x.cover_image)?.cover_image || null
   const showMoneyChart = theme.key === 'money' && stats.length > 0
-  const showMap = theme.key === 'touring'
+  const catKeys = (theme.categories as any[]).map((c) => (typeof c === 'string' ? c : c.key))
+  const isOnsen = catKeys.includes('onsen')
+  const showMap = theme.key === 'touring' || isOnsen
+  const mapCatFallback = catKeys.length === 1 ? catKeys[0] : ''
 
   return (
     <>
       {/* ============ 見出し（左揃え・コンパクト） ============ */}
-      <section class="border-b border-edge2 bg-base">
+      <section class={`relative isolate overflow-hidden border-b border-edge2 ${heroImg ? 'theme-hero' : 'bg-base'}`}>
+        {heroImg ? (
+          <>
+            <img src={heroImg} alt="" class="absolute inset-0 -z-20 h-full w-full object-cover" />
+            <div class="absolute inset-0 -z-10 bg-gradient-to-br from-black/80 via-black/65 to-black/45"></div>
+          </>
+        ) : null}
         <div class="mx-auto max-w-page px-4 py-8 sm:px-6 sm:py-10">
           {/* パンくず */}
           <nav class="flex items-center gap-1.5 text-[11.5px] text-mute">
@@ -85,8 +95,14 @@ export const ThemePage: FC<Props> = ({
           ) : null}
 
           {/* サブカテゴリタブ */}
+        </div>
+      </section>
+
+      {/* ============ サブカテゴリ・導線（ヒーロー外） ============ */}
+      <section class="border-b border-edge2 bg-base">
+        <div class="mx-auto max-w-page px-4 py-5 sm:px-6">
           {hasSub ? (
-            <div class="mt-6 flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2">
               <a
                 href={`${base}${qsOf({ cat: '' })}`}
                 class={`rounded-full px-3.5 py-1.5 text-[13.5px] font-medium transition ${
@@ -116,7 +132,7 @@ export const ThemePage: FC<Props> = ({
             </div>
           ) : null}
           {theme.key === 'touring' ? (
-            <p class="mt-5">
+            <p class="mt-4">
               <ArrowLink href="/supermarket">ご当地スーパーを一覧で見る（店名・訪問時刻・評価つき）</ArrowLink>
             </p>
           ) : null}          
@@ -201,12 +217,12 @@ export const ThemePage: FC<Props> = ({
             <SectionTitle
               eyebrow="Map"
               icon="fa-map-location-dot"
-              title="走った場所と、寄った店"
+              title={isOnsen ? '入った湯の場所' : '走った場所と、寄った店'}
               desc="ピンをタップすると、その記事に移動できます。"
               action={<ArrowLink href="/map">全画面で見る</ArrowLink>}
             />
             <div class="mt-6 overflow-hidden rounded-big border border-edge2">
-              <div id="cat-map" class="h-[320px] w-full sm:h-[400px]" data-category={activeCat || ''}></div>
+              <div id="cat-map" class="h-[320px] w-full sm:h-[400px]" data-category={activeCat || mapCatFallback}></div>
             </div>
           </div>
         </section>
@@ -268,7 +284,7 @@ export const ThemePage: FC<Props> = ({
           {tags.length ? (
             (() => {
               const shown = tags.filter(
-                (t) => t.cnt >= 2 || t.slug === activeTag || t.name === activeTag
+                (t) => t.cnt >= 2 || AREA_TAGS.includes(t.name) || t.slug === activeTag || t.name === activeTag
               )
               const regions = shown
                 .filter((t) => REGION_TAGS.includes(t.name))
@@ -404,8 +420,15 @@ function buildSpecs(theme: ThemeDef, summary: Record<string, any>, counts: Recor
       { label: '都道府県', value: n(summary.prefectures) ? `${summary.prefectures}` : '' },
       { label: '訪問店舗', value: counts.supermarket ? `${counts.supermarket}` : '' },
     ]
+  const keys = (theme.categories as any[]).map((c) => (typeof c === 'string' ? c : c.key))
+  const themeCount = keys.reduce((a: number, k: string) => a + (counts[k] || 0), 0)
+  if (keys.includes('onsen'))
+    return [
+      { label: '入った湯', value: themeCount ? `${themeCount}` : '' },
+      { label: '都道府県', value: n(summary.prefectures) ? `${summary.prefectures}` : '' }
+    ]
   return [
-    { label: '記事', value: counts.it ? `${counts.it}` : '' },
+    { label: '記事', value: themeCount ? `${themeCount}` : '' },
     { label: '削減時間', value: n(summary.saved_hours) ? `${summary.saved_hours} h` : '' }
   ]
 }

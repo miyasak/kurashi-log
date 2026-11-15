@@ -182,7 +182,7 @@ app.get('/theme/:key', async (c) => {
   }
 
   const mapPins = await countMapPins(db)
-  const needsMap = theme.key === 'touring' && mapPins > 0
+  const needsMap = (theme.key === 'touring' || (theme.categories as any[]).map((c: any) => (typeof c === 'string' ? c : c.key)).includes('onsen')) && mapPins > 0
   const scripts = [
     ...(needsMap ? [LEAFLET_JS] : []),
     ...(theme.key === 'money' && stats.length ? [CHART_JS] : []),

@@ -950,3 +950,48 @@ main > section:nth-of-type(even) {
 #mobile-menu .text-brand {
   color: var(--brand) !important;
 }
+
+/* ---------------- テーマページのヒーロー ---------------- */
+.theme-hero {
+  min-height: 300px;
+}
+/* 白背景のカード・チップ・ボタンの中は元の文字色に戻す */
+.theme-hero .bg-panel,
+.theme-hero .bg-base,
+.theme-hero .bg-white,
+.theme-hero [class*='rounded-full'],
+.theme-hero [class*='rounded-big'] {
+  text-shadow: none;
+}
+.theme-hero .bg-panel .text-ink,
+.theme-hero .bg-base .text-ink,
+.theme-hero .bg-white .text-ink,
+.theme-hero [class*='rounded-big'] .text-ink {
+  color: var(--ink, #1a1a19);
+  text-shadow: none;
+}
+.theme-hero .bg-panel .text-sub,
+.theme-hero .bg-base .text-sub,
+.theme-hero .bg-white .text-sub,
+.theme-hero .bg-panel .text-mute,
+.theme-hero .bg-base .text-mute,
+.theme-hero .bg-white .text-mute,
+.theme-hero [class*='rounded-big'] .text-sub,
+.theme-hero [class*='rounded-big'] .text-mute {
+  color: var(--sub, #5c5c58);
+  text-shadow: none;
+}
+.theme-hero h1,
+.theme-hero .text-ink {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.theme-hero .text-sub,
+.theme-hero .text-mute {
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.theme-hero a:hover .text-ink,
+.theme-hero nav a:hover {
+  color: #fff;
+}
