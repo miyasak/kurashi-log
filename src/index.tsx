@@ -182,6 +182,7 @@ app.get('/theme/:key', async (c) => {
   }
 
   const mapPins = await countMapPins(db)
+  const settings = await getSettings(db)
   const needsMap = (theme.key === 'touring' || (theme.categories as any[]).map((c: any) => (typeof c === 'string' ? c : c.key)).includes('onsen')) && mapPins > 0
   const scripts = [
     ...(needsMap ? [LEAFLET_JS] : []),
@@ -214,6 +215,7 @@ app.get('/theme/:key', async (c) => {
         perPage={perPage}
         stats={stats}
         summary={summary}
+        settings={settings}
       />
     </Layout>
   )

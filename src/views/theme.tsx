@@ -24,6 +24,7 @@ type Props = {
   perPage: number
   stats: any[]
   summary: Record<string, any>
+  settings?: Record<string, string>
 }
 
 export const ThemePage: FC<Props> = ({
@@ -38,7 +39,8 @@ export const ThemePage: FC<Props> = ({
   page,
   perPage,
   stats,
-  summary
+  summary,
+  settings
 }) => {
   const pages = Math.max(1, Math.ceil(total / perPage))
   const specs = validSpecs(buildSpecs(theme, summary, counts))
@@ -54,7 +56,11 @@ export const ThemePage: FC<Props> = ({
     return s ? `?${s}` : ''
   }
 
-  const heroImg = posts.find((x) => x.cover_image)?.cover_image || null
+  const heroImg =
+    (settings && activeCat && settings[`hero_${activeCat}`]) ||
+    (settings && settings[`hero_${theme.key}`]) ||
+    posts.find((x) => x.cover_image)?.cover_image ||
+    null
   const showMoneyChart = theme.key === 'money' && stats.length > 0
   const catKeys = (theme.categories as any[]).map((c) => (typeof c === 'string' ? c : c.key))
   const isOnsen = catKeys.includes('onsen')

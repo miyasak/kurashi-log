@@ -353,6 +353,14 @@
       ['disclaimer_spa', '日帰り温泉', '温泉記事の末尾に出ます'],
       ['disclaimer_tech', 'IT', '手順を書いた記事の末尾に出ます']
     ]
+    const heroRows = [
+      ['hero_money', '資産と生活 のヒーロー画像'],
+      ['hero_touring', 'ツーリング のヒーロー画像'],
+      ['hero_camp', '　└ キャンプ場 のヒーロー画像'],
+      ['hero_supermarket', '　└ ご当地スーパー のヒーロー画像'],
+      ['hero_spa', '日帰り温泉 のヒーロー画像'],
+      ['hero_tech', 'IT のヒーロー画像']
+    ]
     main().innerHTML = `
       <div class="max-w-[760px] space-y-5">
         <p class="text-[12.5px] text-ink-mute leading-relaxed">
@@ -365,6 +373,16 @@
             <p class="mt-1 text-[10.5px] text-ink-mute">${hint}</p>
           </div>
         `).join('')}
+        <hr class="border-slate-200" />
+        <p class="text-[12.5px] text-ink-mute leading-relaxed">
+          テーマページ上部の背景写真です。空にすると、そのテーマの最新記事のカバー画像が自動で使われます。
+        </p>
+        ${heroRows.map(([k, label]) => `
+          <div>
+            <label class="admin-label">${label}</label>
+            <input type="text" name="${k}" value="${esc(s[k] || '')}" placeholder="/media/uploads/..." class="admin-input" />
+          </div>
+        `).join('')}
         <div class="flex items-center gap-3">
           <button id="set-save" class="rounded-full bg-brand px-5 py-2.5 text-[13px] font-semibold text-white">保存する</button>
           <span id="set-msg" class="text-[12px] text-ink-mute"></span>
@@ -373,6 +391,7 @@
     document.getElementById('set-save').addEventListener('click', async () => {
       const body = {}
       rows.forEach(([k]) => { body[k] = document.querySelector(`textarea[name="${k}"]`).value.trim() })
+      heroRows.forEach(([k]) => { body[k] = document.querySelector(`input[name="${k}"]`).value.trim() })
       const msg = document.getElementById('set-msg')
       msg.textContent = '保存中...'
       const res = await api('/admin/settings', { method: 'PUT', body: JSON.stringify(body) })
