@@ -219,7 +219,7 @@ api.get('/admin/media', async (c) => {
       size: o.size,
       uploaded: o.uploaded
     }))
-    .sort((a, b) => String(b.uploaded).localeCompare(String(a.uploaded)))
+    .sort((a, b) => new Date(b.uploaded).getTime() - new Date(a.uploaded).getTime())
   return c.json({ ok: true, count: items.length, items })
 })
 
