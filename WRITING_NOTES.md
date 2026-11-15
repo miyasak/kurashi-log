@@ -419,3 +419,8 @@ posts.lat / lng は消してはいけない。空にすると記事ページで 
 - `linked_slug` は1本しか指せないので、記事同士を双方向に辿らせたいときは本文リンクと関連リンクで繋ぐ。
 - 北海道2025は series `hokkaido-2025`。day 30 = post-usutaibe-camp（2025-08-12）、day 40 = post-okhotsk-bihoro（2025-08-13）。day 10 は幌延・ふるさとの森森林公園キャンプ場、day 20 は幌延→宗谷→エサヌカ→枝幸のツーリング記録の枠として空けてある。
 - 2023年の北海道（post-soya-round 2023-07-03 / post-kutcharo-camp 2023-07-23 / post-tawadaira-camp 2023-08-07）はシリーズ未設定。日付が離れているため、同一行程かどうか確認してから付ける。
+
+## 関連カードの見出し（2026-11-15）
+
+- `src/views/post.tsx` の `LinkedCard` が `linked.category` と `current.category` で見出しを出し分けている。
+- キャンプや温泉の記事からツーリング記事を指す場合は「このときのツーリング」。宿泊日と走行日が1日ずれるため「この日の」は使わない。

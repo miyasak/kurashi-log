@@ -521,7 +521,7 @@ const LinkedCard: FC<{ current: Post; linked: Post }> = ({ current, linked }) =>
           ? 'この日入った温泉'
           : current.category === 'supermarket'
             ? 'この店に寄ったツーリング'
-            : 'この日のツーリング'
+            : 'このときのツーリング'
 
   const items = (linked.recommend_items || '')
     .split(/[\n/／・]+/)
