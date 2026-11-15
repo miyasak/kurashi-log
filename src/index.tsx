@@ -99,12 +99,17 @@ app.get('/', async (c) => {
   const sup = await db
     .prepare("SELECT COUNT(*) AS c FROM posts WHERE status='published' AND category='supermarket'")
     .first<{ c: number }>()
+  const prefPh = PREF_TAGS.map(() => '?').join(',')
   const pref = await db
     .prepare(
-      `SELECT COUNT(DISTINCT prefecture) AS c FROM posts
-       WHERE status='published' AND prefecture IS NOT NULL AND prefecture <> ''
-          AND category IN (${MAP_CAT_SQL})`
+      `SELECT COUNT(DISTINCT t.name) AS c
+         FROM posts p
+         JOIN post_tags pt ON pt.post_id = p.id
+         JOIN tags t ON t.id = pt.tag_id
+        WHERE p.status='published' AND p.category IN (${MAP_CAT_SQL})
+          AND t.name IN (${prefPh})`
     )
+    .bind(...PREF_TAGS)
     .first<{ c: number }>()
 
   return doc(
