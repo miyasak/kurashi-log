@@ -955,7 +955,6 @@ main > section:nth-of-type(even) {
 .theme-hero {
   min-height: 396px;
   height: calc(100vw / 1280 * 420);
-  max-height: 560px;
   margin-top: -3.5rem;
   display: flex;
   align-items: center;
