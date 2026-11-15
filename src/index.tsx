@@ -450,7 +450,7 @@ app.get('/camp', async (c) => {
 /* ================== ご当地スーパー一覧 ================== */
 app.get('/supermarket', async (c) => {
   const rows = await c.env.DB.prepare(
-    `SELECT slug, title, place_name, prefecture, visit_date, highlight_value, cospa, rating
+    `SELECT slug, title, place_name, prefecture, visit_date, business_hours, highlight_value, cospa, rating
        FROM posts
       WHERE status='published' AND category='supermarket'
       ORDER BY visit_date DESC, published_at DESC`
@@ -460,6 +460,7 @@ app.get('/supermarket', async (c) => {
     place_name: string | null
     prefecture: string | null
     visit_date: string | null
+    business_hours: string | null
     highlight_value: string | null
     cospa: number | null
     rating: number | null
@@ -470,7 +471,7 @@ app.get('/supermarket', async (c) => {
       title="ご当地スーパー一覧"
       activePage="supermarket"
       activeTheme="touring"
-      description="ツーリング中に立ち寄ったご当地スーパーの一覧です。県・訪問日・値引きを確認できた時刻・コスパと品質のランクから記事を探せます。"
+      description="ツーリング中に立ち寄ったご当地スーパーの一覧です。店名・県・営業時間・値引きシールを確認できた時刻・コスパと品質のランクを表で比較できます。"
       canonical={canonicalOf(c)}
       jsonLd={simplePageJsonLd(originOf(c), 'ご当地スーパー一覧', '/supermarket')}
       scripts={['/static/site.js']}

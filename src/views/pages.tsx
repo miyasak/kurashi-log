@@ -823,6 +823,7 @@ export const SupermarketListPage: FC<{
     place_name: string | null
     prefecture: string | null
     visit_date: string | null
+    business_hours: string | null
     highlight_value: string | null
     cospa: number | null
     rating: number | null
@@ -834,7 +835,7 @@ export const SupermarketListPage: FC<{
         ご当地スーパー一覧
       </h1>
       <p class="mt-2 text-[14px] leading-[1.8] text-sub">
-        ツーリングの途中で立ち寄ったご当地スーパーの記録です。訪問日の新しい順に並んでいます。「値引きを見た時刻」は実際に値引きシールを確認できた時刻で、「—」は観測できていない店です。コスパは定価の安さ、品質は地場品と鮮魚・惣菜の強さを見ています。全国チェーン（イオン・ヨーカドー）をC相当とした、訪問した1店舗についての個人の主観です。詳しい基準は{' '}
+        ツーリングの途中で立ち寄ったご当地スーパーの記録です。訪問日の新しい順に並んでいます。営業時間は訪問した時点のもので、最新の情報は店舗にご確認ください。「値引きを見た時刻」は実際に値引きシールを確認できた時刻で、「—」は観測できていない店です。コスパは定価の安さ、品質は地場品と鮮魚・惣菜の強さを見ています。全国チェーン（イオン・ヨーカドー）をC相当とした、訪問した1店舗についての個人の主観です。詳しい基準は{' '}
         <a href="/about#rank" class="text-brand underline underline-offset-2">
           評価ランクについて
         </a>
@@ -854,7 +855,7 @@ export const SupermarketListPage: FC<{
           <div class="super-row border-b border-edge2 bg-base px-4 py-2 text-[11px] font-bold text-mute">
             <span class="min-w-0 flex-1">店舗</span>
             <span class="w-24">エリア</span>
-            <span class="w-24">訪問日</span>
+            <span class="w-28">営業時間</span>
             <span class="w-28">値引きを見た時刻</span>
             <span class="w-24">コスパ / 品質</span>
           </div>
@@ -870,8 +871,8 @@ export const SupermarketListPage: FC<{
                 {it.place_name || it.title}
               </span>
               <span class="w-24 text-[13px] text-mute">{it.prefecture || '—'}</span>
-              <span class="w-24 font-mono text-[13px] tabular-nums text-mute">
-                {it.visit_date || '—'}
+              <span class="w-28 font-mono text-[13px] tabular-nums text-mute">
+                {it.business_hours || '—'}
               </span>
               <span class="w-28 text-[13px] text-brand">
                 {it.highlight_value || '—'}

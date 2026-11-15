@@ -295,7 +295,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
               </div>
 
               {/* ---------------- 右サイドバー ---------------- */}
-              <aside class="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+              <aside class="order-first lg:order-none lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
                 {/* 目次（PCのみ・サイドバー上部） */}
                 {toc.length >= 3 ? (
                   <nav class="mb-5 hidden rounded-big border border-edge2 bg-panel p-4 lg:block">
