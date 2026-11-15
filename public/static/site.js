@@ -464,11 +464,23 @@
       const res = await fetch('/api/map/points')
       const { points } = await res.json()
       // data-category が空なら地図対象カテゴリすべて（テーマ表示）
-      const want = catMapEl.dataset.category
-      const target = want ? points.filter((p) => p.category === want) : points
+      const want = (catMapEl.dataset.category || '').split(',').map((v) => v.trim()).filter(Boolean)
+      const target = want.length ? points.filter((p) => want.includes(p.category)) : points
+      // 座標が重なるピンは少しずらして、下敷きにならないようにする
+      const seen = {}
       const group = []
       target.forEach((p) => {
-        group.push(L.marker([p.lat, p.lng], { icon: pinIcon(p.category) }).addTo(map).bindPopup(popupHtml(p)))
+        const key = p.lat.toFixed(4) + ',' + p.lng.toFixed(4)
+        const dup = seen[key] || 0
+        seen[key] = dup + 1
+        const a = dup * 2.4
+        const lat = p.lat + (dup ? Math.sin(a) * 0.012 : 0)
+        const lng = p.lng + (dup ? Math.cos(a) * 0.012 : 0)
+        group.push(
+          L.marker([lat, lng], { icon: pinIcon(p.category), zIndexOffset: dup * 100 })
+            .addTo(map)
+            .bindPopup(popupHtml(p))
+        )
       })
       if (group.length) map.fitBounds(L.featureGroup(group).getBounds().pad(0.25))
     }

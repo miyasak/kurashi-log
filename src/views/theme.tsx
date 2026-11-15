@@ -222,7 +222,7 @@ export const ThemePage: FC<Props> = ({
               action={<ArrowLink href="/map">全画面で見る</ArrowLink>}
             />
             <div class="mt-6 overflow-hidden rounded-big border border-edge2">
-              <div id="cat-map" class="h-[320px] w-full sm:h-[400px]" data-category={activeCat || mapCatFallback}></div>
+              <div id="cat-map" class="h-[320px] w-full sm:h-[400px]" data-category={activeCat || catKeys.join(',')}></div>
             </div>
           </div>
         </section>
