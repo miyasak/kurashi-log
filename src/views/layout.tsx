@@ -229,19 +229,42 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
       <div class="fixed inset-0 z-40 hidden pt-14 md:hidden" id="mobile-menu">
         <div class="mx-auto max-w-page overflow-y-auto px-4 py-4" style="max-height:calc(100vh - 3.5rem)">
           {THEMES.map((t) => (
-            <a
-              href={`/theme/${t.key}`}
-              class="flex items-center justify-between border-b border-edge2 py-4"
-            >
-              <span class="min-w-0">
-                <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
-                  <i class={`fa-solid ${t.icon} w-5 text-[14px] text-brand`}></i>
-                  {t.name}
+            <>
+              <a
+                href={`/theme/${t.key}`}
+                class={`flex items-center justify-between py-4 ${
+                  t.categories.length > 1 ? '' : 'border-b border-edge2'
+                }`}
+              >
+                <span class="min-w-0">
+                  <span class="flex items-center gap-3 text-[17px] font-bold tracking-tight">
+                    <i class={`fa-solid ${t.icon} w-5 text-[14px] text-brand`}></i>
+                    {t.name}
+                  </span>
+                  <span class="mt-1 block pl-8 text-[13px] text-mute">{t.label}</span>
                 </span>
-                <span class="mt-1 block pl-8 text-[13px] text-mute">{t.label}</span>
-              </span>
-              <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
-            </a>
+                <i class="fa-solid fa-chevron-right text-[11px] text-mute"></i>
+              </a>
+              {t.categories.length > 1 ? (
+                <div class="border-b border-edge2 pb-3 pl-8">
+                  {t.categories
+                    .map((k) => CATEGORY_MAP[k])
+                    .filter(Boolean)
+                    .map((c) => (
+                      <a
+                        href={`/theme/${t.key}?cat=${c.key}`}
+                        class="flex items-center justify-between py-2.5"
+                      >
+                        <span class="flex items-center gap-2.5 text-[14.5px] font-medium text-sub">
+                          <i class={`fa-solid ${c.icon} w-4 text-[12px] text-brand`}></i>
+                          {c.name}
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-mute"></i>
+                      </a>
+                    ))}
+                </div>
+              ) : null}
+            </>
           ))}
 
           <a href="/about" class="flex items-center justify-between border-b border-edge2 py-4">
