@@ -954,7 +954,7 @@ main > section:nth-of-type(even) {
 /* ---------------- テーマページのヒーロー ---------------- */
 .theme-hero {
   min-height: 396px;
-  height: calc(100vw / 1280 * 420);
+  height: calc(100vw / 1280 * 340);
   margin-top: -3.5rem;
   display: flex;
   align-items: center;
