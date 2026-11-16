@@ -424,6 +424,7 @@ function buildSpecs(theme: ThemeDef, summary: Record<string, any>, counts: Recor
     return [
       { label: '記録したルート', value: n(summary.distance) ? `${Number(summary.distance).toLocaleString()} km` : '' },
       { label: '都道府県', value: n(summary.prefectures) ? `${summary.prefectures}` : '' },
+      { label: 'キャンプ場', value: counts.camp ? `${counts.camp}` : '' },
       { label: '訪問店舗', value: counts.supermarket ? `${counts.supermarket}` : '' },
     ]
   const keys = (theme.categories as any[]).map((c) => (typeof c === 'string' ? c : c.key))
