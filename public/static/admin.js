@@ -549,7 +549,7 @@
               <div class="flex gap-1.5">
                 <label class="cursor-pointer rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-bold text-ink-soft hover:border-slate-300" title="画像を本文に挿入">
                   <i class="fa-solid fa-image mr-1"></i>画像挿入
-                  <input type="file" accept="image/*" class="hidden" id="md-upload" />
+                  <input type="file" accept="image/*" multiple class="hidden" id="md-upload" />
                 </label>
                 <button type="button" id="md-write" class="rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-bold text-white">編集</button>
                 <button type="button" id="md-prev" class="rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-bold text-ink-soft">プレビュー</button>
@@ -714,20 +714,93 @@
     )
     // 本文への画像挿入
     const mdUp = document.getElementById('md-upload')
-    if (mdUp) {
-      mdUp.addEventListener('change', async () => {
-        const file = mdUp.files && mdUp.files[0]
-        if (!file) return
-        const url = await uploadImage(file)
-        if (!url) return
-        const w = await imageWidth(file)
-        const alt = (prompt('画像の説明（alt）。空でもOK', '') || '').replace(/"/g, '&quot;')
+    function ensureImageTray() {
+      let box = document.getElementById('md-tray-box')
+      if (!box) {
+        const ta = $('#md-input')
+        box = document.createElement('div')
+        box.id = 'md-tray-box'
+        box.style.cssText =
+          'margin-top:8px;padding:8px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc'
+        box.innerHTML =
+          '<div style="margin-bottom:6px;font-size:11px;color:#64748b">' +
+          'アップロードした画像（クリックで本文に挿入）</div>' +
+          '<div id="md-tray" style="display:flex;flex-wrap:wrap;gap:8px"></div>'
+        ta.parentNode.insertBefore(box, ta.nextSibling)
+      }
+      return document.getElementById('md-tray')
+    }
+
+    function addTrayItem(tray, url, name) {
+      const wrap = document.createElement('div')
+      wrap.style.cssText = 'position:relative;width:104px;flex:0 0 auto'
+
+      const btn = document.createElement('button')
+      btn.type = 'button'
+      btn.style.cssText =
+        'width:100%;padding:4px;border:2px solid #cbd5e1;' +
+        'border-radius:8px;background:#fff;cursor:pointer;text-align:left'
+      btn.innerHTML =
+        '<img src="' + url + '" alt="" style="width:100%;height:70px;object-fit:cover;border-radius:5px;display:block">' +
+        '<div title="' + name + '" style="margin-top:4px;font-size:10px;color:#64748b;' +
+        'overflow:hidden;white-space:nowrap;direction:rtl;text-align:left">' +
+        '&#8206;' + name + '</div>'
+      btn.addEventListener('click', () => {
         const ta = $('#md-input')
         const pos = ta.selectionStart
-        const text = `\n<p><a href="${url}"><img src="${url}" alt="${alt}" style="width:${w}px;border-radius:10px;"></a></p>\n`
+        const text = '\n[![](' + url + ')](' + url + ')\n'
         ta.value = ta.value.slice(0, pos) + text + ta.value.slice(pos)
         ta.focus()
         ta.selectionStart = ta.selectionEnd = pos + text.length
+        btn.style.borderColor = '#10b981'
+        btn.style.background = '#ecfdf5'
+      })
+
+      const del = document.createElement('button')
+      del.type = 'button'
+      del.textContent = '\u00d7'
+      del.title = 'このサムネイルを消す（画像自体は残ります）'
+      del.style.cssText =
+        'position:absolute;top:-7px;right:-7px;width:20px;height:20px;padding:0;' +
+        'line-height:18px;text-align:center;border:1px solid #cbd5e1;border-radius:50%;' +
+        'background:#fff;color:#64748b;font-size:13px;cursor:pointer'
+      del.addEventListener('click', async (e) => {
+        e.stopPropagation()
+        const inserted = btn.style.borderColor === 'rgb(16, 185, 129)'
+        const msg = inserted
+          ? name + ' をサーバーから削除しますか？\nこの画像はすでに本文に挿入されています。削除すると記事で表示されなくなります。'
+          : name + ' をサーバーから削除しますか？'
+        if (!confirm(msg)) return
+        del.disabled = true
+        try {
+          await api('/admin/media?key=' + encodeURIComponent(url.replace(/^\/media\//, '')), {
+            method: 'DELETE'
+          })
+          wrap.remove()
+          const box = document.getElementById('md-tray-box')
+          const t = document.getElementById('md-tray')
+          if (box && t && !t.children.length) box.remove()
+        } catch (err) {
+          del.disabled = false
+          alert('削除に失敗したにゃ: ' + err.message)
+        }
+      })
+
+      wrap.appendChild(btn)
+      wrap.appendChild(del)
+      tray.appendChild(wrap)
+    }
+
+    if (mdUp) {
+      mdUp.addEventListener('change', async () => {
+        const files = Array.from(mdUp.files || [])
+        if (!files.length) return
+        const tray = ensureImageTray()
+        for (const file of files) {
+          const url = await uploadImage(file)
+          if (!url) continue
+          addTrayItem(tray, url, file.name)
+        }
         mdUp.value = ''
       })
     }
