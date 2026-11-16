@@ -748,8 +748,11 @@
       btn.addEventListener('click', () => {
         const ta = $('#md-input')
         const pos = ta.selectionStart
-        const text = '\n[![](' + url + ')](' + url + ')\n'
-        ta.value = ta.value.slice(0, pos) + text + ta.value.slice(pos)
+        const before = ta.value.slice(0, pos)
+        // 直前がすでに画像なら改行1つでつなげて横並びにする
+        const cont = /\]\([^)]*\)\s*$/.test(before)
+        const text = (cont ? '\n' : '\n\n') + '[![](' + url + ')](' + url + ')' + (cont ? '' : '\n')
+        ta.value = before + text + ta.value.slice(pos)
         ta.focus()
         ta.selectionStart = ta.selectionEnd = pos + text.length
         btn.style.borderColor = '#10b981'
