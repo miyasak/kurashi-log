@@ -202,6 +202,13 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
                 <a href={it.href} class={link(it.active)}>{it.label}</a>
               )
             )}
+            <a
+              href="/search"
+              class="ml-1.5 grid h-9 w-9 place-items-center rounded-full text-white/75 transition hover:bg-white/10 hover:text-white"
+              aria-label="記事を検索"
+            >
+              <i class="fa-solid fa-magnifying-glass text-[14px]"></i>
+            </a>
           </nav>
 
           {/* 右：モバイル */}
