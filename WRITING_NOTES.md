@@ -500,3 +500,11 @@ curl -s -o /dev/null -w "%{http_code} %{content_type}\n" https://tadoreru.com/ic
 キャッチコピー（走った道も、積み上げた数字も、あとから辿れるように。）は `subtitle` から `tagline` に移した。`subtitle` はタイトルに入る短い説明、`tagline` はページ内に表示するコピー、という使い分け。
 
 なおタイトル変更で効くのはCTRだけで、検索順位そのものは動かない。
+
+## OG画像（2026-11-17）
+
+`public/og.png` は 1200×630。元SVGは `/tmp/icons/og.svg` に作り、`rsvg-convert -w 1200 -h 630` でPNGにしている（一時ファイルなので、作り直すときはSVGから書き直す）。テーマ名を変えたときはここの4テーマ表記も直す。2026-11-07版は `Spa（日帰り温泉）／ Tech（業務効率化）` のまま残っていた。
+
+SVG内の日本語は `font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, sans-serif"` を指定する。rsvg-convert はシステムのフォントを使うため、生成後に `open public/og.png` で豆腐になっていないか必ず目視する。
+
+XやFacebookはOG画像を長期キャッシュするので、差し替えても既に共有済みのURLには反映されない。急ぐときは各社のCard Validatorで再取得をかける。
