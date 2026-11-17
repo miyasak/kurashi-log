@@ -27,7 +27,7 @@ type LayoutProps = PropsWithChildren<{
 }>
 
 export const Layout: FC<LayoutProps> = (props) => {
-  const title = props.title ? `${props.title} — ${SITE.title}` : `${SITE.title} — ${SITE.subtitle}`
+  const title = props.title ? `${props.title} — ${SITE.title}` : `${SITE.brandFull}｜${SITE.subtitle}`
   const desc = props.description || SITE.description
   const activeTheme = props.activeTheme || CATEGORY_MAP[props.activeCategory || '']?.theme
   /**
@@ -81,6 +81,7 @@ export const Layout: FC<LayoutProps> = (props) => {
         ) : null}
         {/* 絵文字SVGだと環境によって表示されないため PNG を用意 */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
         <link rel="manifest" href="/site.webmanifest" />
@@ -169,7 +170,7 @@ const SiteHeader: FC<{ activeTheme?: string; activePage?: string; hasMapPins?: b
           {/* 左：サイト名 */}
           <a href="/" class="flex items-center gap-2.5 transition hover:opacity-80" aria-label={SITE.title}>
             <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">
-              <svg viewBox="0 0 100 100" class="h-[13px] w-[13px] fill-current" aria-hidden="true"><rect x="20" y="62" width="60" height="7.2" rx="3.6"/><rect x="20" y="46" width="42" height="7.2" rx="3.6"/><rect x="20" y="30" width="24" height="7.2" rx="3.6"/><circle cx="76" cy="27.5" r="7.2"/></svg>
+              <svg viewBox="10 13 74 74" class="h-[20px] w-[20px] fill-current" aria-hidden="true"><circle cx="50" cy="50" r="29.7" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="7.8"/><path d="M 27.27 30.92 A 29.7 29.7 0 1 1 27.59 69.48" fill="none" stroke="currentColor" stroke-width="7.8" stroke-linecap="round"/><circle cx="24.55" cy="65.3" r="12.8" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="3.1"/><circle cx="24.55" cy="65.3" r="6.9"/></svg>
             </span>
             <span class="text-[15px] font-bold tracking-tight">{SITE.title}</span>
           </a>
@@ -308,7 +309,7 @@ const SiteFooter: FC<{ hasMapPins?: boolean }> = ({ hasMapPins }) => (
     <div class="mx-auto max-w-page px-4 py-10 sm:px-6">
       <div class="flex items-center gap-2.5">
         <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand text-white">
-          <svg viewBox="0 0 100 100" class="h-[13px] w-[13px] fill-current" aria-hidden="true"><rect x="20" y="62" width="60" height="7.2" rx="3.6"/><rect x="20" y="46" width="42" height="7.2" rx="3.6"/><rect x="20" y="30" width="24" height="7.2" rx="3.6"/><circle cx="76" cy="27.5" r="7.2"/></svg>
+          <svg viewBox="10 13 74 74" class="h-[20px] w-[20px] fill-current" aria-hidden="true"><circle cx="50" cy="50" r="29.7" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="7.8"/><path d="M 27.27 30.92 A 29.7 29.7 0 1 1 27.59 69.48" fill="none" stroke="currentColor" stroke-width="7.8" stroke-linecap="round"/><circle cx="24.55" cy="65.3" r="12.8" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="3.1"/><circle cx="24.55" cy="65.3" r="6.9"/></svg>
         </span>
         <span class="text-[15px] font-bold tracking-tight">{SITE.title}</span>
       </div>

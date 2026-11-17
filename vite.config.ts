@@ -31,9 +31,11 @@ export default defineConfig({
             '/static/*',
             '/og.png',
             '/favicon.ico',
+            '/icon.svg',
             '/icon-32.png',
             '/icon-180.png',
             '/icon-512.png',
+            '/icon-maskable-512.png',
             '/site.webmanifest'
           ]
         }

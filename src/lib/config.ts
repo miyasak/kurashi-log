@@ -210,9 +210,13 @@ export const GROUPS = THEMES.map((t) => ({
 /** サイト名やキャッチコピーはここを書き換えるだけで全ページに反映されます */
 export const SITE = {
   title: 'Tadoreru',
+  /** トップページのタイトル用（読みを添えた表記） */
+  brandFull: 'Tadoreru（たどれる）',
   /** ロゴ下に出る小さな英字キャプション */
   caption: 'MONEY · TOURING · ONSEN · TECH',
-  subtitle: '走った道も、積み上げた数字も、あとから辿れるように。',
+  subtitle: 'お金とツーリングを数字で残す記録',
+  /** サイト内で使うキャッチコピー */
+  tagline: '走った道も、積み上げた数字も、あとから辿れるように。',
   author: 'Owner',
   /** ナビと同じ 4テーマ構成で統一した説明文 */
   description:
