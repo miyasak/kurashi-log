@@ -508,3 +508,5 @@ curl -s -o /dev/null -w "%{http_code} %{content_type}\n" https://tadoreru.com/ic
 SVG内の日本語は `font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, sans-serif"` を指定する。rsvg-convert はシステムのフォントを使うため、生成後に `open public/og.png` で豆腐になっていないか必ず目視する。
 
 XやFacebookはOG画像を長期キャッシュするので、差し替えても既に共有済みのURLには反映されない。急ぐときは各社のCard Validatorで再取得をかける。
+
+アイコンとOG画像の元SVGは `assets/icons/` に置いてある（`og.svg` / `icon-square.svg`（180・512用の四角版） / `icon-maskable.svg`）。`public/` ではないのでビルドには含まれない。作り直すときはここから `rsvg-convert` にかける。
