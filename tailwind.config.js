@@ -31,17 +31,20 @@ module.exports = {
       },
       /* public/static/style.css の :root と同じ値にすること。
          片方だけ変えると CSS側とTailwind側で色がズレる */
+      /* 実際の色は public/static/style.css の :root と
+         @media (prefers-color-scheme: dark) で定義する。
+         ここは変数への参照だけ。値を直接書かないこと */
       colors: {
-        base: '#f1f1ec',
-        panel: '#ffffff',
-        panel2: '#e8e8e2',
-        edge: 'rgba(0,0,0,0.16)',
-        edge2: 'rgba(0,0,0,0.11)',
-        ink: '#1a1a19',
-        sub: '#5c5c58',
-        mute: '#8c8c87',
-        brand: '#ea580c',
-        brandsoft: 'rgba(234,88,12,0.10)'
+        base: 'rgb(var(--base-rgb) / <alpha-value>)',
+        panel: 'rgb(var(--panel-rgb) / <alpha-value>)',
+        panel2: 'rgb(var(--panel2-rgb) / <alpha-value>)',
+        ink: 'rgb(var(--ink-rgb) / <alpha-value>)',
+        sub: 'rgb(var(--sub-rgb) / <alpha-value>)',
+        mute: 'rgb(var(--mute-rgb) / <alpha-value>)',
+        brand: 'rgb(var(--brand-rgb) / <alpha-value>)',
+        edge: 'var(--edge)',
+        edge2: 'var(--edge2)',
+        brandsoft: 'var(--brandsoft)'
       },
       maxWidth: { page: 'clamp(1280px, 86vw, 1760px)', text: '800px' },
       borderRadius: { apple: '14px', big: '18px' }

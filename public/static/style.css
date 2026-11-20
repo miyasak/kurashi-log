@@ -3,15 +3,28 @@
    ========================================================= */
 
 :root {
-  --base: #ffffff;
-  --panel: #ffffff;
-  --panel2: #ededed;
+  /* Tailwind に渡す RGB 三つ組。alpha は Tailwind 側が差し込む */
+  --base-rgb: 241 241 236;
+  --panel-rgb: 255 255 255;
+  --panel2-rgb: 232 232 226;
+  --ink-rgb: 26 26 25;
+  --sub-rgb: 92 92 88;
+  --mute-rgb: 140 140 135;
+  --brand-rgb: 234 88 12;
+
+  /* 手書きCSSから使う色。上の三つ組から組み立てる */
+  --base: rgb(var(--base-rgb));
+  --panel: rgb(var(--panel-rgb));
+  --panel2: rgb(var(--panel2-rgb));
+  --ink: rgb(var(--ink-rgb));
+  --sub: rgb(var(--sub-rgb));
+  --mute: rgb(var(--mute-rgb));
+  --brand: rgb(var(--brand-rgb));
+
+  /* 透明度が最初から入っている色はそのまま */
   --edge: rgba(0, 0, 0, 0.16);
-  --edge2: rgba(0, 0, 0, 0.15);
-  --ink: #1a1a19;
-  --sub: #5c5c58;
-  --mute: #8c8c87;
-  --brand: #ea580c;
+  --edge2: rgba(0, 0, 0, 0.11);
+  --brandsoft: rgba(234, 88, 12, 0.1);
 }
 
 html {
@@ -1110,4 +1123,126 @@ main > section:nth-of-type(even) {
 }
 .post-body h2:last-of-type + ul:not(:has(a)) > li::before {
   content: none;
+}
+
+/* =========================================================
+   Dark mode (2026-11-20)
+   OS設定に追従する。変数の差し替えが主で、
+   直接色を書いていた箇所だけ個別に上書きしている。
+   ========================================================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --base-rgb: 20 23 26;
+    --panel-rgb: 28 32 36;
+    --panel2-rgb: 38 43 48;
+    --ink-rgb: 232 230 227;
+    --sub-rgb: 168 164 158;
+    --mute-rgb: 123 120 114;
+    --brand-rgb: 251 146 60;
+    --edge: rgba(255, 255, 255, 0.18);
+    --edge2: rgba(255, 255, 255, 0.13);
+    --brandsoft: rgba(251, 146, 60, 0.14);
+  }
+
+  html,
+  body {
+    background: var(--base);
+  }
+
+  /* セクションの交互の帯。白地のときより控えめに */
+  main > section:nth-of-type(even) {
+    background: #181c20;
+  }
+
+  /* カードは影ではなく明度差で浮かせる */
+  .rounded-big.bg-panel {
+    box-shadow: none;
+    border-color: var(--edge2);
+  }
+
+  /* 一覧表の見出し行 */
+  .camp-row.bg-base,
+  .super-row.bg-base {
+    background: #262b30 !important;
+  }
+
+  /* 本文リンク。暗い地ではオレンジを明るく */
+  .post-body a {
+    color: #fdba74;
+    border-bottom-color: rgba(253, 186, 116, 0.32);
+  }
+  .post-body a:hover {
+    color: var(--brand);
+    border-bottom-color: var(--brand);
+  }
+  .post-body code {
+    background: rgba(255, 255, 255, 0.07);
+    color: #fdba74;
+  }
+  .post-body blockquote {
+    background: rgba(251, 146, 60, 0.09);
+  }
+
+  /* 関連リンクの外部カード */
+  .post-body h2:last-of-type + ul > li > a[href^="http"]:not([href*="tadoreru.com"]),
+  .post-body h2:last-of-type + ul > li > p > a[href^="http"]:not([href*="tadoreru.com"]) {
+    background: #181c20;
+  }
+  .post-body h2:last-of-type + ul > li > a:hover,
+  .post-body h2:last-of-type + ul > li > p > a:hover {
+    background: rgba(251, 146, 60, 0.1);
+    border-color: rgba(251, 146, 60, 0.45);
+  }
+
+  /* 評価ランクのバッジ */
+  .rank-b {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #c7c4bf;
+  }
+  .rank-c {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #99968f;
+  }
+  .rank-d {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #7b7872;
+  }
+
+  /* 並べ替えボタン */
+  .sort-btn {
+    border-color: rgba(255, 255, 255, 0.16);
+    color: var(--sub);
+  }
+  .sort-bar .sort-label {
+    color: var(--mute);
+  }
+
+  /* 地図。タイルは明るいままなので帰属表示だけ合わせる */
+  .leaflet-control-attribution {
+    background: rgba(20, 23, 26, 0.82) !important;
+  }
+  .leaflet-container a,
+  .post-body .leaflet-container a {
+    color: #fdba74;
+  }
+
+  /* 記事本文の画像。白が浮きすぎるのを少し抑える */
+  .post-body img {
+    filter: brightness(0.94);
+  }
+
+  /* 一覧カードのサムネイル。白い画面写真が浮くので少し落とす */
+  a img[src^="/media/uploads/"] {
+    filter: brightness(0.9) contrast(0.96);
+  }
+  a:hover img[src^="/media/uploads/"] {
+    filter: none;
+  }
+
+  ::selection {
+    background: rgba(251, 146, 60, 0.4);
+    color: #fff;
+  }
 }
