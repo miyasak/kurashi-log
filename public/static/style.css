@@ -1092,3 +1092,22 @@ main > section:nth-of-type(even) {
   content: "参考リンク（外部サイト）";
   color: var(--mute);
 }
+
+/* リンクを含まない箇条書きはカード化しない */
+.post-body h2:last-of-type + ul:not(:has(a)),
+.post-body > h2:last-of-type + ul:not(:has(a)) {
+  display: revert;
+  gap: revert;
+  padding: revert;
+  list-style: revert;
+}
+.post-body h2:last-of-type + ul:not(:has(a)) > li {
+  border: 0;
+  background: none;
+  border-radius: 0;
+  padding: revert;
+  display: revert;
+}
+.post-body h2:last-of-type + ul:not(:has(a)) > li::before {
+  content: none;
+}
