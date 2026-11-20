@@ -1028,3 +1028,67 @@ main > section:nth-of-type(even) {
 .theme-hero nav a:hover {
   color: #fff;
 }
+
+/* ---------------- 関連リンク（記事末尾の最後のh2の直後のリスト） ----------------
+   自分の記事は「関連記事」、外部サイトは「参考リンク」とラベルを出す。
+   本文を書き換えずに全記事へ効かせたいのでCSSだけで振り分ける。
+   markedは項目間に空行があると li > p > a になるため、両方の形に対応する */
+.post-body h2:last-of-type + ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1em;
+  display: grid;
+  gap: 10px;
+}
+.post-body h2:last-of-type + ul > li {
+  margin: 0;
+}
+.post-body h2:last-of-type + ul > li + li {
+  margin-top: 0;
+}
+.post-body h2:last-of-type + ul > li > p {
+  margin: 0;
+}
+.post-body h2:last-of-type + ul > li > a,
+.post-body h2:last-of-type + ul > li > p > a {
+  display: block;
+  padding: 13px 16px;
+  border: 1px solid var(--edge2);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.95em;
+  line-height: 1.6;
+  transition: background 0.15s, border-color 0.15s;
+}
+.post-body h2:last-of-type + ul > li > a:hover,
+.post-body h2:last-of-type + ul > li > p > a:hover {
+  background: rgba(249, 115, 22, 0.06);
+  border-color: rgba(249, 115, 22, 0.5);
+  color: var(--ink);
+}
+/* ラベル（既定はサイト内の記事） */
+.post-body h2:last-of-type + ul > li > a::before,
+.post-body h2:last-of-type + ul > li > p > a::before {
+  content: "関連記事";
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--brand);
+  margin-bottom: 3px;
+}
+/* 外部サイトは控えめに、ラベルも差し替える */
+.post-body h2:last-of-type + ul > li > a[href^="http"]:not([href*="tadoreru.com"]),
+.post-body h2:last-of-type + ul > li > p > a[href^="http"]:not([href*="tadoreru.com"]) {
+  font-weight: 500;
+  font-size: 0.9em;
+  color: var(--sub);
+  background: #fcfcfb;
+}
+.post-body h2:last-of-type + ul > li > a[href^="http"]:not([href*="tadoreru.com"])::before,
+.post-body h2:last-of-type + ul > li > p > a[href^="http"]:not([href*="tadoreru.com"])::before {
+  content: "参考リンク（外部サイト）";
+  color: var(--mute);
+}
