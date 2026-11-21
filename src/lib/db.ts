@@ -68,6 +68,8 @@ type ListOptions = {
   categories?: string[]
   tag?: string
   q?: string
+  /** 'draft' | 'published'。管理画面の絞り込み用 */
+  status?: string
   limit?: number
   /** limit の上限を広げたいときだけ指定（sitemap用）。既定は100 */
   maxLimit?: number
@@ -80,7 +82,12 @@ type ListOptions = {
 export async function listPosts(db: D1Database, opts: ListOptions = {}) {
   const where: string[] = []
   const binds: any[] = []
-  if (!opts.includeDrafts) where.push("p.status = 'published'")
+  if (opts.status === 'draft' || opts.status === 'published') {
+    where.push('p.status = ?')
+    binds.push(opts.status)
+  } else if (!opts.includeDrafts) {
+    where.push("p.status = 'published'")
+  }
   if (opts.category) {
     where.push('p.category = ?')
     binds.push(opts.category)
@@ -121,7 +128,12 @@ export async function listPosts(db: D1Database, opts: ListOptions = {}) {
 export async function countPosts(db: D1Database, opts: ListOptions = {}) {
   const where: string[] = []
   const binds: any[] = []
-  if (!opts.includeDrafts) where.push("status = 'published'")
+  if (opts.status === 'draft' || opts.status === 'published') {
+    where.push('status = ?')
+    binds.push(opts.status)
+  } else if (!opts.includeDrafts) {
+    where.push("status = 'published'")
+  }
   if (opts.category) {
     where.push('category = ?')
     binds.push(opts.category)

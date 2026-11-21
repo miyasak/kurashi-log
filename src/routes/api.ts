@@ -107,15 +107,16 @@ api.use('/admin/*', async (c, next) => {
 
 api.get('/admin/posts', async (c) => {
   const { category, q, status, limit, offset } = c.req.query()
-  let posts = await listPosts(c.env.DB, {
+  const opts = {
     category,
     q,
+    status,
     includeDrafts: true,
     limit: num(limit, 100, 100),
     offset: num(offset, 0, 100000)
-  })
-  if (status) posts = posts.filter((p) => p.status === status)
-  const total = await countPosts(c.env.DB, { includeDrafts: true })
+  }
+  const posts = await listPosts(c.env.DB, opts)
+  const total = await countPosts(c.env.DB, opts)
   return c.json({ posts, total })
 })
 
