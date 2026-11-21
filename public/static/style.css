@@ -1151,7 +1151,7 @@ main > section:nth-of-type(even) {
 
   /* セクションの交互の帯。白地のときより控えめに */
   main > section:nth-of-type(even) {
-    background: #181c20;
+      background: #16191c;
   }
 
   /* カードは影ではなく明度差で浮かせる */
