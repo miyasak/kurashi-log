@@ -1246,3 +1246,16 @@ main > section:nth-of-type(even) {
     color: #fff;
   }
 }
+
+/* ---- 管理画面はOSの設定に関わらず常に暗い。入力欄の文字色を固定する ---- */
+.admin-body input,
+.admin-body textarea,
+.admin-body select {
+  color: #f5f5f7 !important;
+  -webkit-text-fill-color: #f5f5f7;
+}
+.admin-body input::placeholder,
+.admin-body textarea::placeholder {
+  color: #71717a !important;
+  -webkit-text-fill-color: #71717a;
+}
