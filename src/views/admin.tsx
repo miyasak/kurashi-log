@@ -155,6 +155,7 @@ export const AdminApp: FC = () => (
       <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       <script src="/static/admin.js"></script>
+        <script src="/static/admin-check.js"></script>
     </body>
   </html>
 )
