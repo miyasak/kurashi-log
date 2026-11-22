@@ -41,6 +41,8 @@
     var list = document.getElementById('series-list')
     if (!input || input.dataset.seriesReady) return
     input.dataset.seriesReady = '1'
+    cache = null          // エディタを開くたびに最新を取り直す
+    loading = null
     if (list) list.remove()
     input.removeAttribute('list')
 
@@ -123,6 +125,8 @@
 
     load().then(fill)
   }
+
+  document.addEventListener('submit', function () { cache = null; loading = null }, true)
 
   new MutationObserver(setup)
     .observe(document.getElementById('admin-main') || document.body, { childList: true, subtree: true })
