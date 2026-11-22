@@ -8,6 +8,7 @@ export type Post = {
   summary: string | null
   body: string
   cover_image: string | null
+  hero_image: string | null
   status: string
   featured: number
   published_at: string | null
@@ -48,7 +49,7 @@ export type Post = {
 }
 
 const POST_FIELDS = [
-  'slug','category','title','summary','body','cover_image','status','featured','published_at',
+  'slug','category','title','summary','body','cover_image','hero_image','status','featured','published_at',
   'place_name','prefecture','address','lat','lng',
   'distance_km','duration_text','weather','bike','route_text',
   'rating','cospa','budget','visit_date','business_hours',

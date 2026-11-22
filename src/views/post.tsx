@@ -41,6 +41,8 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
     const query = s ? `${s.lat},${s.lng}` : `${post.lat},${post.lng}`
     return `https://www.google.com/maps/search/?api=1&query=${query}`
   })()
+  /** ヒーロー背景。専用画像があればそれ、なければカバー画像を流用 */
+  const heroSrc = post.hero_image || post.cover_image
   const accent = ACCENT
   const areaLabel = [post.area, post.prefecture].filter(Boolean).join(' / ')
   const theme = cat ? THEME_MAP[cat.theme] : undefined
@@ -63,10 +65,10 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
            ============================================================ */}
         <header class="relative -mt-16 overflow-hidden bg-base">
           <div class="absolute inset-0">
-            {post.cover_image ? (
+            {heroSrc ? (
               <>
                 <img
-                  src={post.cover_image}
+                  src={heroSrc}
                   alt=""
                   class="h-full w-full object-cover"
                 />

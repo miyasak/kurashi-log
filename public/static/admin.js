@@ -491,6 +491,30 @@
         navigate('editor')
       })
     )
+    const heroInput = main().querySelector('[name="hero_image"]')
+    if (heroInput) {
+      const updateHero = () => {
+        const box = document.getElementById('hero-preview')
+        if (box)
+          box.innerHTML = heroInput.value
+            ? `<img src="${esc(heroInput.value)}" class="h-32 w-full rounded-xl border border-slate-200 object-cover" />`
+            : ''
+      }
+      heroInput.addEventListener('input', updateHero)
+      updateHero()
+      const heroUp = document.getElementById('hero-upload')
+      if (heroUp) {
+        heroUp.addEventListener('change', async () => {
+          const file = heroUp.files && heroUp.files[0]
+          if (!file) return
+          const url = await uploadImage(file)
+          if (!url) return
+          heroInput.value = url
+          updateHero()
+        })
+      }
+    }
+
     main().querySelectorAll('[data-del]').forEach((b) =>
       b.addEventListener('click', async () => {
         if (!confirm('この記事を削除しますか？')) return
@@ -644,6 +668,14 @@
               <input type="file" accept="image/*" class="hidden" id="cover-upload" />
             </label>
             <div id="cover-preview" class="mt-2"></div>
+            <div class="mt-4 border-t border-slate-100 pt-4">
+              ${field('ヒーロー画像URL（任意）', 'hero_image', p.hero_image, { ph: '空ならカバー画像を使います', hint: '記事上部の大きな背景だけに使用。一覧とOGPはカバー画像のまま' })}
+              <label class="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-2.5 text-[11.5px] font-bold text-ink-soft hover:border-slate-400">
+                <i class="fa-solid fa-cloud-arrow-up"></i>端末から画像をアップロード
+                <input type="file" accept="image/*" class="hidden" id="hero-upload" />
+              </label>
+              <div id="hero-preview" class="mt-2"></div>
+            </div>
             <div class="mt-3">
               <label class="admin-label">タグ（カンマ区切り）</label>
               <input name="tags" value="${esc((p.tags || []).join(', '))}" placeholder="NISA, 積立, 振り返り" class="admin-input" />
