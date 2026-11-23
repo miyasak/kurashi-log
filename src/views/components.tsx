@@ -58,7 +58,7 @@ export const SectionTitle: FC<{
 )
 
 /* ---------- カード内画像 ---------- */
-export const Cover: FC<{ post: Post; ratio?: string }> = ({ post, ratio = 'aspect-[16/9]' }) => {
+export const Cover: FC<{ post: Post; ratio?: string }> = ({ post, ratio = 'aspect-[40/21]' }) => {
   const c = CATEGORY_MAP[post.category]
   if (post.cover_image) {
     return (
@@ -134,7 +134,7 @@ export const PostCard: FC<{ post: Post; showCategory?: boolean; variant?: 'tile'
       href={href}
       class="group flex h-full flex-col overflow-hidden rounded-big border border-edge2 bg-panel transition duration-300 hover:border-brand/40"
     >
-      {showFrame ? <Cover post={post} ratio="aspect-[16/9]" /> : null}
+      {showFrame ? <Cover post={post} ratio="aspect-[40/21]" /> : null}
       <div class="flex flex-1 flex-col p-4 sm:p-5">
         {/* バッジ + 日付 */}
         <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
