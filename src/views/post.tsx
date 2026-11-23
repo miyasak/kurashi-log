@@ -42,7 +42,10 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
     return `https://www.google.com/maps/search/?api=1&query=${query}`
   })()
   /** ヒーロー背景。専用画像があればそれ、なければカバー画像を流用 */
-  const heroSrc = post.hero_image || post.cover_image
+  /** 写真で雰囲気を伝える必要がないカテゴリ。ヒーローは無地の背景にする */
+  const NO_HERO_CATS = ['it', 'asset', 'life']
+  /** 専用画像があれば常に優先。無ければ上記以外だけカバー画像を流用 */
+  const heroSrc = post.hero_image || (NO_HERO_CATS.includes(post.category) ? null : post.cover_image)
   const accent = ACCENT
   const areaLabel = [post.area, post.prefecture].filter(Boolean).join(' / ')
   const theme = cat ? THEME_MAP[cat.theme] : undefined
@@ -77,7 +80,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
               </>
             ) : (
               <div
-                style={`background:radial-gradient(120% 100% at 25% 0%, ${cat?.accentSoft}, transparent 70%)`}
+                style={`background:radial-gradient(120% 100% at 25% 0%, ${cat?.accentSoft}, transparent 65%), linear-gradient(170deg, #1e293f 0%, #141c2d 55%, #0e1420 100%)`}
                 class="h-full w-full"
               ></div>
             )}
