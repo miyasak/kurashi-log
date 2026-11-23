@@ -365,7 +365,13 @@ export async function upsertPost(db: D1Database, data: any, id?: number) {
     const first = data.spots.find(
       (s: any) => s?.name && isFinite(Number(s?.lat)) && isFinite(Number(s?.lng))
     )
-    if (first) {
+    // 代表地点が手入力されていればスポット1番目で上書きしない
+    const ownLat = String(payload.lat ?? '').trim()
+    const ownLng = String(payload.lng ?? '').trim()
+    const hasOwnCoord =
+      ownLat !== '' && ownLng !== '' && isFinite(Number(ownLat)) && isFinite(Number(ownLng))
+
+    if (first && !hasOwnCoord) {
       await db
         .prepare('UPDATE posts SET lat = ?, lng = ? WHERE id = ?')
         .bind(Number(first.lat), Number(first.lng), postId)

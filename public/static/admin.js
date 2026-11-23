@@ -1372,6 +1372,11 @@
       .filter(Boolean)
     data.photos = currentPhotos().filter((p) => p.url)
     data.spots = currentSpots().filter((s) => s.name && s.lat && s.lng)
+    // 緯度経度の欄は form の外にあるので FormData では拾えない。直接読む
+    for (const k of ['lat', 'lng']) {
+      const el = main().querySelector('[name="' + k + '"]')
+      if (el) data[k] = el.value.trim()
+    }
     // 代表地点が空ならスポット1の座標で埋める（手入力があれば触らない）
     if (!String(data.lat || '').trim() && !String(data.lng || '').trim() && data.spots.length) {
       data.lat = data.spots[0].lat

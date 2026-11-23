@@ -154,9 +154,9 @@ export const AdminApp: FC = () => (
 
       <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-      <script src="/static/admin.js"></script>
-        <script src="/static/admin-check.js"></script>
-        <script src="/static/admin-series.js"></script>
+      <script src="/static/admin.js?v=202611231657"></script>
+        <script src="/static/admin-check.js?v=202611231657"></script>
+        <script src="/static/admin-series.js?v=202611231657"></script>
     </body>
   </html>
 )
