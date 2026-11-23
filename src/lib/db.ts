@@ -168,6 +168,13 @@ export async function countPosts(db: D1Database, opts: ListOptions = {}) {
  * 逆方向（相手の linked_slug がこの記事を指している）も拾う。
  */
 export async function getLinkedPosts(db: D1Database, post: Post) {
+  // linked_slug はカンマ区切りで複数持てる（連泊したキャンプ場など）
+  const linkedSlugs = String(post.linked_slug || '')
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)
+
+  const marks = linkedSlugs.length ? linkedSlugs.map(() => '?').join(',') : "''"
   const rows = await db
     .prepare(
       `SELECT p.*, (
@@ -175,16 +182,14 @@ export async function getLinkedPosts(db: D1Database, post: Post) {
        ) AS tag_names
        FROM posts p
        WHERE p.status = 'published' AND p.id <> ?
-         AND (p.slug = ? OR (p.linked_slug IS NOT NULL AND p.linked_slug = ?))
-       ORDER BY CASE p.category
-         WHEN 'touring' THEN 1
-         WHEN 'onsen' THEN 2
-         WHEN 'supermarket' THEN 3
-         WHEN 'camp' THEN 4
-         ELSE 5 END
-       LIMIT 3`
+         AND (
+           p.slug IN (${marks})
+           OR (p.linked_slug IS NOT NULL AND ',' || replace(p.linked_slug, ' ', '') || ',' LIKE ?)
+         )
+       ORDER BY p.visit_date IS NULL, p.visit_date, p.published_at
+       LIMIT 6`
     )
-    .bind(post.id, post.linked_slug || '', post.slug)
+    .bind(post.id, ...linkedSlugs, `%,${post.slug},%`)
     .all<any>()
   return (rows.results || []).map(normalize)
 }

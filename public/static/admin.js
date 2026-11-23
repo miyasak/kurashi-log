@@ -1372,6 +1372,10 @@
       .filter(Boolean)
     data.photos = currentPhotos().filter((p) => p.url)
     data.spots = currentSpots().filter((s) => s.name && s.lat && s.lng)
+    // linked_slug も form の外にある（複数選択は admin-linked.js が hidden で持つ）
+    const linkedEl = main().querySelector('input[name="linked_slug"], select[name="linked_slug"]')
+    if (linkedEl) data.linked_slug = String(linkedEl.value || '').trim()
+
     // 緯度経度の欄は form の外にあるので FormData では拾えない。直接読む
     for (const k of ['lat', 'lng']) {
       const el = main().querySelector('[name="' + k + '"]')

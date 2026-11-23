@@ -687,3 +687,19 @@ it / asset / life でも、写真で見せたい記事だけヒーロー欄に 1
 | --- | --- |
 | ツーリング | その日いちばんの見どころ（例: post-towada-oirase は御鼻部山展望台） |
 | キャンプ場 / 日帰り温泉 / ご当地スーパー | その施設そのもの |
+
+## 連泊したときの紐付け（2026-11-23）
+
+キャンプ場に連泊すると、そこへ着いた日と、そこから出かけた日の2本のツーリング記事が関係してくる。`linked_slug` をカンマ区切りにすると両方のカードが出る。
+
+npx wrangler d1 execute tadoreru --remote --command="UPDATE posts SET linked_slug='post-iya-ohoke,post-shikoku-karst' WHERE slug='post-miyanomae-camp'"
+
+表示は `src/lib/db.ts` の `getLinkedPosts` が担当。カンマで分割して拾い、訪問日の古い順に並べ、最大6件まで出す。相手側が自分を指している場合（逆方向）も拾うので、片方だけ設定すれば両方の記事にカードが出る。
+
+**管理画面のプルダウンは1本しか扱えない。** カンマ区切りの値は選択肢と一致しないため「— 紐付けなし —」と表示される。この状態で保存すると紐付けが消えるので、複数にした記事を管理画面で保存したあとは上のSQLで入れ直す。
+
+複数対応のUIは2026-11-23に試したが、`admin.js` が既存値を `select` に入れるタイミングを掴めず断念した。連泊は年に数回なので、SQLで運用する。
+
+| 記事 | linked_slug |
+| --- | --- |
+| post-miyanomae-camp | post-iya-ohoke,post-shikoku-karst |
