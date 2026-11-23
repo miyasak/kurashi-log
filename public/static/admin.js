@@ -662,14 +662,14 @@
           </div>
 
           <div class="rounded-2xl border border-slate-200 bg-white p-5">
-            ${field('カバー画像URL', 'cover_image', p.cover_image, { ph: 'https://... または端末から選択', hint: '外部URL / アップロード画像（/media/…）どちらでも可' })}
+            ${field('カバー画像URL', 'cover_image', p.cover_image, { ph: '1200 × 630', hint: '一覧カードとSNS共有に使用' })}
             <label class="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-2.5 text-[11.5px] font-bold text-ink-soft hover:border-slate-400">
               <i class="fa-solid fa-cloud-arrow-up"></i>端末から画像をアップロード
               <input type="file" accept="image/*" class="hidden" id="cover-upload" />
             </label>
             <div id="cover-preview" class="mt-2"></div>
             <div class="mt-4 border-t border-slate-100 pt-4">
-              ${field('ヒーロー画像URL（任意）', 'hero_image', p.hero_image, { ph: '空ならカバー画像を使います', hint: '記事上部の大きな背景だけに使用。一覧とOGPはカバー画像のまま' })}
+              ${field('ヒーロー画像URL（任意）', 'hero_image', p.hero_image, { ph: '1600 × 900', hint: '記事上部の背景。空ならカバー画像を使用' })}
               <label class="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 py-2.5 text-[11.5px] font-bold text-ink-soft hover:border-slate-400">
                 <i class="fa-solid fa-cloud-arrow-up"></i>端末から画像をアップロード
                 <input type="file" accept="image/*" class="hidden" id="hero-upload" />

@@ -39,3 +39,4 @@ backup_local.sql
 media-list.txt
 .venv/
 .old-png-keys.txt
+covers/
