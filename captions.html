@@ -1,0 +1,84 @@
+<!doctype html><meta charset="utf-8"><title>キャプション入力</title>
+<style>
+body{background:#14181f;color:#e6e6e6;font-family:system-ui;margin:0;padding:24px 32px;}
+h2{font-size:15px;margin:32px 0 10px;border-bottom:1px solid #2c3444;padding-bottom:6px;}
+h2 small{color:#7c879c;font-weight:400;margin-left:10px;font-size:12px;}
+.row{display:flex;gap:16px;align-items:center;margin:10px 0;}
+img{width:260px;height:146px;object-fit:cover;border-radius:6px;background:#222;}
+input{flex:1;background:#1c222c;border:1px solid #2c3444;color:#e6e6e6;
+padding:10px 12px;border-radius:6px;font-size:14px;}
+input:focus{outline:none;border-color:#e8833a;}
+#bar{position:sticky;top:0;background:#14181f;padding:12px 0;z-index:9;}
+button{background:#e8833a;border:0;color:#111;padding:10px 20px;
+border-radius:6px;font-weight:700;cursor:pointer;}
+textarea{width:100%;height:220px;margin-top:12px;background:#0f1319;color:#9fe6b0;
+border:1px solid #2c3444;border-radius:6px;padding:12px;font-family:ui-monospace;font-size:12px;}
+</style>
+<div id="bar"><button onclick="gen()">SQLを作る</button>
+<textarea id="out" placeholder="ここに出てくるのをコピーしてにゃ"></textarea></div>
+<h2>秋田県｜県立中央公園ファミリーキャンプ場｜1泊300円、空港の真横で2連泊<small>post-akita-chuo-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1793283595837-hu1env.jpg" loading="lazy"><input data-url="/media/uploads/1793283595837-hu1env.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>青森県｜姉戸川温泉｜300円のぬる湯、駅前の共同浴場<small>post-anetogawa-spa</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1794573708741-p3n1f4.jpg" loading="lazy"><input data-url="/media/uploads/1794573708741-p3n1f4.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1794573876615-ojb4i7.jpg" loading="lazy"><input data-url="/media/uploads/1794573876615-ojb4i7.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>徳島県｜ハローズ 住吉店｜閉店しない店で、半額はいつ来るのか<small>post-halows-sumiyoshi</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1792851497030-ms363r.jpg" loading="lazy"><input data-url="/media/uploads/1792851497030-ms363r.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>青森県｜花岡公園キャンプ場｜無料・予約不要、国道7号そばの林間サイト<small>post-hanaoka-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795511548553-r9jkyn.jpg" loading="lazy"><input data-url="/media/uploads/1795511548553-r9jkyn.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>青森県｜いとく 浪岡店｜22時閉店、20時でも半額が生きている<small>post-itoku-namioka</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1792851259407-37hojh.jpg" loading="lazy"><input data-url="/media/uploads/1792851259407-37hojh.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>高知県｜咸陽島公園キャンプ場｜無料、だるま夕日の名所に季節外れで泊まる<small>post-kanyojima-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795513947779-348yz8.jpg" loading="lazy"><input data-url="/media/uploads/1795513947779-348yz8.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1793280711361-xw04fx.jpg" loading="lazy"><input data-url="/media/uploads/1793280711361-xw04fx.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>北海道｜クッチャロ湖畔キャンプ場｜400円で宗谷を巡る拠点にする<small>post-kutcharo-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795512424111-9nedww.jpg" loading="lazy"><input data-url="/media/uploads/1795512424111-9nedww.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795512513634-4wkdp2.jpg" loading="lazy"><input data-url="/media/uploads/1795512513634-4wkdp2.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1793186869580-ucux2c.jpg" loading="lazy"><input data-url="/media/uploads/1793186869580-ucux2c.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>岩手県｜マイヤ 大船渡IC店｜三陸道の買い出し拠点として優秀<small>post-maiya-ofunato</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1792851305187-b1hsg2.jpg" loading="lazy"><input data-url="/media/uploads/1792851305187-b1hsg2.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>徳島県｜美濃田の淵キャンプ場｜無料・予約不要、吉野川のほとりで四国の初日<small>post-minodanofuchi-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1793536010179-6vy1bj.jpg" loading="lazy"><input data-url="/media/uploads/1793536010179-6vy1bj.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>高知県｜宮の前公園キャンプ場｜無料・予約不要、仁淀川のほとりで前泊<small>post-miyanomae-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1793537579109-0xv1tf.jpg" loading="lazy"><input data-url="/media/uploads/1793537579109-0xv1tf.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>長野県｜妙琴公園キャンプ場｜4回通っている無料キャンプ場<small>post-myokin-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795511745951-z33p8e.jpg" loading="lazy"><input data-url="/media/uploads/1795511745951-z33p8e.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795511756159-fxf2sj.jpg" loading="lazy"><input data-url="/media/uploads/1795511756159-fxf2sj.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>長野県｜みのわ温泉ながたの湯｜JAF割450円、伊那谷のぬるぬる湯にもう5回<small>post-nagata-no-yu</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1794185043281-meuh70.jpg" loading="lazy"><input data-url="/media/uploads/1794185043281-meuh70.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>愛媛県｜鈍川せせらぎ交流館｜今治市営の優良温泉施設、560円<small>post-nibukawa-spa</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795515059540-5ckeoo.jpg" loading="lazy"><input data-url="/media/uploads/1795515059540-5ckeoo.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1794651862194-3n1go7.jpg" loading="lazy"><input data-url="/media/uploads/1794651862194-3n1go7.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>岩手県｜スーパーオセン 本店｜人口5,500人の町に激安スーパー<small>post-osen-honten</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1792851415574-ma6ob9.jpg" loading="lazy"><input data-url="/media/uploads/1792851415574-ma6ob9.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>北海道｜北見温泉（ポンユ） 三光荘｜500円でpH9.6、38℃のぬる湯に沈む<small>post-ponyu-spa</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1794721994950-19x1cs.jpg" loading="lazy"><input data-url="/media/uploads/1794721994950-19x1cs.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>青森県｜ポパイ温泉｜380円のモール泉、露天もサウナも打たせ湯もある<small>post-popai-spa</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1794615136963-zot7fa.jpg" loading="lazy"><input data-url="/media/uploads/1794615136963-zot7fa.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>山形県｜庄内夕日の丘オートキャンプ場｜入場料440円で泊まれるフリーサイト<small>post-shonai-yuhi-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795511882072-wscn0u.jpg" loading="lazy"><input data-url="/media/uploads/1795511882072-wscn0u.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795511890336-qtkvsm.jpg" loading="lazy"><input data-url="/media/uploads/1795511890336-qtkvsm.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>北海道｜多和平キャンプ場｜380円で雲海の上に泊まる<small>post-tawadaira-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795512186209-fy39e2.jpg" loading="lazy"><input data-url="/media/uploads/1795512186209-fy39e2.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795512196600-mmh5gn.jpg" loading="lazy"><input data-url="/media/uploads/1795512196600-mmh5gn.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795512214285-bh15iq.jpg" loading="lazy"><input data-url="/media/uploads/1795512214285-bh15iq.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>北海道｜豊富温泉ふれあいセンター｜510円で2回入れる、石油の匂いがする湯<small>post-toyotomi-spa</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1794557626646-y3nlb4.jpg" loading="lazy"><input data-url="/media/uploads/1794557626646-y3nlb4.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>宮城県｜ウジエスーパー 石巻山下店｜20時着、半額は貼られたあとだった<small>post-ujie-ishinomaki</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1792851372943-u5bqha.jpg" loading="lazy"><input data-url="/media/uploads/1792851372943-u5bqha.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>北海道｜ウスタイベ千畳岩キャンプ場｜無料・予約不要、オホーツクの岩場の横に張る<small>post-usutaibe-camp</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1794750523867-1qjc5y.jpg" loading="lazy"><input data-url="/media/uploads/1794750523867-1qjc5y.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>青森県｜天然温泉 和ノ湯｜朝風呂450円、設備満足のモール泉<small>post-wanoyu-spa</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1795305555230-btl30d.jpg" loading="lazy"><input data-url="/media/uploads/1795305555230-btl30d.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<h2>青森県｜ヤマヨ 十和田店｜地域密着の激安スーパー<small>post-yamayo-towada</small></h2>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1792850828318-fkl960.jpg" loading="lazy"><input data-url="/media/uploads/1792850828318-fkl960.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<div class="row"><img src="https://tadoreru.com/media/uploads/1792850834898-p8e6u9.jpg" loading="lazy"><input data-url="/media/uploads/1792850834898-p8e6u9.jpg" value="" placeholder="一言で（例：夜の外観。雪が降っていた）"></div>
+<script>
+function gen(){
+  const q = s => s.replace(/'/g, "''");
+  const out = [...document.querySelectorAll('input[data-url]')]
+    .filter(i => i.value.trim())
+    .map(i => `UPDATE post_photos SET caption='${q(i.value.trim())}' WHERE url='${i.dataset.url}';`)
+    .join('\n');
+  document.getElementById('out').value = out || '入力が空にゃ';
+}
+</script>
