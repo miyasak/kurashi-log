@@ -40,3 +40,7 @@ media-list.txt
 .venv/
 .old-png-keys.txt
 covers/
+notes.json
+patch_post.py
+backup-*.sql
+*.bak
