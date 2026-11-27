@@ -19,7 +19,11 @@ const BlockTitle: FC<{ eyebrow: string; title: string; accent?: string }> = ({
 )
 
 export const PostPage: FC<Props> = ({ post, html, related, linked, series, settings }) => {
-  const { html: bodyHtml, toc } = buildToc(html)  
+  const { html: bodyHtml, toc } = buildToc(html)
+  const relMatch = bodyHtml.match(/<h2[^>]*>関連リンク<\/h2>/)
+  const relIdx = relMatch ? bodyHtml.indexOf(relMatch[0]) : -1
+  const bodyMain = relIdx >= 0 ? bodyHtml.slice(0, relIdx) : bodyHtml
+  const bodyLinks = relIdx >= 0 ? bodyHtml.slice(relIdx) : ''  
   const cat = CATEGORY_MAP[post.category]
   const hasGeo = post.lat != null && post.lng != null
   /** Googleマップのリンク先。スポットが2件以上ある記事は経路（ルート）で開く */
@@ -213,7 +217,7 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
                 {/* 本文 */}
                 <div
                   class={`post-body ${post.summary || toc.length >= 3 || (post.photos && post.photos.length) ? 'mt-8' : ''}`}
-                  dangerouslySetInnerHTML={{ __html: bodyHtml }}
+                  dangerouslySetInnerHTML={{ __html: bodyMain }}
                 ></div>
 
                 {/* 路面 / 注意事項 */}
@@ -223,8 +227,12 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
                       <i class="fa-solid fa-triangle-exclamation text-[10.5px]"></i>
                       Road Note
                     </p>
-                    <p class="mt-2 text-[14px] leading-[1.85] text-ink">{post.road_note}</p>
+                    <p class="mt-2 whitespace-pre-line text-[14px] leading-[1.85] text-ink">{post.road_note}</p>
                   </div>
+                ) : null}
+
+                {bodyLinks ? (
+                  <div class="post-body mt-7" dangerouslySetInnerHTML={{ __html: bodyLinks }}></div>
                 ) : null}
 
                 {/* タグ */}
