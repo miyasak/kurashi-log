@@ -353,6 +353,7 @@ export const placeLabel = (cat?: string) =>
 /* 旧slug → 新slug。URL整理時の301リダイレクト用。
    slugを変えたらここに1行足す。 */
 export const SLUG_REDIRECTS: Record<string, string> = {
+  'post-akishima-iida': 'post-iida-2026-day1',
   'post-mvyz3spd': 'post-matsuyama-saijo',
   'post-mtzu8ga8': 'post-asset-1oku-plan',
   'nav-down': 'post-orukan-nav-down',
