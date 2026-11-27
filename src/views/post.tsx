@@ -231,10 +231,6 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
                   </div>
                 ) : null}
 
-                {bodyLinks ? (
-                  <div class="post-body mt-7" dangerouslySetInnerHTML={{ __html: bodyLinks }}></div>
-                ) : null}
-
                 {/* タグ */}
                 {post.tags && post.tags.length ? (
                   <div class="mt-7 flex flex-wrap gap-1.5">
@@ -280,6 +276,9 @@ export const PostPage: FC<Props> = ({ post, html, related, linked, series, setti
                       </ArrowLink>
                     </p>
                   </section>
+                ) : null}
+                {bodyLinks ? (
+                  <div class="post-body mt-10" dangerouslySetInnerHTML={{ __html: bodyLinks }}></div>
                 ) : null}
                 {/* 免責文（全記事の末尾に自動挿入） */}
                 {disclaimerOf(post.category, settings) ? (
